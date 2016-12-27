@@ -17,7 +17,7 @@
                #:puri
                #:hunchentoot
                #:cl-who
-               #:sli-hunchentools
+               #:hunchentools
                #:parenscript)
   :components ((:file "package")
                (:file "util")
