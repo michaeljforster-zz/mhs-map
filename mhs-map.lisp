@@ -21,49 +21,54 @@
                 (static-uri-base #u"http://127.0.0.1:4242/mhs-map/static/")
                 (mhs-base-uri #u"http://www.mhs.mb.ca/docs/sites/")
                 (mhs-sites-uri #u"http://www.mhs.mb.ca/docs/sites/index.shtml"))
-  (unless *my-acceptor*
-    (setf hunchentoot:*catch-errors-p* (not debugp)
-          hunchentoot:*show-lisp-errors-p* debugp
-          hunchentoot:*show-lisp-backtraces-p* debugp
-          hunchentoot:*tmp-directory* #p"/var/tmp/hunchentoot/") ; /tmp too small
-    (setf *username* username)
-    (setf *password* password)
-    (setf *pg-database* pg-database)
-    (setf *pg-user* pg-user)
-    (setf *pg-password* pg-password)
-    (setf *pg-host* pg-host)
-    (setf *http-port* http-port)
-    (setf *http-private-host* http-private-host)
-    (setf *http-private-port* http-private-port)
-    (setf *http-private-protocol* http-private-protocol)
-    (setf *http-session-max-time* http-session-max-time)
-    (setf *static-uri-base* static-uri-base)
-    (setf *mhs-base-uri* mhs-base-uri)
-    (setf *mhs-sites-uri* mhs-sites-uri)
+  (when (null *my-acceptor*)
+    (if debugp
+        (setf hunchentoot:*catch-errors-p* nil
+              hunchentoot:*show-lisp-errors-p* t
+              hunchentoot:*show-lisp-backtraces-p* t)
+        (setf hunchentoot:*catch-errors-p* t
+              hunchentoot:*show-lisp-errors-p* nil
+              hunchentoot:*show-lisp-backtraces-p* nil))
+    (setf *username* username
+          *password* password
+          *pg-database* pg-database
+          *pg-user* pg-user
+          *pg-password* pg-password
+          *pg-host* pg-host
+          *http-port* http-port
+          *http-private-host* http-private-host
+          *http-private-port* http-private-port
+          *http-private-protocol* http-private-protocol
+          *http-session-max-time* http-session-max-time
+          *static-uri-base* static-uri-base
+          *mhs-base-uri* mhs-base-uri
+          *mhs-sites-uri* mhs-sites-uri)
     (push (hunchentoot:create-folder-dispatcher-and-handler
            "/mhs-map/static/"
            (merge-pathnames #p"static/" app-config:*base-directory*))
           hunchentoot:*dispatch-table*)
+    (setf hunchentoot:*tmp-directory* #p"/var/tmp/hunchentoot/")
     (setf *my-acceptor*
 	  (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
 					    :port *http-port*)))))
 
 (defun stop ()
-  (when *my-acceptor*
+  (unless (null *my-acceptor*)
     (hunchentoot:stop *my-acceptor*)
     (setf hunchentoot:*dispatch-table* (last hunchentoot:*dispatch-table*))
-    (setf *pg-database* nil)
-    (setf *pg-user* nil)
-    (setf *pg-password* nil)
-    (setf *pg-host* nil)
-    (setf *http-port* nil)
-    (setf *http-private-host* nil)
-    (setf *http-private-port* nil)
-    (setf *http-private-protocol* nil)
-    (setf *http-session-max-time* nil)
-    (setf *static-uri-base* nil)
-    (setf *mhs-base-uri* nil)
-    (setf *mhs-sites-uri* nil)
+    (setf *pg-database* nil
+          *pg-user* nil
+          *pg-password* nil
+          *pg-host* nil
+          *http-port* nil
+          *http-private-host* nil
+          *http-private-port* nil
+          *http-private-protocol* nil
+          *http-session-max-time* nil
+          *static-uri-base* nil
+          *mhs-base-uri* nil
+          *mhs-sites-uri* nil)
+    (setf hunchentoot:*tmp-directory* nil)
     (setf *my-acceptor* nil)))
 
 (defun set-handler (signo handler)
