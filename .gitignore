@@ -1,0 +1,6 @@
+*~
+\#*
+*.fasl
+scratch.*
+attic/
+build/

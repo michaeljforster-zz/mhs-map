@@ -1,0 +1,32 @@
+;;;; geojson.lisp
+
+(in-package #:mhs-map)
+
+(defun geojson-encode-site (site stream)
+  (json:with-object (stream)
+    (json:encode-object-member :type "Feature" stream)
+    (json:as-object-member (:geometry stream)
+      (json:with-object (stream)
+        (json:encode-object-member :type "Point" stream)
+        (json:as-object-member (:coordinates stream)
+          (json:with-array (stream)
+            ;; GeoJSON X, Y coordinates are longitude, latitude, respectively
+            (json:encode-array-member (site-s-lng site) stream)
+            (json:encode-array-member (site-s-lat site) stream)))))
+    (json:as-object-member (:properties stream)
+      (json:with-object (stream)
+        (json:encode-object-member :s-no (site-s-no site) stream)
+        (json:encode-object-member :s-name (site-s-name site) stream)
+        (json:encode-object-member :m-name (site-m-name site) stream)
+        (json:encode-object-member :s-address (site-s-address site) stream)
+        (json:encode-object-member :st-name (site-st-name site) stream)
+        (json:encode-object-member :s-url (princ-to-string (site-s-url site)) stream)))))
+
+(defun geojson-encode-sites (sites stream)
+  (json:with-object (stream)
+    (json:encode-object-member :type "FeatureCollection" stream)
+    (json:as-object-member (:features stream)
+      (json:with-array (stream)
+        (dolist (site sites)
+          (json:as-array-member (stream)
+            (geojson-encode-site site stream)))))))

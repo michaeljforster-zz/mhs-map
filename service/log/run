@@ -1,0 +1,2 @@
+#!/bin/sh
+exec envdir ./env sh -c 'exec setuidgid ${UIDGID} multilog t ${NUM} ${SIZE} ./main'

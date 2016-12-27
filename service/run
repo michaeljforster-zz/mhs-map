@@ -1,0 +1,4 @@
+#!/bin/sh
+exec 2>&1
+echo "*** Starting service mhs-map..."
+exec envdir ./env sh -c 'exec setuidgid ${UIDGID} ./mhs-map'
