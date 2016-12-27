@@ -7,7 +7,6 @@
   :version "0.2"
   :serial t
   :depends-on (#:sb-posix
-               #:swank
                #:alexandria
                #:flexi-streams
                #:fare-csv
@@ -49,8 +48,7 @@
            #:*http-private-port*
            #:*http-private-protocol*
            #:*http-session-max-time*
-           #:*static-uri-base*
-           #:*swank-port*))
+           #:*static-uri-base*))
 
 (defun app-config::getenv (name)
   (sb-unix::posix-getenv name))
@@ -99,6 +97,3 @@
 
 (defparameter app-config:*static-uri-base*
   (app-config::getenv "STATICURIBASE"))
-
-(defparameter app-config:*swank-port*
-  (parse-integer (app-config::getenv "SWANKPORT")))

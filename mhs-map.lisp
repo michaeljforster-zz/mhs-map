@@ -44,7 +44,5 @@
   (set-handler sb-posix:sighup #'signal-handler)
   (set-handler sb-posix:sigint #'signal-handler)
   (set-handler sb-posix:sigterm #'signal-handler)
-  (setf swank:*log-output* nil)
-  (swank:create-server :port app-config:*swank-port* :dont-close t)
   (start)
   (loop (sleep 1)))
