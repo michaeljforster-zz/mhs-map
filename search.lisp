@@ -37,7 +37,7 @@
           (:div :class "clearfix" :id "page-box"
                 (:div :class "clearfix" :id "page-header-box"
                       (:div :id "page-header-title-box"
-                            (:a :href (princ-to-string (puri:uri app-config:*mhs-sites-uri*))
+                            (:a :href (princ-to-string (puri:uri *mhs-sites-uri*))
                                 :id "page-header-link"
                                 (cl-who:esc *app-title*))
                             ": Map Search"))
@@ -123,7 +123,7 @@
                                                              (if (puri:uri= s-url #u"")
                                                                  (cl-who:esc s-name)
                                                                  (cl-who:htm
-                                                                  (:a :href (princ-to-string (puri:merge-uris s-url (puri:uri app-config:*mhs-base-uri*)))
+                                                                  (:a :href (princ-to-string (puri:merge-uris s-url (puri:uri *mhs-base-uri*)))
                                                                       :target "_blank"
                                                                       (cl-who:esc s-name))))))
                                                       (:td :class "data-browser-data-column data-browser-left-column"

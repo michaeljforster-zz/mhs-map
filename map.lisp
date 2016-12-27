@@ -46,7 +46,7 @@
                                                                                                              spd-no-p
                                                                                                              smd-no-p
                                                                                                              t))))
-                      (defvar *mhs-base-uri* ,(princ-to-string (puri:uri app-config:*mhs-base-uri*)))
+                      (defvar *mhs-base-uri* ,(princ-to-string (puri:uri *mhs-base-uri*)))
                       (defvar *icons-uri* ,(princ-to-string (static-uri "mhs-map/images/icons/")))
                       (defvar *features-json-uri*
                         ,(princ-to-string (puri:copy-uri *features-json-uri*

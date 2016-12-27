@@ -34,66 +34,7 @@
                (:file "mhs-map")))
 
 (defpackage #:app-config
-  (:export #:*base-directory*
-           #:*username*
-           #:*password*
-           #:*mhs-base-uri*
-           #:*mhs-sites-uri*
-           #:*pg-database*
-           #:*pg-user*
-           #:*pg-password*
-           #:*pg-host*
-           #:*http-port*
-           #:*http-private-host*
-           #:*http-private-port*
-           #:*http-private-protocol*
-           #:*http-session-max-time*
-           #:*static-uri-base*))
-
-(defun app-config::getenv (name)
-  (sb-unix::posix-getenv name))
+  (:export #:*base-directory*))
 
 (defparameter app-config:*base-directory* 
   (make-pathname :name nil :type nil :defaults *load-truename*))
-
-(defparameter app-config:*username*
-  (app-config::getenv "USERNAME"))
-
-(defparameter app-config:*password*
-  (app-config::getenv "PASSWORD"))
-
-(defparameter app-config:*mhs-base-uri*
-  (app-config::getenv "MHSBASEURI"))
-
-(defparameter app-config:*mhs-sites-uri*
-  (app-config::getenv "MHSSITESURI"))
-
-(defparameter app-config:*pg-database*
-  (app-config::getenv "PGDATABASE"))
-
-(defparameter app-config:*pg-user*
-  (app-config::getenv "PGUSER"))
-
-(defparameter app-config:*pg-password*
-  (app-config::getenv "PGPASSWORD"))
-
-(defparameter app-config:*pg-host*
-  (app-config::getenv "PGHOST"))
-
-(defparameter app-config:*http-port*
-  (parse-integer (app-config::getenv "HTTPPORT")))
-
-(defparameter app-config:*http-private-host*
-  (app-config::getenv "HTTPPRIVATEHOST"))
-
-(defparameter app-config:*http-private-port*
-  (parse-integer (app-config::getenv "HTTPPRIVATEPORT")))
-
-(defparameter app-config:*http-private-protocol*
-  (intern (string-upcase (app-config::getenv "HTTPPRIVATEPROTOCOL")) :keyword))
-
-(defparameter app-config:*http-session-max-time*
-  (parse-integer (app-config::getenv "HTTPSESSIONMAXTIME")))
-
-(defparameter app-config:*static-uri-base*
-  (app-config::getenv "STATICURIBASE"))

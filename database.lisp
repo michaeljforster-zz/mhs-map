@@ -5,10 +5,10 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defmacro with-database-connection (&body body)
     `(postmodern:with-connection
-         (list app-config:*pg-database*
-               app-config:*pg-user*
-               app-config:*pg-password*
-               app-config:*pg-host*)
+         (list *pg-database*
+               *pg-user*
+               *pg-password*
+               *pg-host*)
        ,@body)))
 
 (defun db-null-to-nil (x)

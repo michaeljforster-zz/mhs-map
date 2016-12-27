@@ -2,16 +2,28 @@
 
 (in-package #:mhs-map)
 
+(defun getenv (name)
+  (sb-unix::posix-getenv name))
+
+(defun getenv-integer (name)
+  (parse-integer (getenv name)))
+
+(defun getenv-keyword (name)
+  (intern (string-upcase (getenv "HTTPPRIVATEPROTOCOL")) :keyword))
+
+(defun getenv-uri (name)
+  (puri:uri (getenv name)))
+
 (defun redirect (uri)
   (hunchentoot:redirect (princ-to-string uri)
-                        :host app-config:*http-private-host*
-                        :port app-config:*http-private-port*
-                        :protocol app-config:*http-private-protocol*))
+                        :host *http-private-host*
+                        :port *http-private-port*
+                        :protocol *http-private-protocol*))
 
 (let (static-uri-base)
   (defun static-uri (relative-uri)
     (when (null static-uri-base)
-      (setf static-uri-base (puri:uri app-config:*static-uri-base*)))
+      (setf static-uri-base (puri:uri *static-uri-base*)))
     (puri:merge-uris relative-uri static-uri-base)))
 
 (defun pair (list)
