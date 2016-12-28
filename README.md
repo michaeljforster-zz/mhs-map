@@ -16,44 +16,29 @@ mhs-map is not available for download via
 [ASDF](https://www.common-lisp.net/project/asdf/) where to find the
 system definition.
 
-## Loading and Running Interactively
+## Running Interactively
 
-Before loading the system, the following following Unix environment
-variables must be set:
-
-    USERNAME
-    PASSWORD
-    MHSBASEURI
-    MHSSITESURI
-    PGDATABASE
-    PGUSER
-    PGPASSWORD
-    PGHOST
-    HTTPPORT
-    HTTPPRIVATEHOST
-    HTTPSESSIONMAXTIME
-    STATICURIBASE
-    SWANKPORT
-
-As a convenience, either the SETDEVENV or SETENV file can be read and
-executed in the current Bourne Shell context to set those variables
-for development or production, respectively:
-
-```shell
-. SETDEVENV
-```
-
-```shell
-. SETENV
-```
-
-Having set the environment variables and started Common Lisp, the
-system can be loaded with quicklisp and run interactively:
+Having started Common Lisp, the system can be loaded with quicklisp
+and run interactively:
 
 ```lisp
 (ql:quickload "mhs-map")
 ...
-(mhs-map:start)
+(mhs-map:start :debugp t
+               :username "foo"
+               :password ""
+               :pg-database "mhs_map"
+               :pg-user "postgres"
+               :pg-password ""
+               :pg-host "localhost"
+               :http-port 4242
+               :http-private-host "127.0.0.1"
+               :http-private-port 4242
+               :http-private-protocol :http
+               :http-session-max-time 10800
+               :static-uri-base #u"http://127.0.0.1:4242/mhs-map/static/"
+               :mhs-base-uri #u"http://www.mhs.mb.ca/docs/sites/"
+               :mhs-sites-uri #u"http://www.mhs.mb.ca/docs/sites/index.shtml")
 ```
 
 Once running, mhs-map can be stopped interactively:
@@ -62,20 +47,18 @@ Once running, mhs-map can be stopped interactively:
 (mhs-map:stop)
 ```
 
-## Building and Running as a Service
+## Building an Executable to Run as a Service
 
-mhs-map can be built as an SBCL executable using
-[buildapp](http://www.xach.com/lisp/buildapp/) using the provided
-buildapp.sh script. The executable and build related files will be
-placed in $BUILD_DIR as defined in buildapp.sh.
+mhs-map can be built as an SBCL executable
+using [buildapp](http://www.xach.com/lisp/buildapp/) using the
+provided build.sh script and a prepared workspace directory tree as
+follows:
 
 ```shell
-./buildapp.sh
+mkdir -p /tmp/workspace/src /tmp/workspace/build
+export WORKSPACE=/tmp/workspace
+./build.sh
 ```
 
-A [daemontools](http://cr.yp.to/daemontools.html) supervision and
-logging directory tree, _service_, is provided. The required Unix
-environment variables are set according to the files in the _env_ and
-_log/env_ subdirectories. The _run_ and _log/run_ scripts hard code
-some paths, and there are symbolic links to the mhs-map executable and
-logging directory, both of which can be changed as needed.
+Upon a successful build, the executable will be saved as
+$WORKSPACE/build/mhs-map.
