@@ -175,7 +175,7 @@
              'spd-no ; don't coalesce, use NIL
              'smd-no ; don't coalesce, use NIL
              :from 'site
-             :left-join 'site-geometry :using ('s-no)
+             :left-join 'site-geo :using ('s-no)
              :left-join 'site-national-designation :using ('s-no)
              :left-join 'site-provincial-designation :using ('s-no)
              :left-join 'site-municipal-designation :using ('s-no)

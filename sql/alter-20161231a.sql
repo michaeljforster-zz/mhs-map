@@ -1,90 +1,26 @@
--- create.sql
+-- alter-20161231a.sql
 
+drop function clear_import ();
 
---
--- Schemas
---
+drop function import_site ( a_s_no integer
+                            , a_s_name site_name
+                            , a_m_name municipality_name
+                            , a_s_address text
+                            , a_st_names anyarray
+                            , a_s_keyword varchar
+                            , a_s_url varchar
+                            , a_s_published_p boolean
+                            , a_lat double precision
+                            , a_lng double precision
+                            , a_snd_no varchar
+                            , a_spd_no varchar
+                            , a_smd_no varchar );
 
-create schema import;
+drop function complete_import ();
 
+drop table site_geometry;
+drop table import.site_geometry;
 
---
--- Types
---
-
-create domain municipality_name varchar (255);
-create domain site_name varchar(255);
-create domain site_type_name varchar(255);
-
-
---
--- Functions
---
-
-create function array_to_set(anyarray) returns setof anyelement as $$
-  select a[i] from (select generate_subscripts($1, 1) as i, $1 as a) as t;
-$$ language sql immutable;
-
-
---
--- Base Relvars
---
-
-create table municipality
-( m_name municipality_name primary key
-);
-
-create table import.municipality
-( m_name municipality_name primary key
-);
-
-create table site_type
-( st_name site_type_name primary key
-);
-
-insert into site_type (st_name) values
-  ('Featured site')   -- 1
-, ('Museum/Archives') -- 2
-, ('Building')        -- 3
-, ('Monument')        -- 4
-, ('Cemetery')        -- 5
-, ('Location')        -- 6
-, ('Other')           -- 7
-;
-
-create table site
-( s_no integer primary key
-, s_name site_name not null                                                   -- site
-, m_name municipality_name not null references municipality on update cascade -- describe
-, s_address text not null                                                     -- location, number
-, st_name site_type_name not null references site_type on update cascade      -- first sitetype
-, s_keyword varchar(255) not null
-, s_url varchar(255) not null                                                 -- file
-, s_published_p boolean not null                                              -- site, preceded by </A> if record hyperlink is to be ignored
-);
-
-create table site_secondary_site_type
-( s_no integer not null references site on update cascade
-, st_name site_type_name not null references site_type on update cascade       -- sitetype
-);
-
-create table import.site
-( s_no integer primary key
-, s_name site_name not null                                                          -- site
-, m_name municipality_name not null references import.municipality on update cascade -- describe
-, s_address text not null                                                            -- location, number
-, st_name site_type_name not null references site_type on update cascade             -- first sitetype
-, s_keyword varchar(255) not null
-, s_url varchar(255) not null                                                        -- file
-, s_published_p boolean not null                                                     -- site, preceded by </A> if record hyperlink is to be ignored
-);
-
-create table import.site_secondary_site_type
-( s_no integer not null references import.site on update cascade
-, st_name site_type_name not null references site_type on update cascade       -- sitetype
-);
-
--- lat, lng
 create table site_geo
 ( s_no integer primary key references site on update cascade on delete cascade
 , sg_geometry geometry not null
@@ -94,53 +30,11 @@ create table site_geo
 create index site_geo_sg_geometry_gix on site_geo using gist (sg_geometry);
 create index site_geo_sg_geography_gix on site_geo using gist (sg_geography);
 
--- lat, lng
 create table import.site_geo
 ( s_no integer primary key references import.site on update cascade on delete cascade
 , sg_geometry geometry not null
 , sg_geography geography not null
 );
-
--- N
-create table site_national_designation
-( s_no integer primary key references site on update cascade on delete cascade
-, snd_no varchar(255) not null 
-);
-
--- N
-create table import.site_national_designation
-( s_no integer primary key references import.site on update cascade on delete cascade
-, snd_no varchar(255) not null 
-);
-
--- P
-create table site_provincial_designation
-( s_no integer primary key references site on update cascade on delete cascade
-, spd_no varchar(255) not null 
-);
-
--- P
-create table import.site_provincial_designation
-( s_no integer primary key references import.site on update cascade on delete cascade
-, spd_no varchar(255) not null 
-);
-
--- M
-create table site_municipal_designation
-( s_no integer primary key references site on update cascade on delete cascade
-, smd_no varchar(255) not null 
-);
-
--- M
-create table import.site_municipal_designation
-( s_no integer primary key references import.site on update cascade on delete cascade
-, smd_no varchar(255) not null 
-);
-
-
---
--- Derived Relvars and Functions
---
 
 create function clear_import () returns void as $$
 begin
