@@ -2,17 +2,8 @@
 
 (in-package #:mhs-map)
 
-(defun render-map (string1
-                   op2
-                   string2
-                   op3
-                   string3
-                   m-name
-                   st-name
-                   snd-no-p
-                   spd-no-p
-                   smd-no-p)
-  (cl-who:with-html-output-to-string (*standard-output* nil :prologue t)
+(defun render-map (&optional (stream *standard-output*))
+  (cl-who:with-html-output (stream nil :prologue t)
     (:html
      (:head
       (:meta :name "viewport" :content "initial-scale=1.0, user-scalable=no")
@@ -32,34 +23,11 @@
                (cl-who:str
                 (ps:ps*
                  `(progn
-                    (defvar *default-lat-lng* (ps:new (ps:chain google maps (-lat-lng ,@*default-lat-lng*))))
-                    (defvar *default-zoom* ,*default-zoom*)
-                    (defvar *current-search-uri* ,(princ-to-string (puri:copy-uri *search-uri*
-                                                                                  :query (format-uri-query (or string1 "")
-                                                                                                           (or op2 :and)
-                                                                                                           (or string2 "")
-                                                                                                           (or op3 :and)
-                                                                                                           (or string3 "")
-                                                                                                           (or m-name "")
-                                                                                                           (or st-name "")
-                                                                                                           snd-no-p
-                                                                                                           spd-no-p
-                                                                                                           smd-no-p
-                                                                                                           t))))
+                    (defvar *current-center* (ps:new (ps:chain google maps (-lat-lng ,@*default-center*))))
+                    (defvar *current-zoom* ,*default-zoom*)
                     (defvar *mhs-base-uri* ,(princ-to-string (puri:uri *mhs-base-uri*)))
                     (defvar *icons-uri* ,(princ-to-string (static-uri "mhs-map/images/icons/")))
-                    (defvar *features-json-uri*
-                      ,(princ-to-string (puri:copy-uri *features-json-uri*
-                                                       :query (format-uri-query (or string1 "")
-                                                                                (or op2 :and)
-                                                                                (or string2 "")
-                                                                                (or op3 :and)
-                                                                                (or string3 "")
-                                                                                (or m-name "")
-                                                                                (or st-name "")
-                                                                                snd-no-p
-                                                                                spd-no-p
-                                                                                smd-no-p))))))))
+                    (defvar *features-json-uri* ,(princ-to-string *features-json-uri*))))))
       (:script :type "text/javascript"
                (cl-who:str
                 (ps:ps
@@ -75,7 +43,7 @@
                                               (alert (+ "Error: "
                                                         (ps:chain xhr (get-status-text))))))))))
                   
-                  (defvar *map-options* (ps:create :center *default-lat-lng* :zoom *default-zoom*))
+                  (defvar *map-options* (ps:create :center *current-center* :zoom *current-zoom*))
 
                   (defvar *map* nil)
 
@@ -92,11 +60,7 @@
                         (setf (ps:@ control-text inner-h-t-m-l)
                               (ps:who-ps-html (:span :class "link-control-content-text" "Search for sites")))
                         (ps:chain control-ui (append-child control-text))
-                        (ps:chain google maps event
-                                  (add-dom-listener control-ui
-                                                    "click"
-                                                    #'(lambda ()
-                                                        (ps:chain window location (assign *current-search-uri*))))))))
+                        )))
 
                   (defun site-type-icon-uri (st-name)
                     (cond ((= st-name "Featured site") "icon_feature.png")
@@ -107,6 +71,13 @@
                           ((= st-name "Location") "icon_location.png")
                           ((= st-name "Other") "icon_other.png")))
 
+                  (defvar *markers* '())
+                  
+                  (defun delete-markers ()
+                    (dolist (marker *markers*)
+                      (ps:chain marker (set-map nil)))
+                    (setf *markers* '()))
+                  
                   (defun add-marker (map feature)
                     (let ((coordinates (ps:@ feature geometry coordinates))
                           (properties (ps:@ feature properties)))
@@ -142,7 +113,8 @@
                                                     "click"
                                                     #'(lambda (event)
                                                         (ps:chain *info-window* (set-content content))
-                                                        (ps:chain *info-window* (open map marker))))))))))
+                                                        (ps:chain *info-window* (open map marker)))))
+                            (ps:chain *markers* (push marker)))))))
 
                   (defun initialize ()
                     (setf *map*
@@ -158,36 +130,25 @@
                         (let ((foo (ps:getprop *map* 'controls position)))
                           (ps:chain foo (push control-div)))))
 
-                    (xhr-get-json *features-json-uri*
-                                  #'(lambda (results)
-                                      (dolist (feature (ps:@ results features))
-                                        (add-marker *map* feature)))))
+                    (ps:chain *map* (add-listener "idle"
+                                                  #'(lambda ()
+                                                      (setf *current-center* (ps:chain *map* (get-center)))
+                                                      (setf *current-zoom* (ps:chain *map* (get-zoom)))
+                                                      (xhr-get-json *features-json-uri*
+                                                                    #'(lambda (results)
+                                                                        (ps:chain console (log "Deleting markers"))
+                                                                        (delete-markers)
+                                                                        (ps:chain console (log "Populating markers"))
+                                                                        (dolist (feature (ps:@ results features))
+                                                                          (add-marker *map* feature))))))))
 
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
       (:div :id "map-canvas")))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))
-    ((submit :parameter-type 'parse-non-empty-string :request-type :get)
-     (string1 :parameter-type 'parse-non-empty-string :request-type :get)
-     (op2 :parameter-type 'keyword :request-type :get)
-     (string2 :parameter-type 'parse-non-empty-string :request-type :get)
-     (op3 :parameter-type 'keyword :request-type :get)
-     (string3 :parameter-type 'parse-non-empty-string :request-type :get)
-     (m-name :parameter-type 'parse-non-empty-string :request-type :get)
-     (st-name :parameter-type 'parse-non-empty-string :request-type :get)
-     (snd-no-p :parameter-type 'boolean :request-type :get)
-     (spd-no-p :parameter-type 'boolean :request-type :get)
-     (smd-no-p :parameter-type 'boolean :request-type :get))
+    ()
   (hunchentoot:no-cache)
   (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
-  (render-map string1
-              op2
-              string2
-              op3
-              string3
-              m-name
-              st-name
-              snd-no-p
-              spd-no-p
-              smd-no-p))
+  (with-output-to-string (stream)
+    (render-map stream)))
