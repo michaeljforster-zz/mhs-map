@@ -130,6 +130,22 @@
                         (let ((foo (ps:getprop *map* 'controls position)))
                           (ps:chain foo (push control-div)))))
 
+                    ;; https://developers.google.com/maps/documentation/javascript/events
+                    ;;
+                    ;; Note:
+                    ;; 
+                    ;;     Tip: If you're trying to detect a change in
+                    ;;     the viewport, be sure to use the specific
+                    ;;     bounds_changed event rather than
+                    ;;     constituent zoom_changed and center_changed
+                    ;;     events. ...
+                    ;;
+                    ;; However, because bounds_changed appears to fire
+                    ;; repeatedly during a pan or resize, we listen
+                    ;; for the idle event instead:
+                    ;; 
+                    ;;     This event is fired when the map becomes
+                    ;;     idle after panning or zooming.
                     (ps:chain *map* (add-listener "idle"
                                                   #'(lambda ()
                                                       (setf *current-center* (ps:chain *map* (get-center)))
