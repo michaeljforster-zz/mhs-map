@@ -21,15 +21,15 @@ body {
     height: 100%;
 }
 
-.info-window-content-box {}
+.site-info-window-content-box {}
 
-.info-window-site-name-box {}
+.site-info-window-site-name-box {}
 
-.info-window-site-link {}
+.site-info-window-site-link {}
 
-.info-window-site-address-box {}
+.site-info-window-site-address-box {}
 
-.info-window-site-address-text {}
+.site-info-window-site-address-text {}
 
 .link-control-box {
     margin: 5px;
