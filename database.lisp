@@ -131,6 +131,50 @@
 (postmodern:defprepared select-municipality-names
     (:order-by (:select 'm-name :from 'municipality) 'm-name) :column)
 
+(postmodernity:defpgstruct site
+  s-no
+  s-name
+  m-name
+  s-address
+  st-name
+  (s-url #'(lambda (string) (ignore-errors (puri:parse-uri string))))
+  s-published-p
+  s-lat
+  s-lng
+  snd-no
+  spd-no
+  smd-no)
+
+(postmodern:defprepared-with-names select-sites-within-bounds (south west north east)
+  ((:order-by
+    (:select 's-no
+             's-name
+             'm-name
+             's-address
+             'st-name
+             's-url
+             's-published-p
+             (:as (:st-y 'sg-geometry) 's-lat) ; yes, Y is latitude; don't coalesce, use NIL
+             (:as (:st-x 'sg-geometry) 's-lng) ; yes, X is longitude; don't coalesce, use NIL
+             'snd-no ; don't coalesce, use NIL
+             'spd-no ; don't coalesce, use NIL
+             'smd-no ; don't coalesce, use NIL
+             :from 'site
+             :left-join 'site-geo :using ('s-no)
+             :left-join 'site-national-designation :using ('s-no)
+             :left-join 'site-provincial-designation :using ('s-no)
+             :left-join 'site-municipal-designation :using ('s-no)
+             :where (:st-within 'sg-geometry
+                                (:st-setsrid (:st-makebox2d (:st-point '$1 '$2) ; lower left
+                                                            (:st-point '$3 '$4)) ; upper right
+                                             4326)))
+    's-name)
+   south
+   west
+   north
+   east)
+  :sites)
+
 (defun make-binary-logical-form (a op b)
   (if (not (and op b))
       a
