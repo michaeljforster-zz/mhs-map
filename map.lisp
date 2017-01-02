@@ -122,7 +122,32 @@
                        "Bounds: " bounds "<br>"
                        "Sites within bounds:  " count))
 
+
+                  (defun geolocation-success (position)
+                    (let ((lat (ps:@ position coords latitude))
+                          (lng (ps:@ position coords longitude))
+                          (altitude (ps:@ position coords altitude))
+                          (accuracy (ps:@ position coords accuracy)))
+                      (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat=" lat " lng=" lng)))))
+
+                  (defun geolocation-error (error)
+                    (ps:chain console (log (+ "GEOLOCATION ERROR: " (ps:@ error code) ": " (ps:@ error message)))))
+
+                  (defvar *geolocation-options*
+                    (ps:create :enable-high-accuracy 'true
+                               :maximum-age 30000
+                               :timeout 27000))
+                  
                   (defun initialize ()
+                    (if (ps:@ navigator geolocation)
+                        (ps:chain
+                         navigator
+                         geolocation
+                         (get-current-position #'geolocation-success
+                                               #'geolocation-error
+                                               *geolocation-options*))
+                        (ps:chain console (log "no geolocation")))
+                    
                     (setf *map*
                           (ps:new (ps:chain google maps
                                             (-map (ps:chain document
