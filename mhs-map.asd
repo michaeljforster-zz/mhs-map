@@ -8,12 +8,14 @@
   :serial t
   :depends-on (#:sb-posix
                #:alexandria
+               #:wu-decimal
                #:flexi-streams
                #:fare-csv
                #:parse-number
 	       #:split-sequence
                #:cl-json
                #:postmodern
+               #:postmodernity
                #:puri
                #:hunchentoot
                #:cl-who
