@@ -129,7 +129,7 @@
                         (setf (ps:@ control-div index) 1)
                         (let ((foo (ps:getprop *map* 'controls position)))
                           (ps:chain foo (push control-div)))))
-
+                    
                     ;; https://developers.google.com/maps/documentation/javascript/events
                     ;;
                     ;; Note:
@@ -150,13 +150,24 @@
                                                   #'(lambda ()
                                                       (setf *current-center* (ps:chain *map* (get-center)))
                                                       (setf *current-zoom* (ps:chain *map* (get-zoom)))
-                                                      (xhr-get-json *features-json-uri*
-                                                                    #'(lambda (results)
-                                                                        (ps:chain console (log "Deleting markers"))
-                                                                        (delete-markers)
-                                                                        (ps:chain console (log "Populating markers"))
-                                                                        (dolist (feature (ps:@ results features))
-                                                                          (add-marker *map* feature))))))))
+                                                      (let ((bounds (ps:chain *map* (get-bounds))))
+                                                        (let ((south-west (ps:chain bounds (get-south-west)))
+                                                              (north-east (ps:chain bounds (get-north-east))))
+                                                          (let ((south (ps:chain south-west (lng)))
+                                                                (west (ps:chain south-west (lat)))
+                                                                (north (ps:chain north-east (lng)))
+                                                                (east (ps:chain north-east (lat))))
+                                                            (xhr-get-json (+ *features-json-uri*
+                                                                             "?south=" south
+                                                                             "&west=" west
+                                                                             "&north=" north
+                                                                             "&east=" east)
+                                                                          #'(lambda (results)
+                                                                              (ps:chain console (log "Deleting markers"))
+                                                                              (delete-markers)
+                                                                              (ps:chain console (log (+ "Populating markers: " (ps:@ results features length))))
+                                                                              (dolist (feature (ps:@ results features))
+                                                                                (add-marker *map* feature)))))))))))
 
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
