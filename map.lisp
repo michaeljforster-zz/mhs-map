@@ -71,13 +71,24 @@
                           ((= st-name "Location") "icon_location.png")
                           ((= st-name "Other") "icon_other.png")))
 
+
+                  (defvar *my-marker* nil)
+
+                  (defun set-my-marker (map position)
+                    (when (null *my-marker*)
+                      (setf *my-marker*
+                            (ps:new (ps:chain google
+                                              maps
+                                              (-marker (ps:create :map map))))))
+                    (ps:chain *my-marker* (set-position position)))
+
                   (defvar *markers* '())
                   
                   (defun delete-markers ()
                     (dolist (marker *markers*)
                       (ps:chain marker (set-map nil)))
                     (setf *markers* '()))
-                  
+
                   (defun add-marker (map feature)
                     (let ((coordinates (ps:@ feature geometry coordinates))
                           (properties (ps:@ feature properties)))
@@ -122,30 +133,45 @@
                        "Bounds: " bounds "<br>"
                        "Sites within bounds:  " count))
 
-
+                  ;; (let ((results-info-window (ps:new (ps:chain google maps (-info-window (ps:create))))))
+                  ;;   (ps:chain results-info-window
+                  ;;             (set-content (format-results-info-window-content *current-center*
+                  ;;                                                              *current-zoom*
+                  ;;                                                              bounds
+                  ;;                                                              sites-count)))
+                  ;;   (ps:chain results-info-window (set-position *current-center*))
+                  ;;   (ps:chain results-info-window (open *map*)))
+                  
                   (defun geolocation-success (position)
                     (let ((lat (ps:@ position coords latitude))
                           (lng (ps:@ position coords longitude))
                           (altitude (ps:@ position coords altitude))
                           (accuracy (ps:@ position coords accuracy)))
+                      (set-my-marker *map* (ps:new (ps:chain google maps (-lat-lng (ps:create :lat lat :lng lng)))))
                       (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat=" lat " lng=" lng)))))
 
                   (defun geolocation-error (error)
                     (ps:chain console (log (+ "GEOLOCATION ERROR: " (ps:@ error code) ": " (ps:@ error message)))))
 
                   (defvar *geolocation-options*
-                    (ps:create :enable-high-accuracy 'true
-                               :maximum-age 30000
-                               :timeout 27000))
+                    (ps:create
+                     ;; :enable-high-accuracy 'true
+                     ;; :maximum-age 10000
+                     ;; :timeout 27000
+                     ))
+
+                  (defvar *watch-id* nil)
                   
                   (defun initialize ()
+
                     (if (ps:@ navigator geolocation)
-                        (ps:chain
-                         navigator
-                         geolocation
-                         (get-current-position #'geolocation-success
+                        (setf *watch-id*
+                              (ps:chain
+                               navigator
+                               geolocation
+                               (watch-position #'geolocation-success
                                                #'geolocation-error
-                                               *geolocation-options*))
+                                               *geolocation-options*)))
                         (ps:chain console (log "no geolocation")))
                     
                     (setf *map*
@@ -161,54 +187,46 @@
                         (let ((foo (ps:getprop *map* 'controls position)))
                           (ps:chain foo (push control-div)))))
 
-                    (let ((results-info-window (ps:new (ps:chain google maps (-info-window (ps:create))))))
-
-                      ;; https://developers.google.com/maps/documentation/javascript/events
-                      ;;
-                      ;; Note:
-                      ;; 
-                      ;;     Tip: If you're trying to detect a change in
-                      ;;     the viewport, be sure to use the specific
-                      ;;     bounds_changed event rather than
-                      ;;     constituent zoom_changed and center_changed
-                      ;;     events. ...
-                      ;;
-                      ;; However, because bounds_changed appears to fire
-                      ;; repeatedly during a pan or resize, we listen
-                      ;; for the idle event instead:
-                      ;; 
-                      ;;     This event is fired when the map becomes
-                      ;;     idle after panning or zooming.
-                      (ps:chain *map* (add-listener "idle"
-                                                    #'(lambda ()
-                                                        (setf *current-center* (ps:chain *map* (get-center)))
-                                                        (setf *current-zoom* (ps:chain *map* (get-zoom)))
-                                                        (let ((bounds (ps:chain *map* (get-bounds))))
-                                                          (let ((south-west (ps:chain bounds (get-south-west)))
-                                                                (north-east (ps:chain bounds (get-north-east))))
-                                                            (let ((south (ps:chain south-west (lng)))
-                                                                  (west (ps:chain south-west (lat)))
-                                                                  (north (ps:chain north-east (lng)))
-                                                                  (east (ps:chain north-east (lat))))
-                                                              (xhr-get-json (+ *features-json-uri*
-                                                                               "?south=" south
-                                                                               "&west=" west
-                                                                               "&north=" north
-                                                                               "&east=" east)
-                                                                            #'(lambda (results)
-                                                                                (ps:chain console (log "Deleting markers"))
-                                                                                (delete-markers)
-                                                                                (let ((sites-count (ps:@ results features length)))
-                                                                                  (ps:chain console (log (+ "Populating markers: " sites-count)))
-                                                                                  (dolist (feature (ps:@ results features))
-                                                                                    (add-marker *map* feature))
-                                                                                  (ps:chain results-info-window
-                                                                                            (set-content (format-results-info-window-content *current-center*
-                                                                                                                                             *current-zoom*
-                                                                                                                                             bounds
-                                                                                                                                             sites-count)))
-                                                                                  (ps:chain results-info-window (set-position *current-center*))
-                                                                                  (ps:chain results-info-window (open *map*)))))))))))))
+                    ;; https://developers.google.com/maps/documentation/javascript/events
+                    ;;
+                    ;; Note:
+                    ;; 
+                    ;;     Tip: If you're trying to detect a change in
+                    ;;     the viewport, be sure to use the specific
+                    ;;     bounds_changed event rather than
+                    ;;     constituent zoom_changed and center_changed
+                    ;;     events. ...
+                    ;;
+                    ;; However, because bounds_changed appears to fire
+                    ;; repeatedly during a pan or resize, we listen
+                    ;; for the idle event instead:
+                    ;; 
+                    ;;     This event is fired when the map becomes
+                    ;;     idle after panning or zooming.
+                    (ps:chain *map* (add-listener "idle"
+                                                  #'(lambda ()
+                                                      (setf *current-center* (ps:chain *map* (get-center)))
+                                                      (setf *current-zoom* (ps:chain *map* (get-zoom)))
+                                                      (let ((bounds (ps:chain *map* (get-bounds))))
+                                                        (let ((south-west (ps:chain bounds (get-south-west)))
+                                                              (north-east (ps:chain bounds (get-north-east))))
+                                                          (let ((south (ps:chain south-west (lng)))
+                                                                (west (ps:chain south-west (lat)))
+                                                                (north (ps:chain north-east (lng)))
+                                                                (east (ps:chain north-east (lat))))
+                                                            (xhr-get-json (+ *features-json-uri*
+                                                                             "?south=" south
+                                                                             "&west=" west
+                                                                             "&north=" north
+                                                                             "&east=" east)
+                                                                          #'(lambda (results)
+                                                                              (ps:chain console (log "Deleting markers"))
+                                                                              (delete-markers)
+                                                                              (let ((sites-count (ps:@ results features length)))
+                                                                                (ps:chain console (log (+ "Populating markers: " sites-count " center=" *current-center* " zoom=" *current-zoom* " bounds=" bounds)))
+                                                                                ;; (dolist (feature (ps:@ results features))
+                                                                                ;;   (add-marker *map* feature))
+                                                                                ))))))))))
 
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
