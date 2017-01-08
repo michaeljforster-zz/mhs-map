@@ -62,12 +62,6 @@
   (setf (ps:@ this url) url)
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
-  (setf (ps:@ this for-each)
-        #'(lambda (fn)
-            (ps:chain this sites (for-each fn))))
-  (setf (ps:@ this map)
-        #'(lambda (fn)
-            (ps:chain this sites (map fn))))
   this)
 
 (defun sites-unsubscribe-all (sites)
@@ -163,6 +157,7 @@
                          ;; TODO isolate this in a renderer for the site model
                          (ps:chain this
                                    model
+                                   sites
                                    (map #'(lambda (site)
                                             (ps:who-ps-html
                                              (:li (+ (ps:@ site s-no)
@@ -170,6 +165,54 @@
                                                      (ps:@ site s-name))))))
                                    (join ""))))))))
   this)
+
+(defun site-icon-uri (site)
+  (let ((st-name (ps:@ site st-name)))
+    (cond ((= st-name "Featured site") "icon_feature.png")
+          ((= st-name "Museum/Archives") "icon_museum.png")
+          ((= st-name "Building") "icon_building.png")
+          ((= st-name "Monument") "icon_monument.png")
+          ((= st-name "Cemetery") "icon_cemetery.png")
+          ((= st-name "Location") "icon_location.png")
+          ((= st-name "Other") "icon_other.png"))))
+
+(defun site-marker-icon (site)
+  (ps:create :url (+ *icons-uri* (site-icon-uri site))
+             :size (ps:new (ps:chain google maps (-size 32 32)))
+             :origin (ps:new (ps:chain google maps (-point 0 0)))
+             :anchor (ps:new (ps:chain google maps (-point 16 16)))))
+
+(defun site-link-title (site)
+  (let ((s-address (ps:@ site s-address)))
+    (+ (ps:@ site s-name)
+       ", "
+       (ps:@ site m-name)
+       (if (= s-address "") "" (+ ", " s-address)))))
+
+(defun site-link-url (site)
+  (+ *mhs-base-uri* (ps:@ site s-url)))
+
+(defun map-add-marker (google-map site-info-window site)
+  (let ((marker (ps:new
+                 (ps:chain google maps
+                           (-marker (ps:create :position (ps:@ site lat-lng)
+                                               :icon (site-marker-icon site)
+                                               :title (ps:@ site s-name)
+                                               :map google-map)))))
+        (content (ps:who-ps-html
+                  (:div :class "site-info-window-content-box"
+                        (:div :class "site-info-window-site-name-box"
+                              (:a :class "site-info-window-site-link"
+                                  :href (site-link-url site)
+                                  :target "_blank"
+                                  (site-link-title site)))))))
+    (ps:chain google maps event
+              (add-listener marker
+                            "click"
+                            #'(lambda (event)
+                                (ps:chain site-info-window (set-content content))
+                                (ps:chain site-info-window (open google-map marker)))))
+    marker))
 
 (defun -map-widget (model jqelement center zoom geolocation-options)
   (setf (ps:@ this model) model)
@@ -183,6 +226,16 @@
         (ps:new (ps:chain google maps
                           (-map (ps:@ jqelement 0)
                                 (ps:create :center center :zoom zoom)))))
+  (setf (ps:@ this update-widget)
+        #'(lambda ()
+            (dolist (marker (ps:@ this markers))
+              (ps:chain marker (set-map nil)))
+            (setf (ps:@ this markers length) 0)
+            (dolist (site (ps:@ this model sites))
+              (let ((marker (map-add-marker (ps:@ this map)
+                                            (ps:@ this site-info-window)
+                                            site)))
+                (ps:chain this markers (push marker))))))
   this)
 
 ;; TODO
@@ -244,64 +297,6 @@
 ;;       (alert "Geolocation is not available.")))
 
 
-(defun site-icon-uri (site)
-  (let ((st-name (ps:@ site st-name)))
-    (cond ((= st-name "Featured site") "icon_feature.png")
-          ((= st-name "Museum/Archives") "icon_museum.png")
-          ((= st-name "Building") "icon_building.png")
-          ((= st-name "Monument") "icon_monument.png")
-          ((= st-name "Cemetery") "icon_cemetery.png")
-          ((= st-name "Location") "icon_location.png")
-          ((= st-name "Other") "icon_other.png"))))
-
-(defun site-marker-icon (site)
-  (ps:create :url (+ *icons-uri* (site-icon-uri site))
-             :size (ps:new (ps:chain google maps (-size 32 32)))
-             :origin (ps:new (ps:chain google maps (-point 0 0)))
-             :anchor (ps:new (ps:chain google maps (-point 16 16)))))
-
-(defun site-link-title (site)
-  (let ((s-address (ps:@ site s-address)))
-    (+ (ps:@ site s-name)
-       ", "
-       (ps:@ site m-name)
-       (if (= s-address "") "" (+ ", " s-address)))))
-
-(defun site-link-url (site)
-  (+ *mhs-base-uri* (ps:@ site s-url)))
-
-(defun map-add-marker (map site)
-  (let ((marker (ps:new
-                 (ps:chain google maps
-                           (-marker (ps:create :position (ps:@ site lat-lng)
-                                               :icon (site-marker-icon site)
-                                               :title (ps:@ site s-name)
-                                               :map (ps:@ map map))))))
-        (content (ps:who-ps-html
-                  (:div :class "site-info-window-content-box"
-                        (:div :class "site-info-window-site-name-box"
-                              (:a :class "site-info-window-site-link"
-                                  :href (site-link-url site)
-                                  :target "_blank"
-                                  (site-link-title site)))))))
-    (ps:chain google maps event
-              (add-listener marker
-                            "click"
-                            #'(lambda (event)
-                                (ps:chain map site-info-window (set-content content))
-                                (ps:chain map site-info-window (open (ps:@ map map) marker)))))
-    (ps:chain (ps:@ map markers) (push marker))))
-
-(defun map-delete-markers (map)
-  (dolist (marker (ps:@ map markers))
-    (ps:chain marker (set-map nil)))
-  (setf (ps:@ map markers length) 0))
-
-(defun map-add-markers (map)
-  (ps:chain map
-            model 
-            (for-each #'(lambda (site)
-                          (map-add-marker map site)))))
 
 (defvar *sites* nil)
 (defvar *list-widget* nil)
@@ -346,9 +341,7 @@
   (sites-subscribe-to-populated *sites*
                                 #'(lambda ()
                                     (ps:chain console (log (+ "MAP notified " (ps:@ *sites* sites length))))
-                                    ;; TODO update-view - delete/add markers
-                                    (map-delete-markers *map*)
-                                    (map-add-markers *map*)))
+                                    (update-widget *map*)))
                                      
   ;; TODO (map-start-updating-markers map)
   ;; TODO (map-start-geolocation map)
