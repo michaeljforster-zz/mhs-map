@@ -25,6 +25,11 @@
                  `(progn
                     (defvar *current-center* (ps:new (ps:chain google maps (-lat-lng ,@*default-center*))))
                     (defvar *current-zoom* ,*default-zoom*)
+                    (defvar *geolocation-options*
+                      (ps:create
+                       :enable-high-accuracy 'true
+                       :maximum-age 10000
+                       :timeout 27000))
                     (defvar *mhs-base-uri* ,(princ-to-string (puri:uri *mhs-base-uri*)))
                     (defvar *icons-uri* ,(princ-to-string (static-uri "mhs-map/images/icons/")))
                     (defvar *features-json-uri* ,(princ-to-string *features-json-uri*))))))
