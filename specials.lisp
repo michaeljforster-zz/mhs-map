@@ -11,7 +11,7 @@
 
 ;;; Map defaults
 
-(defparameter *default-center* (list 51.4 -98.4)) ; rough center of southern MB
+(defparameter *default-center* (list 54.0 -98.4)) ; rough center of MB
 (defparameter *default-zoom* 6) ; 8 okay for desktop, 7 better for iPad, 6 better for Android/iPhone
 
 ;;; URIs
