@@ -73,39 +73,39 @@ function sitesPopulate(sites) {
 function updateWidget(widget) {
     return widget.updateWidget();
 };
-function ListWidget(model, jqobject) {
+function ListWidget(model, jqelement) {
     this.model = model;
-    this.jqobject = jqobject;
+    this.jqelement = jqelement;
     this.updateWidget = function () {
-        this.jqobject.empty();
-        return this.jqobject.html(['<UL>', this.model.map(function (site) {
+        this.jqelement.empty();
+        return this.jqelement.html(['<UL>', this.model.map(function (site) {
             return ['<LI>', site.sNo + ' - ' + site.sName, '</LI>'].join('');
         }).join(''), '</UL>'].join(''));
     };
     return this;
 };
-function MapWidget(model, element, center, zoom, geolocationOptions) {
+function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.model = model;
     this.markers = [];
     this.siteInfoWindow = new google.maps.InfoWindow({  });
-    this.map = new google.maps.Map(element, { 'center' : center, 'zoom' : zoom });
+    this.map = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     return this;
 };
 function siteIconUri(site) {
-    var stName302 = site.stName;
-    if (stName302 === 'Featured site') {
+    var stName306 = site.stName;
+    if (stName306 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName302 === 'Museum/Archives') {
+    } else if (stName306 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName302 === 'Building') {
+    } else if (stName306 === 'Building') {
         return 'icon_building.png';
-    } else if (stName302 === 'Monument') {
+    } else if (stName306 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName302 === 'Cemetery') {
+    } else if (stName306 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName302 === 'Location') {
+    } else if (stName306 === 'Location') {
         return 'icon_location.png';
-    } else if (stName302 === 'Other') {
+    } else if (stName306 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -117,8 +117,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress303 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress303 === '' ? '' : ', ' + sAddress303);
+    var sAddress307 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress307 === '' ? '' : ', ' + sAddress307);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -137,8 +137,8 @@ function mapAddMarker(map, site) {
     return map.markers.push(marker);
 };
 function mapDeleteMarkers(map) {
-    for (var marker = null, _js_arrvar305 = map.markers, _js_idx304 = 0; _js_idx304 < _js_arrvar305.length; _js_idx304 += 1) {
-        marker = _js_arrvar305[_js_idx304];
+    for (var marker = null, _js_arrvar309 = map.markers, _js_idx308 = 0; _js_idx308 < _js_arrvar309.length; _js_idx308 += 1) {
+        marker = _js_arrvar309[_js_idx308];
         marker.setMap(null);
     };
     return map.markers.length = 0;
@@ -168,7 +168,7 @@ function initialize() {
         console.log('LIST-WIDGET notified ' + SITES.sites.length);
         return updateWidget(LISTWIDGET);
     });
-    MAP = new MapWidget(SITES, jQuery('#map-canvas')[0], CURRENTCENTER, CURRENTZOOM, GEOLOCATIONOPTIONS);
+    MAP = new MapWidget(SITES, jQuery('#map-canvas'), CURRENTCENTER, CURRENTZOOM, GEOLOCATIONOPTIONS);
     sitesSubscribeToPopulated(SITES, function () {
         console.log('MAP notified ' + SITES.sites.length);
         mapDeleteMarkers(MAP);
