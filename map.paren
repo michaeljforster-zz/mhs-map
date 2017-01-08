@@ -20,10 +20,15 @@
           (west (ps:chain south-west (lng)))
           (north (ps:chain north-east (lat)))
           (east (ps:chain north-east (lng))))
+      ;; TODO REMOVE...
+      (ps:chain console (log (+ "BOUNDS: " bounds
+                                " SOUTH-EAST: " south-west
+                                " SOUTH: " south
+                                " WEST: " west
+                                " NORTH-EAST: " north-east
+                                " NORTH: " north
+                                " EAST: " east)))
       (values south west north east))))
-
-
-
 
 ;;; Models
 
@@ -71,9 +76,13 @@
   sites)
 
 ;; TODO alternate queries (PLAN.md) ...
-(defun sites-populate (sites)
+(defun sites-populate (sites south west north east)
   ;; TODO again, need better error logging and handling ...
-  (xhr-get-json (ps:@ sites url)
+  (xhr-get-json (+ (ps:@ sites url)
+                   "?south=" south
+                   "&west=" west
+                   "&north=" north
+                   "&east=" east)
                 #'(lambda (results)
                     (setf (ps:@ sites sites) (array))
                     (ps:chain results
@@ -84,31 +93,7 @@
                                                       (push (feature-to-site feature))))))
                     (sites-announce-populated sites)
                     sites)))
-;; TODO map view - subscribe to model announcements and add/delete markers
-;; TODO map view - map pan, zoom, etc. should tell model to requery/update
-;; TODO updating markers on 'idle'
-;; (defun map-start-updating-markers (map)
-;;   (ps:chain map
-;;             (add-listener "idle"
-;;                           #'(lambda ()
-;;                               (let ((center (ps:chain map (get-center)))
-;;                                     (zoom (ps:chain map (get-zoom)))
-;;                                     (bounds (ps:chain map (get-bounds))))
-;;                                 (multiple-value-bind (south west north east)
-;;                                     (decode-bounds bounds)
-;;   TODO see SITES-POPULATE...
-;;                                   (xhr-get-json (+ *features-json-uri*
-;;                                                    "?south=" south
-;;                                                    "&west=" west
-;;                                                    "&north=" north
-;;                                                    "&east=" east)
-;;                                                 #'(lambda (results)
-;;                                                     (map-delete-markers)
-;;                                                     (let ((sites-count (ps:@ results features length)))
-;;                                                       (ps:chain console (log (+ "Populating markers: " sites-count " center=" *current-center* " zoom=" *current-zoom* " bounds=" bounds)))
-;;                                                       ;; (dolist (feature (ps:@ results features))
-;;                                                       ;;   (map-add-marker map feature))
-;;                                                       )))))))))
+
 
 ;; (defun log-foo ()
 ;;   (let ((sites-count (ps:@ results features length)))
@@ -232,6 +217,15 @@
                 (ps:chain this markers (push marker))))))
   this)
 
+(defun map-widget-start-updating-markers (map-widget)
+  (ps:chain map-widget
+            google-map
+            (add-listener "idle"
+                          #'(lambda ()
+                              (multiple-value-bind (south west north east)
+                                  (decode-bounds (ps:chain *map* google-map (get-bounds)))
+                                (sites-populate *sites* south west north east))))))
+
 ;; TODO
 ;; (let ((control-div (ps:chain document (create-element "div"))))
 ;;   (let ((control (ps:new (link-control control-div)))
@@ -313,7 +307,7 @@
 
 
   (setf *sites*
-        (ps:new (-sites "http://127.0.0.1:4242/mhs-map/features.json?west=49.620877447334585&south=-100.59589233398435&east=50.09805541906053&north=-99.2802795410156")))
+        (ps:new (-sites "http://127.0.0.1:4242/mhs-map/features.json")))
 
 
   (setf *list-widget*
@@ -337,7 +331,7 @@
                                     (ps:chain console (log (+ "MAP notified " (ps:@ *sites* sites length))))
                                     (update-widget *map*)))
                                      
-  ;; TODO (map-start-updating-markers map)
+  (map-widget-start-updating-markers *map*)
   ;; TODO (map-start-geolocation map)
-  
-  (sites-populate *sites*))
+
+  )
