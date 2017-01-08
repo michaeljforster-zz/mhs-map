@@ -147,16 +147,13 @@
 
 ;; TODO search/list view - should tell model to requery/update
 
-;; TODO rename "render" to something like "update-view" and treat it
-;; as a generic function that works for map-widget, too
-
-(defun render (widget)
-  (ps:chain widget (render)))
+(defun update-widget (widget)
+  (ps:chain widget (update-widget)))
 
 (defun -list-widget (model jqobject)
   (setf (ps:@ this model) model)
   (setf (ps:@ this jqobject) jqobject)
-  (setf (ps:@ this render)
+  (setf (ps:@ this update-widget)
         #'(lambda ()
             (ps:chain this jqobject (empty))
             (ps:chain this jqobject
@@ -352,7 +349,7 @@
                                     (ps:chain console (log (+ "LIST-WIDGET notified " (ps:@ *sites* sites length))))
                                     ;; TODO update-view
                                     ;; TODO supply the jqobject via the constructor
-                                    (render *list-widget*)
+                                    (update-widget *list-widget*)
                                     ))
 
   (setf *map*
