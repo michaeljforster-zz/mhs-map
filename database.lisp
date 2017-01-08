@@ -165,9 +165,15 @@
              :left-join 'site-provincial-designation :using ('s-no)
              :left-join 'site-municipal-designation :using ('s-no)
              :where (:st-within 'sg-geometry
-                                (:st-setsrid (:st-makebox2d (:st-point '$1 '$2) ; lower left
-                                                            (:st-point '$3 '$4)) ; upper right
-                                             4326)))
+                                (:st-setsrid
+                                 ;; NOTE: st-makebox2d (lower-left-point upper-right-point)
+                                 ;; NOTE: st-makepoint (x/lng y/lat)
+                                 (:st-makebox2d
+                                  ;; NOTE: st-makepoint (west south)
+                                  (:st-makepoint '$2 '$1)
+                                  ;; NOTE: st-makepoint (east north)
+                                  (:st-makepoint '$4 '$3))
+                                 4326)))
     's-name)
    south
    west

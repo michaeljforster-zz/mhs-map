@@ -12,12 +12,6 @@
             (fail #'(lambda (jq-x-h-r text-status error-thrown)
                       (alert (+ "Error: " text-status))))))
 
-
-
-;; TODO >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-;; TODO review bounds -> ... -> postgis points and 2dbox
-;; TODO seems to be wrong, looking at the search results
-;; HINT could be in the database.lisp/sql where we compare to _geometry_ (x,y)
 ;; https://developers.google.com/maps/documentation/javascript/3.exp/reference#LatLngBounds
 (defun decode-bounds (bounds)
   (let ((south-west (ps:chain bounds (get-south-west)))
