@@ -171,18 +171,7 @@
                                    (join ""))))))))
   this)
 
-
-
-
-
-
-
-
-
-
-;; HERE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-(defun -map (model element center zoom geolocation-options)
+(defun -map-widget (model element center zoom geolocation-options)
   (setf (ps:@ this model) model)
   ;; TODO (setf (ps:@ this geolocation-options) geolocation-options)
   ;; TODO (setf (ps:@ this geolocation-marker) nil)
@@ -195,8 +184,6 @@
                           (-map element
                                 (ps:create :center center :zoom zoom)))))
   this)
-
-
 
 ;; TODO
 ;; (let ((control-div (ps:chain document (create-element "div"))))
@@ -347,17 +334,14 @@
   (sites-subscribe-to-populated *sites*
                                 #'(lambda ()
                                     (ps:chain console (log (+ "LIST-WIDGET notified " (ps:@ *sites* sites length))))
-                                    ;; TODO update-view
-                                    ;; TODO supply the jqobject via the constructor
-                                    (update-widget *list-widget*)
-                                    ))
+                                    (update-widget *list-widget*)))
 
   (setf *map*
-        (ps:new (-map *sites*
-                      (ps:@ (j-query "#map-canvas") 0)
-                      *current-center*
-                      *current-zoom*
-                      *geolocation-options*)))
+        (ps:new (-map-widget *sites*
+                             (ps:@ (j-query "#map-canvas") 0)
+                             *current-center*
+                             *current-zoom*
+                             *geolocation-options*)))
 
   (sites-subscribe-to-populated *sites*
                                 #'(lambda ()
