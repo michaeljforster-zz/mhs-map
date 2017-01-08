@@ -316,10 +316,8 @@
                        (ps:chain (j-query "#list-view") (hide))
                        (ps:chain (j-query "#map-canvas") (show)))))
 
-
   (setf *sites*
-        (ps:new (-sites "http://127.0.0.1:4242/mhs-map/features.json")))
-
+        (ps:new (-sites *features-json-uri*)))
 
   (setf *list-widget*
         (ps:new (-list-widget *sites*
@@ -343,6 +341,4 @@
                                     (update-widget *map*)))
                                      
   (map-widget-start-updating-markers *map*)
-  (map-widget-start-geolocation *map*)
-
-  )
+  (map-widget-start-geolocation *map*))
