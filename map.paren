@@ -17,7 +17,7 @@
 ;; TODO >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;; TODO review bounds -> ... -> postgis points and 2dbox
 ;; TODO seems to be wrong, looking at the search results
-
+;; HINT could be in the database.lisp/sql where we compare to _geometry_ (x,y)
 ;; https://developers.google.com/maps/documentation/javascript/3.exp/reference#LatLngBounds
 (defun decode-bounds (bounds)
   (let ((south-west (ps:chain bounds (get-south-west)))
@@ -145,16 +145,21 @@
 
 
 
-(defun render (widget jqobject)
-  (ps:chain widget (render jqobject)))
-
 ;; TODO search/list view - should tell model to requery/update
-(defun -list-widget (model)
+
+;; TODO rename "render" to something like "update-view" and treat it
+;; as a generic function that works for map-widget, too
+
+(defun render (widget)
+  (ps:chain widget (render)))
+
+(defun -list-widget (model jqobject)
   (setf (ps:@ this model) model)
+  (setf (ps:@ this jqobject) jqobject)
   (setf (ps:@ this render)
-        #'(lambda (jqobject)
-            (ps:chain jqobject (empty))
-            (ps:chain jqobject
+        #'(lambda ()
+            (ps:chain this jqobject (empty))
+            (ps:chain this jqobject
                       (html
                        (ps:who-ps-html
                         (:ul
@@ -339,12 +344,16 @@
 
 
   (setf *list-widget*
-        (ps:new (-list-widget *sites*)))
+        (ps:new (-list-widget *sites*
+                              (j-query "#list-view"))))
 
   (sites-subscribe-to-populated *sites*
                                 #'(lambda ()
                                     (ps:chain console (log (+ "LIST-WIDGET notified " (ps:@ *sites* sites length))))
-                                    (render *list-widget* (j-query "#list-view"))))
+                                    ;; TODO update-view
+                                    ;; TODO supply the jqobject via the constructor
+                                    (render *list-widget*)
+                                    ))
 
   (setf *map*
         (ps:new (-map *sites*
@@ -356,6 +365,7 @@
   (sites-subscribe-to-populated *sites*
                                 #'(lambda ()
                                     (ps:chain console (log (+ "MAP notified " (ps:@ *sites* sites length))))
+                                    ;; TODO update-view - delete/add markers
                                     (map-delete-markers *map*)
                                     (map-add-markers *map*)))
                                      

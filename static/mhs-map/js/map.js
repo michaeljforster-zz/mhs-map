@@ -70,14 +70,15 @@ function sitesPopulate(sites) {
         return sites;
     });
 };
-function render(widget, jqobject) {
-    return widget.render(jqobject);
+function render(widget) {
+    return widget.render();
 };
-function ListWidget(model) {
+function ListWidget(model, jqobject) {
     this.model = model;
-    this.render = function (jqobject) {
-        jqobject.empty();
-        return jqobject.html(['<UL>', this.model.map(function (site) {
+    this.jqobject = jqobject;
+    this.render = function () {
+        this.jqobject.empty();
+        return this.jqobject.html(['<UL>', this.model.map(function (site) {
             return ['<LI>', site.sNo + ' - ' + site.sName, '</LI>'].join('');
         }).join(''), '</UL>'].join(''));
     };
@@ -91,20 +92,20 @@ function Map(model, element, center, zoom, geolocationOptions) {
     return this;
 };
 function siteIconUri(site) {
-    var stName286 = site.stName;
-    if (stName286 === 'Featured site') {
+    var stName290 = site.stName;
+    if (stName290 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName286 === 'Museum/Archives') {
+    } else if (stName290 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName286 === 'Building') {
+    } else if (stName290 === 'Building') {
         return 'icon_building.png';
-    } else if (stName286 === 'Monument') {
+    } else if (stName290 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName286 === 'Cemetery') {
+    } else if (stName290 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName286 === 'Location') {
+    } else if (stName290 === 'Location') {
         return 'icon_location.png';
-    } else if (stName286 === 'Other') {
+    } else if (stName290 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -116,8 +117,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress287 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress287 === '' ? '' : ', ' + sAddress287);
+    var sAddress291 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress291 === '' ? '' : ', ' + sAddress291);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -136,8 +137,8 @@ function mapAddMarker(map, site) {
     return map.markers.push(marker);
 };
 function mapDeleteMarkers(map) {
-    for (var marker = null, _js_arrvar289 = map.markers, _js_idx288 = 0; _js_idx288 < _js_arrvar289.length; _js_idx288 += 1) {
-        marker = _js_arrvar289[_js_idx288];
+    for (var marker = null, _js_arrvar293 = map.markers, _js_idx292 = 0; _js_idx292 < _js_arrvar293.length; _js_idx292 += 1) {
+        marker = _js_arrvar293[_js_idx292];
         marker.setMap(null);
     };
     return map.markers.length = 0;
@@ -162,10 +163,10 @@ function initialize() {
         return jQuery('#map-canvas').show();
     });
     SITES = new Sites('http://127.0.0.1:4242/mhs-map/features.json?west=49.620877447334585&south=-100.59589233398435&east=50.09805541906053&north=-99.2802795410156');
-    LISTWIDGET = new ListWidget(SITES);
+    LISTWIDGET = new ListWidget(SITES, jQuery('#list-view'));
     sitesSubscribeToPopulated(SITES, function () {
         console.log('LIST-WIDGET notified ' + SITES.sites.length);
-        return render(LISTWIDGET, jQuery('#list-view'));
+        return render(LISTWIDGET);
     });
     MAP = new Map(SITES, jQuery('#map-canvas')[0], CURRENTCENTER, CURRENTZOOM, GEOLOCATIONOPTIONS);
     sitesSubscribeToPopulated(SITES, function () {
