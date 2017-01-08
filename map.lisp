@@ -17,14 +17,7 @@
       (:title (cl-who:esc (concatenate 'string *app-title* ": Map")))
       (:link :rel "stylesheet" :type "text/css" :href (static-uri "mhs-map/css/reset.css"))
       (:link :rel "stylesheet" :type "text/css" :href (static-uri "mhs-map/css/map.css"))
-      (:script :type "text/javascript" :src (static-uri "closure-library/closure/goog/base.js"))
-      (:script :type "text/javascript"
-               (cl-who:str
-                (ps:ps
-                  (ps:chain goog (require "goog.dom"))
-                  (ps:chain goog (require "goog.events"))
-                  (ps:chain goog (require "goog.events.EventType"))
-                  (ps:chain goog (require "goog.net.XhrIo")))))
+      (:script :type "text/javascript" :src "static/vendor/jquery-3.1.1.js")
       (:script :type "text/javascript" :src "https://maps.googleapis.com/maps/api/js?v=3&sensor=false")
       (:script :type "text/javascript"
                (cl-who:str

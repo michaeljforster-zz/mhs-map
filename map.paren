@@ -3,15 +3,11 @@
 (in-package #:mhs-map)
 
 (defun xhr-get-json (url success-function)
-  (ps:chain goog net -xhr-io
-            (send url
-                  #'(lambda (event)
-                      (let ((xhr (ps:@ event target)))
-                        (if (ps:chain xhr (is-success))
-                            (funcall success-function
-                                     (ps:chain xhr (get-response-json)))
-                            (alert (+ "Error: "
-                                      (ps:chain xhr (get-status-text))))))))))
+  (ps:chain $
+            (get-j-s-o-n url success-function)
+            ;; TODO better error logging and handling
+            (fail #'(lambda (jq-x-h-r text-status error-thrown)
+                      (alert (+ "Error: " text-status))))))
 
 (defvar *map-options* (ps:create :center *current-center* :zoom *current-zoom*))
 
@@ -40,7 +36,6 @@
         ((= st-name "Cemetery") "icon_cemetery.png")
         ((= st-name "Location") "icon_location.png")
         ((= st-name "Other") "icon_other.png")))
-
 
 (defvar *my-marker* nil)
 

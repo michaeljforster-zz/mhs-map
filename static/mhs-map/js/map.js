@@ -1,7 +1,6 @@
 function xhrGetJson(url, successFunction) {
-    return goog.net.XhrIo.send(url, function (event) {
-        var xhr = event.target;
-        return xhr.isSuccess() ? successFunction(xhr.getResponseJson()) : alert('Error: ' + xhr.getStatusText());
+    return $.getJSON(url, successFunction).fail(function (jqXHR, textStatus, errorThrown) {
+        return alert('Error: ' + textStatus);
     });
 };
 var MAPOPTIONS = { 'center' : CURRENTCENTER, 'zoom' : CURRENTZOOM };
@@ -44,34 +43,34 @@ function setMyMarker(map, position) {
 };
 var MARKERS = [];
 function deleteMarkers() {
-    for (var marker = null, _js_idx1 = 0; _js_idx1 < MARKERS.length; _js_idx1 += 1) {
-        marker = MARKERS[_js_idx1];
+    for (var marker = null, _js_idx56 = 0; _js_idx56 < MARKERS.length; _js_idx56 += 1) {
+        marker = MARKERS[_js_idx56];
         marker.setMap(null);
     };
     return MARKERS = [];
 };
 function addMarker(map, feature) {
-    var coordinates2 = feature.geometry.coordinates;
-    var properties3 = feature.properties;
-    var latLng = new google.maps.LatLng(coordinates2[1], coordinates2[0]);
-    var sNo4 = properties3.sNo;
-    var sName5 = properties3.sName;
-    var mName6 = properties3.mName;
-    var sAddress7 = properties3.sAddress;
-    var stName8 = properties3.stName;
-    var sUrl9 = properties3.sUrl;
-    var icon = { 'url' : ICONSURI + siteTypeIconUri(stName8),
+    var coordinates57 = feature.geometry.coordinates;
+    var properties58 = feature.properties;
+    var latLng = new google.maps.LatLng(coordinates57[1], coordinates57[0]);
+    var sNo59 = properties58.sNo;
+    var sName60 = properties58.sName;
+    var mName61 = properties58.mName;
+    var sAddress62 = properties58.sAddress;
+    var stName63 = properties58.stName;
+    var sUrl64 = properties58.sUrl;
+    var icon = { 'url' : ICONSURI + siteTypeIconUri(stName63),
                  'size' : new google.maps.Size(32, 32),
                  'origin' : new google.maps.Point(0, 0),
                  'anchor' : new google.maps.Point(16, 16)
                };
-    var s = sName5 + ', ' + mName6 + (sAddress7 === '' ? '' : ', ' + sAddress7);
+    var s = sName60 + ', ' + mName61 + (sAddress62 === '' ? '' : ', ' + sAddress62);
     var marker = new google.maps.Marker({ 'position' : latLng,
                                           'icon' : icon,
-                                          'title' : sName5,
+                                          'title' : sName60,
                                           'map' : map
                                         });
-    var content = ['<DIV CLASS="site-info-window-content-box"><DIV CLASS="site-info-window-site-name-box"><A CLASS="site-info-window-site-link" HREF="', MHSBASEURI + sUrl9, '" TARGET="_blank">', s, '</A></DIV></DIV>'].join('');
+    var content = ['<DIV CLASS="site-info-window-content-box"><DIV CLASS="site-info-window-site-name-box"><A CLASS="site-info-window-site-link" HREF="', MHSBASEURI + sUrl64, '" TARGET="_blank">', s, '</A></DIV></DIV>'].join('');
     google.maps.event.addListener(marker, 'click', function (event) {
         SITEINFOWINDOW.setContent(content);
         return SITEINFOWINDOW.open(map, marker);
@@ -84,8 +83,8 @@ function formatResultsInfoWindowContent(center, zoom, bounds, count) {
 function geolocationSuccess(position) {
     var lat = position.coords.latitude;
     var lng = position.coords.longitude;
-    var altitude10 = position.coords.altitude;
-    var accuracy11 = position.coords.accuracy;
+    var altitude65 = position.coords.altitude;
+    var accuracy66 = position.coords.accuracy;
     setMyMarker(MAP, new google.maps.LatLng({ 'lat' : lat, 'lng' : lng }));
     return console.log('GEOLOCATION SUCCESS: lat=' + lat + ' lng=' + lng);
 };
