@@ -222,7 +222,7 @@
   (setf (ps:@ this markers) (array))
   (setf (ps:@ this site-info-window)
         (ps:new (ps:chain google maps (-info-window (ps:create)))))
-  (setf (ps:@ this map)
+  (setf (ps:@ this google-map)
         (ps:new (ps:chain google maps
                           (-map (ps:@ jqelement 0)
                                 (ps:create :center center :zoom zoom)))))
@@ -232,7 +232,7 @@
               (ps:chain marker (set-map nil)))
             (setf (ps:@ this markers length) 0)
             (dolist (site (ps:@ this model sites))
-              (let ((marker (map-add-marker (ps:@ this map)
+              (let ((marker (map-add-marker (ps:@ this google-map)
                                             (ps:@ this site-info-window)
                                             site)))
                 (ps:chain this markers (push marker))))))
@@ -345,5 +345,5 @@
                                      
   ;; TODO (map-start-updating-markers map)
   ;; TODO (map-start-geolocation map)
-
+  
   (sites-populate *sites*))

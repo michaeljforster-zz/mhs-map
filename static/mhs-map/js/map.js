@@ -79,20 +79,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName348 = site.stName;
-    if (stName348 === 'Featured site') {
+    var stName354 = site.stName;
+    if (stName354 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName348 === 'Museum/Archives') {
+    } else if (stName354 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName348 === 'Building') {
+    } else if (stName354 === 'Building') {
         return 'icon_building.png';
-    } else if (stName348 === 'Monument') {
+    } else if (stName354 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName348 === 'Cemetery') {
+    } else if (stName354 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName348 === 'Location') {
+    } else if (stName354 === 'Location') {
         return 'icon_location.png';
-    } else if (stName348 === 'Other') {
+    } else if (stName354 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -104,8 +104,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress349 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress349 === '' ? '' : ', ' + sAddress349);
+    var sAddress355 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress355 === '' ? '' : ', ' + sAddress355);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -127,16 +127,16 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.model = model;
     this.markers = [];
     this.siteInfoWindow = new google.maps.InfoWindow({  });
-    this.map = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
+    this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar353 = this.markers, _js_idx352 = 0; _js_idx352 < _js_arrvar353.length; _js_idx352 += 1) {
-            marker = _js_arrvar353[_js_idx352];
+        for (var marker = null, _js_arrvar359 = this.markers, _js_idx358 = 0; _js_idx358 < _js_arrvar359.length; _js_idx358 += 1) {
+            marker = _js_arrvar359[_js_idx358];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar351 = this.model.sites, _js_idx350 = 0; _js_idx350 < _js_arrvar351.length; _js_idx350 += 1) {
-            site = _js_arrvar351[_js_idx350];
-            var marker = mapAddMarker(this.map, this.siteInfoWindow, site);
+        for (var site = null, _js_arrvar357 = this.model.sites, _js_idx356 = 0; _js_idx356 < _js_arrvar357.length; _js_idx356 += 1) {
+            site = _js_arrvar357[_js_idx356];
+            var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
     };
