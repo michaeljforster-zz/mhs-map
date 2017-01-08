@@ -34,6 +34,9 @@
                 (ps:ps
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
+      (:button :id "list-button" "Display List")
+      (:button :id "map-button" "Display Map")
+      (:div :id "list-view")
       (:div :id "map-canvas")))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))

@@ -2,13 +2,156 @@
 
 (in-package #:mhs-map)
 
+;; TODO need better error logging and handling ...
+;; http://api.jquery.com/jQuery.ajax/
 (defun xhr-get-json (url success-function)
-  (ps:chain $
+  (ps:chain j-query
             (get-j-s-o-n url success-function)
-            ;; TODO better error logging and handling
             (fail #'(lambda (jq-x-h-r text-status error-thrown)
                       (alert (+ "Error: " text-status))))))
 
+;;; Model
+
+(defun -site (s-no s-name m-name s-address st-name s-url lat-lng)
+  (setf (ps:@ this s-no) s-no)
+  (setf (ps:@ this s-name) s-name)
+  (setf (ps:@ this m-name) m-name)
+  (setf (ps:@ this s-address) s-address)
+  (setf (ps:@ this st-name) st-name)
+  (setf (ps:@ this s-url) s-url)
+  (setf (ps:@ this lat-lng) lat-lng)
+  this)
+
+(defun feature-to-site (feature)
+  (let ((site (ps:new (-site))))
+    (setf (ps:@ site s-no) (ps:@ feature properties s-no))
+    (setf (ps:@ site s-name) (ps:@ feature properties s-name))
+    (setf (ps:@ site m-name) (ps:@ feature properties m-name))
+    (setf (ps:@ site s-address) (ps:@ feature properties s-address))
+    (setf (ps:@ site st-name) (ps:@ feature properties st-name))
+    (setf (ps:@ site s-url) (ps:@ feature properties s-url))
+    (setf (ps:@ site lat-lng)
+          (ps:new (ps:chain google
+                            maps
+                            (-lat-lng (ps:create 'lat (ps:@ feature geometry coordinates 1)
+                                                 'lng (ps:@ feature geometry coordinates 0))))))
+    site))
+
+(defun -sites (url)
+  (setf (ps:@ this url) url)
+  (setf (ps:@ this sites) (array))
+  (setf (ps:@ this subscribers) (array))
+  (setf (ps:@ this for-each)
+        #'(lambda (fn)
+            (ps:chain this sites (for-each fn))))
+  (setf (ps:@ this map)
+        #'(lambda (fn)
+            (ps:chain this sites (map fn))))
+  this)
+
+(defun unsubscribe-all (sites)
+  (setf (ps:@ this subscribers) (array))
+  sites)
+
+(defun subscribe-to-populated (sites fn)
+  (ps:chain sites subscribers (push fn))
+  sites)
+
+(defun announce-populated (sites)
+  (ps:chain sites subscribers (for-each #'(lambda (element) (funcall element sites))))
+  sites)
+
+(defun populate (sites)
+  ;; TODO again, need better error logging and handling ...
+  (xhr-get-json (ps:@ sites url)
+                #'(lambda (results)
+                    (setf (ps:@ sites sites) (array))
+                    (ps:chain results
+                              features
+                              (for-each #'(lambda (feature)
+                                            (ps:chain sites
+                                                      sites
+                                                      (push (feature-to-site feature))))))
+                    (announce-populated sites)
+                    sites)))
+
+(defun render (widget jqobject)
+  (ps:chain widget (render jqobject)))
+
+(defun -list-widget (model)
+  (setf (ps:@ this model) model)
+  (setf (ps:@ this render)
+        #'(lambda (jqobject)
+            (ps:chain jqobject (empty))
+            (ps:chain jqobject
+                      (html
+                       (ps:who-ps-html
+                        (:ul
+                         ;; TODO isolate this in a renderer for the site model
+                         (ps:chain this
+                                   model
+                                   (map #'(lambda (site)
+                                            (ps:who-ps-html
+                                             (:li (+ (ps:@ site s-no)
+                                                     " - "
+                                                     (ps:@ site s-name))))))
+                                   (join ""))))))))
+  this)
+
+
+
+
+;; TODO google-map-view - subscribe to model announcements and add/delete markers
+
+;; TODO map view - map pan, zoom, etc. should tell model to requery/update
+
+;; TODO search/list view - should tell model to requery/update
+
+;; TODO alternate queries (PLAN.md)
+
+
+(defun initialize ()
+
+  ;; TODO by default, show map, hide list
+  (ps:chain (j-query "#list-view") (show))
+  (ps:chain (j-query "#map-canvas") (hide))
+
+  (ps:chain (j-query "#list-button")
+            (click #'(lambda ()
+                       (ps:chain (j-query "#list-view") (show))
+                       (ps:chain (j-query "#map-canvas") (hide)))))
+
+  (ps:chain (j-query "#map-button")
+            (click #'(lambda ()
+                       (ps:chain (j-query "#list-view") (hide))
+                       (ps:chain (j-query "#map-canvas") (show)))))
+
+
+  (defvar *sites*
+    (ps:new (-sites "http://127.0.0.1:4242/mhs-map/features.json?west=49.620877447334585&south=-100.59589233398435&east=50.09805541906053&north=-99.2802795410156")))
+
+
+  (defvar *list-widget*
+    (ps:new (-list-widget *sites*)))
+
+  (subscribe-to-populated *sites*
+                          #'(lambda (sites)
+                              (render *list-widget* (j-query "#list-view"))))
+
+
+  ;; TODO (defvar *map-widget*
+  ;;   (ps:new (-map-widget *sites*)))
+
+  ;; (subscribe-to-populated *sites*
+  ;;                         #'(lambda (sites)
+  ;;                             (render *map-widget* (j-query "#map-canvas"))))
+
+  (populate *sites*))
+
+
+
+
+#|
 (defvar *map-options* (ps:create :center *current-center* :zoom *current-zoom*))
 
 (defvar *map* nil)
@@ -178,6 +321,7 @@
                                               (west (ps:chain south-west (lat)))
                                               (north (ps:chain north-east (lng)))
                                               (east (ps:chain north-east (lat))))
+                                          ;; TODO again, need better error logging and handling ...
                                           (xhr-get-json (+ *features-json-uri*
                                                            "?south=" south
                                                            "&west=" west
@@ -191,3 +335,4 @@
                                                               ;; (dolist (feature (ps:@ results features))
                                                               ;;   (add-marker *map* feature))
                                                               ))))))))))
+|#
