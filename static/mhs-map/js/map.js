@@ -80,20 +80,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName448 = site.stName;
-    if (stName448 === 'Featured site') {
+    var stName483 = site.stName;
+    if (stName483 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName448 === 'Museum/Archives') {
+    } else if (stName483 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName448 === 'Building') {
+    } else if (stName483 === 'Building') {
         return 'icon_building.png';
-    } else if (stName448 === 'Monument') {
+    } else if (stName483 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName448 === 'Cemetery') {
+    } else if (stName483 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName448 === 'Location') {
+    } else if (stName483 === 'Location') {
         return 'icon_location.png';
-    } else if (stName448 === 'Other') {
+    } else if (stName483 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -105,8 +105,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress449 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress449 === '' ? '' : ', ' + sAddress449);
+    var sAddress484 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress484 === '' ? '' : ', ' + sAddress484);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -126,17 +126,20 @@ function mapAddMarker(googleMap, siteInfoWindow, site) {
 };
 function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.model = model;
+    this.geolocationOptions = geolocationOptions;
+    this.geolocationMarker = new google.maps.Marker({ 'map' : null });
+    this.geolocationWatchId = null;
     this.markers = [];
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar453 = this.markers, _js_idx452 = 0; _js_idx452 < _js_arrvar453.length; _js_idx452 += 1) {
-            marker = _js_arrvar453[_js_idx452];
+        for (var marker = null, _js_arrvar488 = this.markers, _js_idx487 = 0; _js_idx487 < _js_arrvar488.length; _js_idx487 += 1) {
+            marker = _js_arrvar488[_js_idx487];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar451 = this.model.sites, _js_idx450 = 0; _js_idx450 < _js_arrvar451.length; _js_idx450 += 1) {
-            site = _js_arrvar451[_js_idx450];
+        for (var site = null, _js_arrvar486 = this.model.sites, _js_idx485 = 0; _js_idx485 < _js_arrvar486.length; _js_idx485 += 1) {
+            site = _js_arrvar486[_js_idx485];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -145,18 +148,48 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv454 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv489 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db455 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db455[0];
-            var north = _db455[1];
-            var east = _db455[2];
+            var _db490 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db490[0];
+            var north = _db490[1];
+            var east = _db490[2];
             return sitesPopulate(SITES, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv454;
+            __PS_MV_REG = prevMv489;
         };
     });
+};
+function geolocationSuccess(mapWidget, position) {
+    var lat = position.coords.latitude;
+    var lng = position.coords.longitude;
+    var position491 = new google.maps.LatLng({ 'lat' : lat, 'lng' : lng });
+    mapWidget.geolocationMarker.setPosition(position491);
+    return console.log('GEOLOCATION SUCCESS: lat=' + lat + ' lng=' + lng + ' postion=' + position491);
+};
+function geolocationError(positionError) {
+    console.log('GEOLOCATION ERROR: ' + error.code + ': ' + error.message);
+    return alert('Geolocation Error: ' + error.code + ': ' + error.message);
+};
+function mapWidgetStartGeolocation(mapWidget) {
+    if (navigator.geolocation) {
+        mapWidget.geolocationMarker.setMap(mapWidget.googleMap);
+        return mapWidget.geolocationWatchId = navigator.geolocation.watchPosition(function (position) {
+            return geolocationSuccess(mapWidget, position);
+        }, geolocationError, mapWidget.geolocationOptions);
+    } else {
+        return alert('Geolocation is not available.');
+    };
+};
+function mapWidgetStopGeolocation(mapWidget) {
+    if (navigator.geolocation) {
+        navigator.geolocation.clearWatch(mapWidget.geolocationWatchId);
+        map.geolocationWatchId = null;
+        return mapWidget.geolocationMarker.setMap(null);
+    } else {
+        return alert('Geolocation is not available.');
+    };
 };
 var SITES = null;
 var LISTWIDGET = null;
@@ -183,5 +216,6 @@ function initialize() {
         console.log('MAP notified ' + SITES.sites.length);
         return updateWidget(MAP);
     });
-    return mapWidgetStartUpdatingMarkers(MAP);
+    mapWidgetStartUpdatingMarkers(MAP);
+    return mapWidgetStartGeolocation(MAP);
 };

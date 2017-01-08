@@ -195,9 +195,12 @@
 
 (defun -map-widget (model jqelement center zoom geolocation-options)
   (setf (ps:@ this model) model)
-  ;; TODO (setf (ps:@ this geolocation-options) geolocation-options)
-  ;; TODO (setf (ps:@ this geolocation-marker) nil)
-  ;; TODO (setf (ps:@ this geolocation-watch-id) nil)
+  (setf (ps:@ this geolocation-options) geolocation-options)
+  (setf (ps:@ this geolocation-marker)
+        (ps:new (ps:chain google
+                          maps
+                          (-marker (ps:create :map nil)))))
+  (setf (ps:@ this geolocation-watch-id) nil)
   (setf (ps:@ this markers) (array))
   (setf (ps:@ this site-info-window)
         (ps:new (ps:chain google maps (-info-window (ps:create)))))
@@ -226,6 +229,51 @@
                                   (decode-bounds (ps:chain *map* google-map (get-bounds)))
                                 (sites-populate *sites* south west north east))))))
 
+;; TODO refactor
+(defun geolocation-success (map-widget position)
+  (let ((lat (ps:@ position coords latitude))
+        (lng (ps:@ position coords longitude)))
+    (let ((position (ps:new (ps:chain google maps (-lat-lng (ps:create :lat lat :lng lng))))))
+      (ps:chain (ps:@ map-widget geolocation-marker) (set-position position))
+      (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat=" lat " lng=" lng " postion=" position))))))
+
+;; TODO refactor
+(defun geolocation-error (position-error)
+  (ps:chain console (log (+ "GEOLOCATION ERROR: "
+                            (ps:@ error code)
+                            ": "
+                            (ps:@ error message))))
+  (alert (+ "Geolocation Error: "
+            (ps:@ error code)
+            ": "
+            (ps:@ error message))))
+
+;; TODO refactor
+(defun map-widget-start-geolocation (map-widget)
+  (if (ps:@ navigator geolocation)
+      (progn
+        (ps:chain map-widget
+                  geolocation-marker
+                  (set-map (ps:@ map-widget google-map)))
+        (setf (ps:@ map-widget geolocation-watch-id)
+              (ps:chain navigator
+                        geolocation
+                        (watch-position #'(lambda (position) (geolocation-success map-widget position))
+                                        #'geolocation-error
+                                        (ps:@ map-widget geolocation-options)))))
+      (alert "Geolocation is not available.")))
+
+;; TODO refactor
+(defun map-widget-stop-geolocation (map-widget)
+  (if (ps:@ navigator geolocation)
+      (progn
+        (ps:chain navigator
+                  geolocation
+                  (clear-watch (ps:@ map-widget geolocation-watch-id)))
+        (setf (ps:@ map geolocation-watch-id) nil)
+        (ps:chain map-widget geolocation-marker (set-map nil)))
+      (alert "Geolocation is not available.")))
+
 ;; TODO
 ;; (let ((control-div (ps:chain document (create-element "div"))))
 ;;   (let ((control (ps:new (link-control control-div)))
@@ -246,43 +294,6 @@
 ;;             (ps:who-ps-html (:span :class "link-control-content-text" "Search for sites")))
 ;;       (ps:chain control-ui (append-child control-text))
 ;;       )))
-
-;; TODO (defun set-my-marker (map position)
-;;   (when (null (ps:@ map geolocation-marker))
-;;     (setf (ps:@ map geolocation-marker)
-;;           (ps:new (ps:chain google
-;;                             maps
-;;                             (-marker (ps:create :map map))))))
-;;   (ps:chain (ps:@ map geolocation-marker) (set-position position)))
-
-;; TODO (defun geolocation-success (position)
-;;   (let ((lat (ps:@ position coords latitude))
-;;         (lng (ps:@ position coords longitude))
-;;         (altitude (ps:@ position coords altitude))
-;;         (accuracy (ps:@ position coords accuracy)))
-;;     (set-my-marker *map* (ps:new (ps:chain google maps (-lat-lng (ps:create :lat lat :lng lng)))))
-;;     (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat=" lat " lng=" lng)))))
-
-;; TODO (defun geolocation-error (error)
-;; TODO display an alert box for the error as that is consistent with the initial permission confirm dialog
-;;   (ps:chain console (log (+ "GEOLOCATION ERROR: " (ps:@ error code) ": " (ps:@ error message)))))
-
-;; TODO functions to start and stop map geolocation watcher...
-;; (defun map-stop-geolocation (map)
-;;   (if (ps:@ navigator geolocation)
-;;       (progn
-;;         (ps:chain navigator geolocation (clear-watch (ps:@ map geolocation-watch-id)))
-;;         (setf (ps:@ map geolocation-watch-id) nil))
-;;       (alert "Geolocation is not available.")))
-;; (defun map-start-geolocation (map)
-;;   (if (ps:@ navigator geolocation)
-;;       (setf (ps:@ map geolocation-watch-id)
-;;             (ps:chain navigator
-;;                       geolocation
-;;                       (watch-position #'geolocation-success
-;;                                       #'geolocation-error
-;;                                       *geolocation-options*)))
-;;       (alert "Geolocation is not available.")))
 
 
 
@@ -332,6 +343,6 @@
                                     (update-widget *map*)))
                                      
   (map-widget-start-updating-markers *map*)
-  ;; TODO (map-start-geolocation map)
+  (map-widget-start-geolocation *map*)
 
   )
