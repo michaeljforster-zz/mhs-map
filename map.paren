@@ -4,8 +4,6 @@
 
 ;;; Utilities
 
-;; TODO need better error logging and handling ...
-;; http://api.jquery.com/jQuery.ajax/
 (defun xhr-get-json (url success-function)
   (ps:chain j-query
             (get-j-s-o-n url success-function)
@@ -88,7 +86,6 @@
 
 ;; TODO alternate queries (PLAN.md) ...
 (defun sites-populate (sites south west north east)
-  ;; TODO again, need better error logging and handling ...
   (xhr-get-json (+ (ps:@ sites url)
                    "?south=" south
                    "&west=" west
@@ -105,32 +102,6 @@
                     (sites-announce-populated sites)
                     sites)))
 
-
-;; (defun log-foo ()
-;;   (let ((sites-count (ps:@ results features length)))
-;;     (ps:chain console (log (+ "Populating markers: " sites-count " center=" *current-center* " zoom=" *current-zoom* " bounds=" bounds)))
-
-;; https://developers.google.com/maps/documentation/javascript/events
-;;
-;; Note:
-;; 
-;;     Tip: If you're trying to detect a change in
-;;     the viewport, be sure to use the specific
-;;     bounds_changed event rather than
-;;     constituent zoom_changed and center_changed
-;;     events. ...
-;;
-;; However, because bounds_changed appears to fire
-;; repeatedly during a pan or resize, we listen
-;; for the idle event instead:
-;; 
-;;     This event is fired when the map becomes
-;;     idle after panning or zooming.
-
-
-
-;; TODO search/list view - should tell model to requery/update
-
 (defun update-widget (widget)
   (ps:chain widget (update-widget)))
 
@@ -144,7 +115,6 @@
                       (html
                        (ps:who-ps-html
                         (:ul
-                         ;; TODO isolate this in a renderer for the site model
                          (ps:chain this
                                    model
                                    sites
@@ -231,6 +201,22 @@
                 (ps:chain this markers (push marker))))))
   this)
 
+;; https://developers.google.com/maps/documentation/javascript/events
+;;
+;; Note:
+;; 
+;;     Tip: If you're trying to detect a change in
+;;     the viewport, be sure to use the specific
+;;     bounds_changed event rather than
+;;     constituent zoom_changed and center_changed
+;;     events. ...
+;;
+;; However, because bounds_changed appears to fire
+;; repeatedly during a pan or resize, we listen
+;; for the idle event instead:
+;; 
+;;     This event is fired when the map becomes
+;;     idle after panning or zooming.
 (defun map-widget-start-updating-markers (map-widget)
   (ps:chain map-widget
             google-map
@@ -240,7 +226,6 @@
                                   (decode-bounds (ps:chain *map* google-map (get-bounds)))
                                 (sites-populate *sites* south west north east))))))
 
-;; TODO refactor
 (defun geolocation-success (map-widget position)
   (let ((lat (ps:@ position coords latitude))
         (lng (ps:@ position coords longitude)))
@@ -248,7 +233,6 @@
       (ps:chain (ps:@ map-widget geolocation-marker) (set-position position))
       (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat=" lat " lng=" lng " postion=" position))))))
 
-;; TODO refactor
 (defun geolocation-error (position-error)
   (ps:chain console (log (+ "GEOLOCATION ERROR: "
                             (ps:@ error code)
@@ -259,7 +243,6 @@
             ": "
             (ps:@ error message))))
 
-;; TODO refactor
 (defun map-widget-start-geolocation (map-widget)
   (if (ps:@ navigator geolocation)
       (progn
@@ -274,7 +257,6 @@
                                         (ps:@ map-widget geolocation-options)))))
       (alert "Geolocation is not available.")))
 
-;; TODO refactor
 (defun map-widget-stop-geolocation (map-widget)
   (if (ps:@ navigator geolocation)
       (progn
@@ -284,29 +266,6 @@
         (setf (ps:@ map geolocation-watch-id) nil)
         (ps:chain map-widget geolocation-marker (set-map nil)))
       (alert "Geolocation is not available.")))
-
-;; TODO
-;; (let ((control-div (ps:chain document (create-element "div"))))
-;;   (let ((control (ps:new (link-control control-div)))
-;;         (position (ps:@ google maps -control-position "TOP_CENTER")))
-;;     (setf (ps:@ control-div index) 1)
-;;     (let ((foo (ps:getprop *map* 'controls position)))
-;;       (ps:chain foo (push control-div)))))
-;;
-;; (defun link-control (control-div)
-;;   (setf (ps:@ control-div class-name) "link-control-box")
-;;   (let ((control-ui (ps:chain document (create-element "div"))))
-;;     (setf (ps:@ control-ui class-name) "link-control-outline-box")
-;;     (setf (ps:@ control-ui title) "Click to return to search page")
-;;     (ps:chain control-div (append-child control-ui))
-;;     (let ((control-text (ps:chain document (create-element "div"))))
-;;       (setf (ps:@ control-text class-name) "link-control-content-box")
-;;       (setf (ps:@ control-text inner-h-t-m-l)
-;;             (ps:who-ps-html (:span :class "link-control-content-text" "Search for sites")))
-;;       (ps:chain control-ui (append-child control-text))
-;;       )))
-
-
 
 (defvar *sites* nil)
 (defvar *list-widget* nil)
@@ -353,7 +312,4 @@
                                      
   (map-widget-start-updating-markers *map*)
 
-  ;; TODO to make the map follow on geolocation, we'll need to--in the
-  ;; geolocation-success function--check to see if the point has moved
-  ;; out of the map bounds and, if so, re-center the map on the point.
   (map-widget-start-geolocation *map*))
