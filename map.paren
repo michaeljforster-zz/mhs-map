@@ -42,20 +42,31 @@
   (setf (ps:@ this lat-lng) lat-lng)
   this)
 
+(defun geometry-point-x (geometry)
+  (if (/= (ps:@ geometry type) "Point")
+      (throw "Geometry is not a Point")
+      (ps:@ geometry coordinates 0)))
+
+(defun geometry-point-y (geometry)
+  (if (/= (ps:@ geometry type) "Point")
+      (throw "Geometry is not a Point")
+      (ps:@ geometry coordinates 1)))
+
+(defun geometry-point-to-lat-lng (geometry)
+  (ps:new (ps:chain google
+                    maps
+                    (-lat-lng (ps:create 'lat (geometry-point-y geometry)
+                                         'lng (geometry-point-x geometry))))))
+
 (defun feature-to-site (feature)
-  (let ((site (ps:new (-site))))
-    (setf (ps:@ site s-no) (ps:@ feature properties s-no))
-    (setf (ps:@ site s-name) (ps:@ feature properties s-name))
-    (setf (ps:@ site m-name) (ps:@ feature properties m-name))
-    (setf (ps:@ site s-address) (ps:@ feature properties s-address))
-    (setf (ps:@ site st-name) (ps:@ feature properties st-name))
-    (setf (ps:@ site s-url) (ps:@ feature properties s-url))
-    (setf (ps:@ site lat-lng)
-          (ps:new (ps:chain google
-                            maps
-                            (-lat-lng (ps:create 'lat (ps:@ feature geometry coordinates 1)
-                                                 'lng (ps:@ feature geometry coordinates 0))))))
-    site))
+  (ps:new (-site
+           (ps:@ feature properties s-no)
+           (ps:@ feature properties s-name)
+           (ps:@ feature properties m-name)
+           (ps:@ feature properties s-address)
+           (ps:@ feature properties st-name)
+           (ps:@ feature properties s-url)
+           (geometry-point-to-lat-lng (ps:@ feature geometry)))))
 
 (defun -sites (url)
   (setf (ps:@ this url) url)
@@ -341,4 +352,8 @@
                                     (update-widget *map*)))
                                      
   (map-widget-start-updating-markers *map*)
+
+  ;; TODO to make the map follow on geolocation, we'll need to--in the
+  ;; geolocation-success function--check to see if the point has moved
+  ;; out of the map bounds and, if so, re-center the map on the point.
   (map-widget-start-geolocation *map*))
