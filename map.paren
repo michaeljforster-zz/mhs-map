@@ -233,6 +233,7 @@
 
 (defun geolocation-success (map-widget position)
   (let ((google-lat-lng (geolocation-position-to-google-lat-lng position)))
+    (ps:chain map-widget google-map (set-center google-lat-lng))
     (ps:chain (ps:@ map-widget geolocation-marker) (set-position google-lat-lng))
     (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat-lng=" google-lat-lng)))))
 

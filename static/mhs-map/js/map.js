@@ -89,20 +89,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName61 = site.stName;
-    if (stName61 === 'Featured site') {
+    var stName77 = site.stName;
+    if (stName77 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName61 === 'Museum/Archives') {
+    } else if (stName77 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName61 === 'Building') {
+    } else if (stName77 === 'Building') {
         return 'icon_building.png';
-    } else if (stName61 === 'Monument') {
+    } else if (stName77 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName61 === 'Cemetery') {
+    } else if (stName77 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName61 === 'Location') {
+    } else if (stName77 === 'Location') {
         return 'icon_location.png';
-    } else if (stName61 === 'Other') {
+    } else if (stName77 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -114,8 +114,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress62 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress62 === '' ? '' : ', ' + sAddress62);
+    var sAddress78 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress78 === '' ? '' : ', ' + sAddress78);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -142,13 +142,13 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar66 = this.markers, _js_idx65 = 0; _js_idx65 < _js_arrvar66.length; _js_idx65 += 1) {
-            marker = _js_arrvar66[_js_idx65];
+        for (var marker = null, _js_arrvar82 = this.markers, _js_idx81 = 0; _js_idx81 < _js_arrvar82.length; _js_idx81 += 1) {
+            marker = _js_arrvar82[_js_idx81];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar64 = this.model.sites, _js_idx63 = 0; _js_idx63 < _js_arrvar64.length; _js_idx63 += 1) {
-            site = _js_arrvar64[_js_idx63];
+        for (var site = null, _js_arrvar80 = this.model.sites, _js_idx79 = 0; _js_idx79 < _js_arrvar80.length; _js_idx79 += 1) {
+            site = _js_arrvar80[_js_idx79];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -157,16 +157,16 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv67 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv83 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db68 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db68[0];
-            var north = _db68[1];
-            var east = _db68[2];
+            var _db84 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db84[0];
+            var north = _db84[1];
+            var east = _db84[2];
             return sitesPopulate(SITES, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv67;
+            __PS_MV_REG = prevMv83;
         };
     });
 };
@@ -177,6 +177,7 @@ function geolocationPositionToGoogleLatLng(position) {
 };
 function geolocationSuccess(mapWidget, position) {
     var googleLatLng = geolocationPositionToGoogleLatLng(position);
+    mapWidget.googleMap.setCenter(googleLatLng);
     mapWidget.geolocationMarker.setPosition(googleLatLng);
     return console.log('GEOLOCATION SUCCESS: lat-lng=' + googleLatLng);
 };
