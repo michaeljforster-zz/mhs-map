@@ -226,12 +226,15 @@
                                   (decode-bounds (ps:chain *map* google-map (get-bounds)))
                                 (sites-populate *sites* south west north east))))))
 
-(defun geolocation-success (map-widget position)
+(defun geolocation-position-to-google-lat-lng (position)
   (let ((lat (ps:@ position coords latitude))
         (lng (ps:@ position coords longitude)))
-    (let ((position (ps:new (ps:chain google maps (-lat-lng (ps:create :lat lat :lng lng))))))
-      (ps:chain (ps:@ map-widget geolocation-marker) (set-position position))
-      (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat=" lat " lng=" lng " postion=" position))))))
+    (ps:new (ps:chain google maps (-lat-lng (ps:create :lat lat :lng lng))))))
+
+(defun geolocation-success (map-widget position)
+  (let ((google-lat-lng (geolocation-position-to-google-lat-lng position)))
+    (ps:chain (ps:@ map-widget geolocation-marker) (set-position google-lat-lng))
+    (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat-lng=" google-lat-lng)))))
 
 (defun geolocation-error (position-error)
   (ps:chain console (log (+ "GEOLOCATION ERROR: "

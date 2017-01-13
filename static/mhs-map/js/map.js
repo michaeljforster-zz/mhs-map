@@ -89,20 +89,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName28 = site.stName;
-    if (stName28 === 'Featured site') {
+    var stName61 = site.stName;
+    if (stName61 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName28 === 'Museum/Archives') {
+    } else if (stName61 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName28 === 'Building') {
+    } else if (stName61 === 'Building') {
         return 'icon_building.png';
-    } else if (stName28 === 'Monument') {
+    } else if (stName61 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName28 === 'Cemetery') {
+    } else if (stName61 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName28 === 'Location') {
+    } else if (stName61 === 'Location') {
         return 'icon_location.png';
-    } else if (stName28 === 'Other') {
+    } else if (stName61 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -114,8 +114,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress29 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress29 === '' ? '' : ', ' + sAddress29);
+    var sAddress62 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress62 === '' ? '' : ', ' + sAddress62);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -142,13 +142,13 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar33 = this.markers, _js_idx32 = 0; _js_idx32 < _js_arrvar33.length; _js_idx32 += 1) {
-            marker = _js_arrvar33[_js_idx32];
+        for (var marker = null, _js_arrvar66 = this.markers, _js_idx65 = 0; _js_idx65 < _js_arrvar66.length; _js_idx65 += 1) {
+            marker = _js_arrvar66[_js_idx65];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar31 = this.model.sites, _js_idx30 = 0; _js_idx30 < _js_arrvar31.length; _js_idx30 += 1) {
-            site = _js_arrvar31[_js_idx30];
+        for (var site = null, _js_arrvar64 = this.model.sites, _js_idx63 = 0; _js_idx63 < _js_arrvar64.length; _js_idx63 += 1) {
+            site = _js_arrvar64[_js_idx63];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -157,25 +157,28 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv34 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv67 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db35 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db35[0];
-            var north = _db35[1];
-            var east = _db35[2];
+            var _db68 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db68[0];
+            var north = _db68[1];
+            var east = _db68[2];
             return sitesPopulate(SITES, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv34;
+            __PS_MV_REG = prevMv67;
         };
     });
 };
-function geolocationSuccess(mapWidget, position) {
+function geolocationPositionToGoogleLatLng(position) {
     var lat = position.coords.latitude;
     var lng = position.coords.longitude;
-    var position36 = new google.maps.LatLng({ 'lat' : lat, 'lng' : lng });
-    mapWidget.geolocationMarker.setPosition(position36);
-    return console.log('GEOLOCATION SUCCESS: lat=' + lat + ' lng=' + lng + ' postion=' + position36);
+    return new google.maps.LatLng({ 'lat' : lat, 'lng' : lng });
+};
+function geolocationSuccess(mapWidget, position) {
+    var googleLatLng = geolocationPositionToGoogleLatLng(position);
+    mapWidget.geolocationMarker.setPosition(googleLatLng);
+    return console.log('GEOLOCATION SUCCESS: lat-lng=' + googleLatLng);
 };
 function geolocationError(positionError) {
     console.log('GEOLOCATION ERROR: ' + error.code + ': ' + error.message);
