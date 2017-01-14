@@ -181,6 +181,40 @@
    east)
   :sites)
 
+(postmodern:defprepared-with-names select-sites-within-distance (lat lng distance)
+  ((:order-by
+    (:select 's-no
+             's-name
+             'm-name
+             's-address
+             'st-name
+             's-url
+             's-published-p
+             (:as (:st-y 'sg-geometry) 's-lat) ; yes, Y is latitude; don't coalesce, use NIL
+             (:as (:st-x 'sg-geometry) 's-lng) ; yes, X is longitude; don't coalesce, use NIL
+             'snd-no ; don't coalesce, use NIL
+             'spd-no ; don't coalesce, use NIL
+             'smd-no ; don't coalesce, use NIL
+             :from 'site
+             :left-join 'site-geo :using ('s-no)
+             :left-join 'site-national-designation :using ('s-no)
+             :left-join 'site-provincial-designation :using ('s-no)
+             :left-join 'site-municipal-designation :using ('s-no)
+             :where (:st-dwithin 'sg-geography
+                                 (:geography
+                                  (:st-transform
+                                   (:st-setsrid
+                                    ;; NOTE: st-makepoint (x/lng y/lat)
+                                    (:st-makepoint '$2 '$1)
+                                    *default-srid*)
+                                   *default-srid*))
+                                 '$3))
+    's-name)
+   lat
+   lng
+   distance)
+  :sites)
+
 (defun make-binary-logical-form (a op b)
   (if (not (and op b))
       a
