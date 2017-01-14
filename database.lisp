@@ -311,45 +311,45 @@
          (values (make-sql `(:and ,keyword-form ,@designation-form))
                  nil))))))
 
-(define-struct-row-reader site
-  (s-no 0)
-  (s-name "")
-  (m-name "")
-  (s-address "")
-  (st-name "")
-  (s-url #u"" #'(lambda (string) (ignore-errors (puri:parse-uri string))))
-  (s-published-p nil)
-  (s-lat nil)
-  (s-lng nil)
-  (snd-no nil)
-  (spd-no nil)
-  (smd-no nil))
+;; (define-struct-row-reader site
+;;   (s-no 0)
+;;   (s-name "")
+;;   (m-name "")
+;;   (s-address "")
+;;   (st-name "")
+;;   (s-url #u"" #'(lambda (string) (ignore-errors (puri:parse-uri string))))
+;;   (s-published-p nil)
+;;   (s-lat nil)
+;;   (s-lng nil)
+;;   (snd-no nil)
+;;   (spd-no nil)
+;;   (smd-no nil))
 
-(defun select-site (s-no &optional (database postmodern:*database*))
-  (cl-postgres:prepare-query database "" *select-site-sql*)
-  (first (cl-postgres:exec-prepared database "" (list s-no) 'site-row-reader)))
+;; (defun select-site (s-no &optional (database postmodern:*database*))
+;;   (cl-postgres:prepare-query database "" *select-site-sql*)
+;;   (first (cl-postgres:exec-prepared database "" (list s-no) 'site-row-reader)))
 
-(defun select-sites (keyword1
-                     op2
-                     keyword2
-                     op3
-                     keyword3
-                     m-name
-                     st-name
-                     snd-no-p
-                     spd-no-p
-                     smd-no-p
-                     &optional (database postmodern:*database*))
-  (multiple-value-bind (sql args)
-      (make-select-sites-sql keyword1
-                             op2
-                             keyword2
-                             op3
-                             keyword3
-                             m-name
-                             st-name
-                             snd-no-p
-                             spd-no-p
-                             smd-no-p)
-    (cl-postgres:prepare-query database "" sql)
-    (cl-postgres:exec-prepared database "" args 'site-row-reader)))
+;; (defun select-sites (keyword1
+;;                      op2
+;;                      keyword2
+;;                      op3
+;;                      keyword3
+;;                      m-name
+;;                      st-name
+;;                      snd-no-p
+;;                      spd-no-p
+;;                      smd-no-p
+;;                      &optional (database postmodern:*database*))
+;;   (multiple-value-bind (sql args)
+;;       (make-select-sites-sql keyword1
+;;                              op2
+;;                              keyword2
+;;                              op3
+;;                              keyword3
+;;                              m-name
+;;                              st-name
+;;                              snd-no-p
+;;                              spd-no-p
+;;                              smd-no-p)
+;;     (cl-postgres:prepare-query database "" sql)
+;;     (cl-postgres:exec-prepared database "" args 'site-row-reader)))
