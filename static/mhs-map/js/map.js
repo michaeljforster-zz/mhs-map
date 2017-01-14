@@ -64,7 +64,7 @@ function sitesAnnouncePopulated(sites) {
     });
     return sites;
 };
-function sitesPopulate(sites, south, west, north, east) {
+function sitesPopulateWithinBounds(sites, south, west, north, east) {
     return xhrGetJson(sites.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
         sites.sites = [];
         results.features.forEach(function (feature) {
@@ -89,20 +89,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName1 = site.stName;
-    if (stName1 === 'Featured site') {
+    var stName9 = site.stName;
+    if (stName9 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName1 === 'Museum/Archives') {
+    } else if (stName9 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName1 === 'Building') {
+    } else if (stName9 === 'Building') {
         return 'icon_building.png';
-    } else if (stName1 === 'Monument') {
+    } else if (stName9 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName1 === 'Cemetery') {
+    } else if (stName9 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName1 === 'Location') {
+    } else if (stName9 === 'Location') {
         return 'icon_location.png';
-    } else if (stName1 === 'Other') {
+    } else if (stName9 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -114,8 +114,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress2 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress2 === '' ? '' : ', ' + sAddress2);
+    var sAddress10 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress10 === '' ? '' : ', ' + sAddress10);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -142,13 +142,13 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar6 = this.markers, _js_idx5 = 0; _js_idx5 < _js_arrvar6.length; _js_idx5 += 1) {
-            marker = _js_arrvar6[_js_idx5];
+        for (var marker = null, _js_arrvar14 = this.markers, _js_idx13 = 0; _js_idx13 < _js_arrvar14.length; _js_idx13 += 1) {
+            marker = _js_arrvar14[_js_idx13];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar4 = this.model.sites, _js_idx3 = 0; _js_idx3 < _js_arrvar4.length; _js_idx3 += 1) {
-            site = _js_arrvar4[_js_idx3];
+        for (var site = null, _js_arrvar12 = this.model.sites, _js_idx11 = 0; _js_idx11 < _js_arrvar12.length; _js_idx11 += 1) {
+            site = _js_arrvar12[_js_idx11];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -157,16 +157,16 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv7 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv15 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db8 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db8[0];
-            var north = _db8[1];
-            var east = _db8[2];
-            return sitesPopulate(SITES, south, west, north, east);
+            var _db16 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db16[0];
+            var north = _db16[1];
+            var east = _db16[2];
+            return sitesPopulateWithinBounds(SITES, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv7;
+            __PS_MV_REG = prevMv15;
         };
     });
 };
@@ -218,7 +218,7 @@ function initialize() {
         jQuery('#list-view').hide();
         return jQuery('#map-canvas').show();
     });
-    SITES = new Sites(FEATURESJSONURI);
+    SITES = new Sites(FEATURESWITHINBOUNDSURI);
     LISTWIDGET = new ListWidget(SITES, jQuery('#list-view'));
     sitesSubscribeToPopulated(SITES, function () {
         console.log('LIST-WIDGET notified ' + SITES.sites.length);

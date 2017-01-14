@@ -31,7 +31,8 @@
 ;;       (with-output-to-string (stream)
 ;;         (geojson-encode-sites rows stream)))))
 
-(hunchentoot:define-easy-handler (handle-features-json :uri (princ-to-string *features-json-uri*))
+(hunchentoot:define-easy-handler (handle-features-within-bounds
+                                  :uri (princ-to-string *features-within-bounds-uri*))
     ((south :parameter-type 'wu-decimal:parse-decimal :request-type :get)
      (west :parameter-type 'wu-decimal:parse-decimal :request-type :get)
      (north :parameter-type 'wu-decimal:parse-decimal :request-type :get)
@@ -41,7 +42,24 @@
   (with-database-connection
     (multiple-value-bind (rows count)
         (select-sites-within-bounds south west north east)
-      ;; TODO (declare (ignore count))
-      (hunchentoot:log-message* :info "HANDLE-FEATURES-JSON1: south ~F west ~F north ~F east ~F" south west north east count)
+      (hunchentoot:log-message* :info
+                                "HANDLE-FEATURES-WITHIN-BOUNDS: south ~F west ~F north ~F east ~F count ~D"
+                                south west north east count)
+      (with-output-to-string (stream)
+        (geojson-encode-sites rows stream)))))
+
+(hunchentoot:define-easy-handler (handle-features-within-distance
+                                  :uri (princ-to-string *features-within-distance-uri*))
+    ((lat :parameter-type 'wu-decimal:parse-decimal :request-type :get)
+     (lng :parameter-type 'wu-decimal:parse-decimal :request-type :get)
+     (distance :parameter-type 'wu-decimal:parse-decimal :request-type :get))
+  (hunchentoot:no-cache)
+  (setf (hunchentoot:content-type*) "application/json; charset=utf-8")
+  (with-database-connection
+    (multiple-value-bind (rows count)
+        (select-sites-within-distance lat lng distance)
+      (hunchentoot:log-message* :info
+                                "HANDLE-FEATURES-WITHIN-DISTANCE: lat ~F lng ~F distance ~F count ~D"
+                                lat lng distance count)
       (with-output-to-string (stream)
         (geojson-encode-sites rows stream)))))
