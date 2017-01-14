@@ -32,6 +32,7 @@ $$ language sql immutable;
 
 create table municipality
 ( m_name municipality_name primary key
+, m_geometry geometry not null
 );
 
 create table import.municipality
@@ -212,7 +213,8 @@ begin
   delete from site_secondary_site_type;
   delete from site;
   delete from municipality;
-  insert into municipality (m_name) select m_name from import.municipality;
+  insert into municipality (m_name, m_geometry)
+  select m_name, 'POINT EMPTY'::geometry from import.municipality;
   insert into site (s_no, s_name, m_name, s_address, st_name, s_keyword, s_url, s_published_p)
   select s_no, s_name, m_name, s_address, st_name, s_keyword, s_url, s_published_p from import.site;
   insert into site_secondary_site_type (s_no, st_name)
@@ -223,14 +225,10 @@ begin
   select s_no, spd_no from import.site_provincial_designation;
   insert into site_municipal_designation (s_no, smd_no)
   select s_no, smd_no from import.site_municipal_designation;
-  insert into site_geo
-  ( s_no
-  , sg_geometry
-  , sg_geography)
-  select
-    s_no
-  , sg_geometry
-  , sg_geography
-  from import.site_geo;
+  insert into site_geo (s_no, sg_geometry, sg_geography)
+  select s_no, sg_geometry, sg_geography from import.site_geo;
+  update municipality as m set m_geometry =
+  ( select coalesce(st_centroid(st_multi(st_union(sg_geometry))), 'POINT EMPTY'::geometry) from
+    ( select sg_geometry from site join site_geo using (s_no) where m_name = m.m_name ) as t0 );
 end;
 $$ language plpgsql;
