@@ -89,20 +89,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName77 = site.stName;
-    if (stName77 === 'Featured site') {
+    var stName1 = site.stName;
+    if (stName1 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName77 === 'Museum/Archives') {
+    } else if (stName1 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName77 === 'Building') {
+    } else if (stName1 === 'Building') {
         return 'icon_building.png';
-    } else if (stName77 === 'Monument') {
+    } else if (stName1 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName77 === 'Cemetery') {
+    } else if (stName1 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName77 === 'Location') {
+    } else if (stName1 === 'Location') {
         return 'icon_location.png';
-    } else if (stName77 === 'Other') {
+    } else if (stName1 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -114,8 +114,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress78 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress78 === '' ? '' : ', ' + sAddress78);
+    var sAddress2 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress2 === '' ? '' : ', ' + sAddress2);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -142,13 +142,13 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar82 = this.markers, _js_idx81 = 0; _js_idx81 < _js_arrvar82.length; _js_idx81 += 1) {
-            marker = _js_arrvar82[_js_idx81];
+        for (var marker = null, _js_arrvar6 = this.markers, _js_idx5 = 0; _js_idx5 < _js_arrvar6.length; _js_idx5 += 1) {
+            marker = _js_arrvar6[_js_idx5];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar80 = this.model.sites, _js_idx79 = 0; _js_idx79 < _js_arrvar80.length; _js_idx79 += 1) {
-            site = _js_arrvar80[_js_idx79];
+        for (var site = null, _js_arrvar4 = this.model.sites, _js_idx3 = 0; _js_idx3 < _js_arrvar4.length; _js_idx3 += 1) {
+            site = _js_arrvar4[_js_idx3];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -157,16 +157,16 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv83 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv7 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db84 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db84[0];
-            var north = _db84[1];
-            var east = _db84[2];
+            var _db8 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db8[0];
+            var north = _db8[1];
+            var east = _db8[2];
             return sitesPopulate(SITES, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv83;
+            __PS_MV_REG = prevMv7;
         };
     });
 };
@@ -224,7 +224,7 @@ function initialize() {
         console.log('LIST-WIDGET notified ' + SITES.sites.length);
         return updateWidget(LISTWIDGET);
     });
-    MAP = new MapWidget(SITES, jQuery('#map-canvas'), CURRENTCENTER, CURRENTZOOM, GEOLOCATIONOPTIONS);
+    MAP = new MapWidget(SITES, jQuery('#map-canvas'), DEFAULTCENTER, DEFAULTZOOM, GEOLOCATIONOPTIONS);
     sitesSubscribeToPopulated(SITES, function () {
         console.log('MAP notified ' + SITES.sites.length);
         return updateWidget(MAP);

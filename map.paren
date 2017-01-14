@@ -305,8 +305,8 @@
   (setf *map*
         (ps:new (-map-widget *sites*
                              (j-query "#map-canvas")
-                             *current-center*
-                             *current-zoom*
+                             *default-center*
+                             *default-zoom*
                              *geolocation-options*)))
 
   (sites-subscribe-to-populated *sites*

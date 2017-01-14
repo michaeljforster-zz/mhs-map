@@ -23,8 +23,8 @@
                (cl-who:str
                 (ps:ps*
                  `(progn
-                    (defvar *current-center* (ps:new (ps:chain google maps (-lat-lng ,@*default-center*))))
-                    (defvar *current-zoom* ,*default-zoom*)
+                    (defvar *default-center* (ps:new (ps:chain google maps (-lat-lng ,@*default-center*))))
+                    (defvar *default-zoom* ,*default-zoom*)
                     (defvar *geolocation-options*
                       (ps:create
                        :enable-high-accuracy 'true
