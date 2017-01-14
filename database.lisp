@@ -131,6 +131,31 @@
 (postmodern:defprepared select-municipality-names
     (:order-by (:select 'm-name :from 'municipality) 'm-name) :column)
 
+(postmodernity:defpgstruct municipality
+  m-name
+  m-lat
+  m-lng)
+
+(postmodern:defprepared select-municipalities
+    (:order-by
+     (:select 'm-name
+              (:as (:st-y 'm-geometry) 'm-lat) ; yes, Y is latitude; don't coalesce, use NIL
+              (:as (:st-x 'm-geometry) 'm-lng) ; yes, X is longitude; don't coalesce, use NIL
+              :from 'municipality)
+     'm-name)
+  :municipalitys) ; No, not a miss-spelling
+
+(postmodern:defprepared-with-names select-municipality (m-name)
+  ((:order-by
+    (:select 'm-name
+             (:as (:st-y 'm-geometry) 'm-lat) ; yes, Y is latitude; don't coalesce, use NIL
+             (:as (:st-x 'm-geometry) 'm-lng) ; yes, X is longitude; don't coalesce, use NIL
+             :from 'municipality
+             :where (:= 'm-name '$1))
+    'm-name)
+   m-name)
+  :municipality)
+
 (postmodernity:defpgstruct site
   s-no
   s-name
