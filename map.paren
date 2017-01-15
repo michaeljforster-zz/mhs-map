@@ -239,13 +239,13 @@
 
 (defun geolocation-error (position-error)
   (ps:chain console (log (+ "GEOLOCATION ERROR: "
-                            (ps:@ error code)
+                            (ps:@ position-error code)
                             ": "
-                            (ps:@ error message))))
+                            (ps:@ position-error message))))
   (alert (+ "Geolocation Error: "
-            (ps:@ error code)
-            ": "
-            (ps:@ error message))))
+          (ps:@ position-error code)
+          ": "
+          (ps:@ position-error message))))
 
 (defun map-widget-start-geolocation (map-widget)
   (if (ps:@ navigator geolocation)
