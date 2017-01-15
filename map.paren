@@ -78,6 +78,9 @@
 (defun site-list-map (site-list fn)
   (ps:chain site-list sites (map fn)))
 
+(defun site-list-do (site-list fn)
+  (ps:chain site-list sites (for-each fn)))
+
 (defun site-list-unsubscribe-all (site-list)
   (setf (ps:@ site-list subscribers) (array))
   site-list)
