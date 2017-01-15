@@ -217,8 +217,9 @@
 ;;     idle after panning or zooming.
 (defun map-widget-listen-on-idle (map-widget fn)
   (unless (null (ps:@ map-widget idle-listener))
-    (ps:chain map-widget
-              google-map
+    (ps:chain google
+              maps
+              event
               (remove-listener (ps:@ map-widget idle-listener))))
   (setf (ps:@ map-widget idle-listener)
         (ps:chain map-widget
