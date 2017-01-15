@@ -274,6 +274,21 @@
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
+(defun set-map-area-mode ()
+  (map-widget-listen-on-idle *map*
+                             #'(lambda (map-widget)
+                                 (multiple-value-bind (south west north east)
+                                     (decode-bounds (map-widget-bounds map-widget))
+                                   (xhr-get-json (+ *features-within-bounds-uri*
+                                                    "?south=" south
+                                                    "&west=" west
+                                                    "&north=" north
+                                                    "&east=" east)
+                                                 #'(lambda (results)
+                                                     (site-list-populate (ps:@ map-widget model)
+                                                                         (ps:@ results features)))))))
+  (ps:chain *map* google-map (pan-to *default-center*)))
+
 (defun initialize ()
 
   (ps:chain (j-query "#list-view") (hide))
@@ -315,18 +330,7 @@
                                                   (log (+ "MAP notified "
                                                           (site-list-size *site-list*))))
                                         (update-widget *map*)))
-  
-  (map-widget-listen-on-idle *map*
-                             #'(lambda (map-widget)
-                                 (multiple-value-bind (south west north east)
-                                     (decode-bounds (map-widget-bounds map-widget))
-                                   (xhr-get-json (+ *features-within-bounds-uri*
-                                                    "?south=" south
-                                                    "&west=" west
-                                                    "&north=" north
-                                                    "&east=" east)
-                                                 #'(lambda (results)
-                                                     (site-list-populate (ps:@ map-widget model)
-                                                                         (ps:@ results features)))))))
 
+  (set-map-area-mode)
+  
   )
