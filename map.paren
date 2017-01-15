@@ -72,6 +72,9 @@
   (setf (ps:@ this subscribers) (array))
   this)
 
+(defun site-list-size (site-list)
+  (ps:@ site-list sites length))
+
 (defun site-list-unsubscribe-all (site-list)
   (setf (ps:@ site-list subscribers) (array))
   site-list)
@@ -300,7 +303,9 @@
 
   (site-list-subscribe-to-populated *site-list*
                                     #'(lambda ()
-                                        (ps:chain console (log (+ "LIST-WIDGET notified " (ps:@ *site-list* sites length))))
+                                        (ps:chain console
+                                                  (log (+ "LIST-WIDGET notified "
+                                                          (site-list-size *site-list*))))
                                         (update-widget *list-widget*)))
 
   (setf *map*
@@ -312,7 +317,9 @@
 
   (site-list-subscribe-to-populated *site-list*
                                     #'(lambda ()
-                                        (ps:chain console (log (+ "MAP notified " (ps:@ *site-list* sites length))))
+                                        (ps:chain console
+                                                  (log (+ "MAP notified "
+                                                          (site-list-size *site-list*))))
                                         (update-widget *map*)))
   
   (map-widget-start-updating-markers *map*)
