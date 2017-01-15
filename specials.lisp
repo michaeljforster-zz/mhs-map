@@ -23,6 +23,7 @@
 (defparameter *search-uri* #u"/mhs-map/search")
 (defparameter *features-within-bounds-uri* #u"/mhs-map/features-within-bounds")
 (defparameter *features-within-distance-uri* #u"/mhs-map/features-within-distance")
+(defparameter *features-by-municipality-uri* #u"/mhs-map/features-by-municipality")
 (defparameter *map-uri* #u"/mhs-map/map")
 (defparameter *mhs-base-uri* nil)
 (defparameter *mhs-sites-uri* nil)

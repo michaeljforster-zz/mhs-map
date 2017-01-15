@@ -63,3 +63,17 @@
                                 lat lng distance count)
       (with-output-to-string (stream)
         (geojson-encode-sites rows stream)))))
+
+(hunchentoot:define-easy-handler (handle-features-by-municipality
+                                  :uri (princ-to-string *features-by-municipality-uri*))
+    ((municipality :parameter-type 'parse-non-empty-string :request-type :get))
+  (hunchentoot:no-cache)
+  (setf (hunchentoot:content-type*) "application/json; charset=utf-8")
+  (with-database-connection
+    (multiple-value-bind (rows count)
+        (select-sites-by-municipality municipality)
+      (hunchentoot:log-message* :info
+                                "HANDLE-FEATURES-BY-MUNICIPALITY: municipality ~A count ~D"
+                                municipality count)
+      (with-output-to-string (stream)
+        (geojson-encode-sites rows stream)))))
