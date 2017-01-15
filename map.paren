@@ -75,6 +75,9 @@
 (defun site-list-size (site-list)
   (ps:@ site-list sites length))
 
+(defun site-list-map (site-list fn)
+  (ps:chain site-list sites (map fn)))
+
 (defun site-list-unsubscribe-all (site-list)
   (setf (ps:@ site-list subscribers) (array))
   site-list)
@@ -118,14 +121,12 @@
                       (html
                        (ps:who-ps-html
                         (:ul
-                         (ps:chain this
-                                   model
-                                   sites
-                                   (map #'(lambda (site)
-                                            (ps:who-ps-html
-                                             (:li (+ (ps:@ site s-no)
-                                                     " - "
-                                                     (ps:@ site s-name))))))
+                         (ps:chain (site-list-map (ps:@ this model)
+                                                  #'(lambda (site)
+                                                      (ps:who-ps-html
+                                                       (:li (+ (ps:@ site s-no)
+                                                               " - "
+                                                               (ps:@ site s-name))))))
                                    (join ""))))))))
   this)
 
