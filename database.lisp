@@ -240,6 +240,30 @@
    distance)
   :sites)
 
+(postmodern:defprepared-with-names select-sites-by-municipality (m-name)
+  ((:order-by
+    (:select 's-no
+             's-name
+             'm-name
+             's-address
+             'st-name
+             's-url
+             's-published-p
+             (:as (:st-y 'sg-geometry) 's-lat) ; yes, Y is latitude; don't coalesce, use NIL
+             (:as (:st-x 'sg-geometry) 's-lng) ; yes, X is longitude; don't coalesce, use NIL
+             'snd-no ; don't coalesce, use NIL
+             'spd-no ; don't coalesce, use NIL
+             'smd-no ; don't coalesce, use NIL
+             :from 'site
+             :left-join 'site-geo :using ('s-no)
+             :left-join 'site-national-designation :using ('s-no)
+             :left-join 'site-provincial-designation :using ('s-no)
+             :left-join 'site-municipal-designation :using ('s-no)
+             :where (:= 'm-name '$1))
+    's-name)
+   m-name)
+  :sites)
+
 (defun make-binary-logical-form (a op b)
   (if (not (and op b))
       a
