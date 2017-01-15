@@ -64,14 +64,18 @@ function sitesAnnouncePopulated(sites) {
     });
     return sites;
 };
+function sitesPopulate(sites, features) {
+    sites.sites = [];
+    for (var feature = null, _js_idx1 = 0; _js_idx1 < features.length; _js_idx1 += 1) {
+        feature = features[_js_idx1];
+        sites.sites.push(featureToSite(feature));
+    };
+    sitesAnnouncePopulated(sites);
+    return sites;
+};
 function sitesPopulateWithinBounds(sites, south, west, north, east) {
     return xhrGetJson(sites.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
-        sites.sites = [];
-        results.features.forEach(function (feature) {
-            return sites.sites.push(featureToSite(feature));
-        });
-        sitesAnnouncePopulated(sites);
-        return sites;
+        return sitesPopulate(sites, results.features);
     });
 };
 function updateWidget(widget) {
@@ -89,20 +93,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName9 = site.stName;
-    if (stName9 === 'Featured site') {
+    var stName2 = site.stName;
+    if (stName2 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName9 === 'Museum/Archives') {
+    } else if (stName2 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName9 === 'Building') {
+    } else if (stName2 === 'Building') {
         return 'icon_building.png';
-    } else if (stName9 === 'Monument') {
+    } else if (stName2 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName9 === 'Cemetery') {
+    } else if (stName2 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName9 === 'Location') {
+    } else if (stName2 === 'Location') {
         return 'icon_location.png';
-    } else if (stName9 === 'Other') {
+    } else if (stName2 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -114,8 +118,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress10 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress10 === '' ? '' : ', ' + sAddress10);
+    var sAddress3 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress3 === '' ? '' : ', ' + sAddress3);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -142,13 +146,13 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar14 = this.markers, _js_idx13 = 0; _js_idx13 < _js_arrvar14.length; _js_idx13 += 1) {
-            marker = _js_arrvar14[_js_idx13];
+        for (var marker = null, _js_arrvar7 = this.markers, _js_idx6 = 0; _js_idx6 < _js_arrvar7.length; _js_idx6 += 1) {
+            marker = _js_arrvar7[_js_idx6];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar12 = this.model.sites, _js_idx11 = 0; _js_idx11 < _js_arrvar12.length; _js_idx11 += 1) {
-            site = _js_arrvar12[_js_idx11];
+        for (var site = null, _js_arrvar5 = this.model.sites, _js_idx4 = 0; _js_idx4 < _js_arrvar5.length; _js_idx4 += 1) {
+            site = _js_arrvar5[_js_idx4];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -157,16 +161,16 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv15 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv8 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db16 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db16[0];
-            var north = _db16[1];
-            var east = _db16[2];
+            var _db9 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db9[0];
+            var north = _db9[1];
+            var east = _db9[2];
             return sitesPopulateWithinBounds(SITES, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv15;
+            __PS_MV_REG = prevMv8;
         };
     });
 };

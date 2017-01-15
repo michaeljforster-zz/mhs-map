@@ -84,6 +84,15 @@
   (ps:chain sites subscribers (for-each #'(lambda (element) (funcall element))))
   sites)
 
+(defun sites-populate (sites features)
+  (setf (ps:@ sites sites) (array))
+  (dolist (feature features)
+    (ps:chain sites
+              sites
+              (push (feature-to-site feature))))
+  (sites-announce-populated sites)
+  sites)
+
 (defun sites-populate-within-bounds (sites south west north east)
   (xhr-get-json (+ (ps:@ sites url)
                    "?south=" south
@@ -91,15 +100,7 @@
                    "&north=" north
                    "&east=" east)
                 #'(lambda (results)
-                    (setf (ps:@ sites sites) (array))
-                    (ps:chain results
-                              features
-                              (for-each #'(lambda (feature)
-                                            (ps:chain sites
-                                                      sites
-                                                      (push (feature-to-site feature))))))
-                    (sites-announce-populated sites)
-                    sites)))
+                    (sites-populate sites (ps:@ results features)))))
 
 (defun update-widget (widget)
   (ps:chain widget (update-widget)))
