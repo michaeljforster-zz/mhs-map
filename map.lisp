@@ -33,7 +33,8 @@
                     (defvar *mhs-base-uri* ,(princ-to-string (puri:uri *mhs-base-uri*)))
                     (defvar *icons-uri* ,(princ-to-string (static-uri "mhs-map/images/icons/")))
                     (defvar *features-within-bounds-uri* ,(princ-to-string *features-within-bounds-uri*))
-                    (defvar *features-within-distance-uri* ,(princ-to-string *features-within-distance-uri*))))))
+                    (defvar *features-within-distance-uri* ,(princ-to-string *features-within-distance-uri*))
+                    (defvar *features-by-municipality-uri* ,(princ-to-string *features-by-municipality-uri*))))))
       (:script :type "text/javascript" :src (static-uri "mhs-map/js/map.js"))
       (:script :type "text/javascript"
                (cl-who:str

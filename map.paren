@@ -58,8 +58,7 @@
            (ps:@ feature properties s-url)
            (geometry-point-to-lat-lng (ps:@ feature geometry)))))
 
-(defun -site-list (url)
-  (setf (ps:@ this url) url)
+(defun -site-list ()
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
   this)
@@ -237,9 +236,9 @@
                             ": "
                             (ps:@ position-error message))))
   (alert (+ "Geolocation Error: "
-          (ps:@ position-error code)
-          ": "
-          (ps:@ position-error message))))
+            (ps:@ position-error code)
+            ": "
+            (ps:@ position-error message))))
 
 (defun map-widget-start-geolocation (map-widget)
   (if (ps:@ navigator geolocation)
@@ -284,9 +283,7 @@
                        (ps:chain (j-query "#list-view") (hide))
                        (ps:chain (j-query "#map-canvas") (show)))))
 
-
-  (setf *site-list*
-        (ps:new (-site-list *features-within-bounds-uri*)))
+  (setf *site-list* (ps:new (-site-list)))
 
   (setf *list-widget*
         (ps:new (-list-widget *site-list*
@@ -317,7 +314,7 @@
                              #'(lambda (map-widget)
                                  (multiple-value-bind (south west north east)
                                      (decode-bounds (map-widget-bounds map-widget))
-                                   (xhr-get-json (+ (ps:@ map-widget model url)
+                                   (xhr-get-json (+ *features-within-bounds-uri*
                                                     "?south=" south
                                                     "&west=" west
                                                     "&north=" north
