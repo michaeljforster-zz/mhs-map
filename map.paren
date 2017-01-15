@@ -118,19 +118,21 @@
   (setf (ps:@ this model) model)
   (setf (ps:@ this jqelement) jqelement)
   (setf (ps:@ this update-widget)
-        #'(lambda ()
-            (ps:chain this jqelement (empty))
-            (ps:chain this jqelement
-                      (html
-                       (ps:who-ps-html
-                        (:ul
-                         (ps:chain (site-list-map (ps:@ this model)
-                                                  #'(lambda (site)
-                                                      (ps:who-ps-html
-                                                       (:li (+ (ps:@ site s-no)
-                                                               " - "
-                                                               (ps:@ site s-name))))))
-                                   (join ""))))))))
+        (ps:chain #'(lambda ()
+                      (ps:chain this jqelement (empty))
+                      (ps:chain this jqelement
+                                (html
+                                 (ps:who-ps-html
+                                  (:ul
+                                   (ps:chain (site-list-map (ps:@ this model)
+                                                            (ps:chain #'(lambda (site)
+                                                                          (ps:who-ps-html
+                                                                           (:li (+ (ps:@ site s-no)
+                                                                                   " - "
+                                                                                   (ps:@ site s-name)))))
+                                                                      (bind this)))
+                                             (join "")))))))
+                  (bind this)))
   this)
 
 (defun site-icon-uri (site)
@@ -197,15 +199,18 @@
                           (-map (ps:@ jqelement 0)
                                 (ps:create :center center :zoom zoom)))))
   (setf (ps:@ this update-widget)
-        #'(lambda ()
-            (dolist (marker (ps:@ this markers))
-              (ps:chain marker (set-map nil)))
-            (setf (ps:@ this markers length) 0)
-            (dolist (site (ps:@ this model sites))
-              (let ((marker (map-add-marker (ps:@ this google-map)
-                                            (ps:@ this site-info-window)
-                                            site)))
-                (ps:chain this markers (push marker))))))
+        (ps:chain #'(lambda ()
+                      (dolist (marker (ps:@ this markers))
+                        (ps:chain marker (set-map nil)))
+                      (setf (ps:@ this markers length) 0)
+                      (site-list-do (ps:@ this model)
+                                    (ps:chain #'(lambda (site)
+                                                  (let ((marker (map-add-marker (ps:@ this google-map)
+                                                                                (ps:@ this site-info-window)
+                                                                                site)))
+                                                    (ps:chain this markers (push marker))))
+                                              (bind this))))
+                  (bind this)))
   this)
 
 ;; https://developers.google.com/maps/documentation/javascript/events
