@@ -10,7 +10,6 @@ function decodeBounds(bounds) {
     var west = southWest.lng();
     var north = northEast.lat();
     var east = northEast.lng();
-    console.log('BOUNDS: ' + bounds + ' SOUTH-EAST: ' + southWest + ' SOUTH: ' + south + ' WEST: ' + west + ' NORTH-EAST: ' + northEast + ' NORTH: ' + north + ' EAST: ' + east);
     __PS_MV_REG = { 'tag' : arguments.callee, 'values' : [west, north, east] };
     return south;
 };
@@ -75,17 +74,12 @@ function siteListAnnouncePopulated(siteList) {
 };
 function siteListPopulate(siteList, features) {
     siteList.sites = [];
-    for (var feature = null, _js_idx149 = 0; _js_idx149 < features.length; _js_idx149 += 1) {
-        feature = features[_js_idx149];
+    for (var feature = null, _js_idx191 = 0; _js_idx191 < features.length; _js_idx191 += 1) {
+        feature = features[_js_idx191];
         siteList.sites.push(featureToSite(feature));
     };
     siteListAnnouncePopulated(siteList);
     return siteList;
-};
-function siteListPopulateWithinBounds(siteList, south, west, north, east) {
-    return xhrGetJson(siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
-        return siteListPopulate(siteList, results.features);
-    });
 };
 function updateWidget(widget) {
     return widget.updateWidget();
@@ -102,20 +96,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName150 = site.stName;
-    if (stName150 === 'Featured site') {
+    var stName192 = site.stName;
+    if (stName192 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName150 === 'Museum/Archives') {
+    } else if (stName192 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName150 === 'Building') {
+    } else if (stName192 === 'Building') {
         return 'icon_building.png';
-    } else if (stName150 === 'Monument') {
+    } else if (stName192 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName150 === 'Cemetery') {
+    } else if (stName192 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName150 === 'Location') {
+    } else if (stName192 === 'Location') {
         return 'icon_location.png';
-    } else if (stName150 === 'Other') {
+    } else if (stName192 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -127,8 +121,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress151 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress151 === '' ? '' : ', ' + sAddress151);
+    var sAddress193 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress193 === '' ? '' : ', ' + sAddress193);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -155,8 +149,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = (function () {
-        for (var marker = null, _js_arrvar153 = this.markers, _js_idx152 = 0; _js_idx152 < _js_arrvar153.length; _js_idx152 += 1) {
-            marker = _js_arrvar153[_js_idx152];
+        for (var marker = null, _js_arrvar195 = this.markers, _js_idx194 = 0; _js_idx194 < _js_arrvar195.length; _js_idx194 += 1) {
+            marker = _js_arrvar195[_js_idx194];
             marker.setMap(null);
         };
         this.markers.length = 0;
@@ -167,18 +161,23 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     }).bind(this);
     return this;
 };
+function siteListPopulateWithinBounds(siteList, south, west, north, east) {
+    return xhrGetJson(siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
+        return siteListPopulate(siteList, results.features);
+    });
+};
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv154 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv196 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(mapWidget.googleMap.getBounds());
-            var _db155 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db155[0];
-            var north = _db155[1];
-            var east = _db155[2];
+            var _db197 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db197[0];
+            var north = _db197[1];
+            var east = _db197[2];
             return siteListPopulateWithinBounds(mapWidget.model, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv154;
+            __PS_MV_REG = prevMv196;
         };
     });
 };
@@ -241,6 +240,5 @@ function initialize() {
         console.log('MAP notified ' + siteListSize(SITELIST));
         return updateWidget(MAP);
     });
-    mapWidgetStartUpdatingMarkers(MAP);
-    return mapWidgetStartGeolocation(MAP);
+    return mapWidgetStartUpdatingMarkers(MAP);
 };

@@ -18,14 +18,6 @@
           (west (ps:chain south-west (lng)))
           (north (ps:chain north-east (lat)))
           (east (ps:chain north-east (lng))))
-      ;; TODO REMOVE...
-      (ps:chain console (log (+ "BOUNDS: " bounds
-                                " SOUTH-EAST: " south-west
-                                " SOUTH: " south
-                                " WEST: " west
-                                " NORTH-EAST: " north-east
-                                " NORTH: " north
-                                " EAST: " east)))
       (values south west north east))))
 
 ;;; Models
@@ -101,15 +93,6 @@
               (push (feature-to-site feature))))
   (site-list-announce-populated site-list)
   site-list)
-
-(defun site-list-populate-within-bounds (site-list south west north east)
-  (xhr-get-json (+ (ps:@ site-list url)
-                   "?south=" south
-                   "&west=" west
-                   "&north=" north
-                   "&east=" east)
-                #'(lambda (results)
-                    (site-list-populate site-list (ps:@ results features)))))
 
 (defun update-widget (widget)
   (ps:chain widget (update-widget)))
@@ -212,6 +195,15 @@
                                               (bind this))))
                   (bind this)))
   this)
+
+(defun site-list-populate-within-bounds (site-list south west north east)
+  (xhr-get-json (+ (ps:@ site-list url)
+                   "?south=" south
+                   "&west=" west
+                   "&north=" north
+                   "&east=" east)
+                #'(lambda (results)
+                    (site-list-populate site-list (ps:@ results features)))))
 
 ;; https://developers.google.com/maps/documentation/javascript/events
 ;;
@@ -334,4 +326,4 @@
   
   (map-widget-start-updating-markers *map*)
 
-  (map-widget-start-geolocation *map*))
+  )
