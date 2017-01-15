@@ -1,0 +1,48 @@
+;;;; model.paren
+
+(in-package #:mhs-map)
+
+(defun -site (s-no s-name m-name s-address st-name s-url lat-lng)
+  (setf (ps:@ this s-no) s-no)
+  (setf (ps:@ this s-name) s-name)
+  (setf (ps:@ this m-name) m-name)
+  (setf (ps:@ this s-address) s-address)
+  (setf (ps:@ this st-name) st-name)
+  (setf (ps:@ this s-url) s-url)
+  (setf (ps:@ this lat-lng) lat-lng)
+  this)
+
+(defun -site-list ()
+  (setf (ps:@ this sites) (array))
+  (setf (ps:@ this subscribers) (array))
+  this)
+
+(defun site-list-size (site-list)
+  (ps:@ site-list sites length))
+
+(defun site-list-map (site-list fn)
+  (ps:chain site-list sites (map fn)))
+
+(defun site-list-do (site-list fn)
+  (ps:chain site-list sites (for-each fn)))
+
+(defun site-list-unsubscribe-all (site-list)
+  (setf (ps:@ site-list subscribers) (array))
+  site-list)
+
+(defun site-list-subscribe-to-populated (site-list fn)
+  (ps:chain site-list subscribers (push fn))
+  site-list)
+
+(defun site-list-announce-populated (site-list)
+  (ps:chain site-list subscribers (for-each #'(lambda (element) (funcall element))))
+  site-list)
+
+(defun site-list-populate (site-list features)
+  (setf (ps:@ site-list sites) (array))
+  (dolist (feature features)
+    (ps:chain site-list
+              sites
+              (push (feature-to-site feature))))
+  (site-list-announce-populated site-list)
+  site-list)

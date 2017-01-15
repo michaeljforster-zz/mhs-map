@@ -1,0 +1,181 @@
+;;;; widget.paren
+
+(in-package #:mhs-map)
+
+(defun update-widget (widget)
+  (ps:chain widget (update-widget)))
+
+(defun -list-widget (model jqelement)
+  (setf (ps:@ this model) model)
+  (setf (ps:@ this jqelement) jqelement)
+  (setf (ps:@ this update-widget)
+        (ps:chain #'(lambda ()
+                      (ps:chain this jqelement (empty))
+                      (ps:chain this jqelement
+                                (html
+                                 (ps:who-ps-html
+                                  (:ul
+                                   (ps:chain (site-list-map (ps:@ this model)
+                                                            (ps:chain #'(lambda (site)
+                                                                          (ps:who-ps-html
+                                                                           (:li (+ (ps:@ site s-no)
+                                                                                   " - "
+                                                                                   (ps:@ site s-name)))))
+                                                                      (bind this)))
+                                             (join "")))))))
+                  (bind this)))
+  this)
+
+(defun site-icon-uri (site)
+  (let ((st-name (ps:@ site st-name)))
+    (cond ((= st-name "Featured site") "icon_feature.png")
+          ((= st-name "Museum/Archives") "icon_museum.png")
+          ((= st-name "Building") "icon_building.png")
+          ((= st-name "Monument") "icon_monument.png")
+          ((= st-name "Cemetery") "icon_cemetery.png")
+          ((= st-name "Location") "icon_location.png")
+          ((= st-name "Other") "icon_other.png"))))
+
+(defun site-marker-icon (site)
+  (ps:create :url (+ *icons-uri* (site-icon-uri site))
+             :size (ps:new (ps:chain google maps (-size 32 32)))
+             :origin (ps:new (ps:chain google maps (-point 0 0)))
+             :anchor (ps:new (ps:chain google maps (-point 16 16)))))
+
+(defun site-link-title (site)
+  (let ((s-address (ps:@ site s-address)))
+    (+ (ps:@ site s-name)
+       ", "
+       (ps:@ site m-name)
+       (if (= s-address "") "" (+ ", " s-address)))))
+
+(defun site-link-url (site)
+  (+ *mhs-base-uri* (ps:@ site s-url)))
+
+(defun map-add-marker (google-map site-info-window site)
+  (let ((marker (ps:new
+                 (ps:chain google maps
+                           (-marker (ps:create :position (ps:@ site lat-lng)
+                                               :icon (site-marker-icon site)
+                                               :title (ps:@ site s-name)
+                                               :map google-map)))))
+        (content (ps:who-ps-html
+                  (:div :class "site-info-window-content-box"
+                        (:div :class "site-info-window-site-name-box"
+                              (:a :class "site-info-window-site-link"
+                                  :href (site-link-url site)
+                                  :target "_blank"
+                                  (site-link-title site)))))))
+    (ps:chain google maps event
+              (add-listener marker
+                            "click"
+                            #'(lambda (event)
+                                (ps:chain site-info-window (set-content content))
+                                (ps:chain site-info-window (open google-map marker)))))
+    marker))
+
+(defun -map-widget (model jqelement center zoom geolocation-options)
+  (setf (ps:@ this model) model)
+  (setf (ps:@ this idle-listener) nil)
+  (setf (ps:@ this geolocation-options) geolocation-options)
+  (setf (ps:@ this geolocation-marker)
+        (ps:new (ps:chain google
+                          maps
+                          (-marker (ps:create :map nil)))))
+  (setf (ps:@ this geolocation-watch-id) nil)
+  (setf (ps:@ this markers) (array))
+  (setf (ps:@ this site-info-window)
+        (ps:new (ps:chain google maps (-info-window (ps:create)))))
+  (setf (ps:@ this google-map)
+        (ps:new (ps:chain google maps
+                          (-map (ps:@ jqelement 0)
+                                (ps:create :center center :zoom zoom)))))
+  (setf (ps:@ this update-widget)
+        (ps:chain #'(lambda ()
+                      (dolist (marker (ps:@ this markers))
+                        (ps:chain marker (set-map nil)))
+                      (setf (ps:@ this markers length) 0)
+                      (site-list-do (ps:@ this model)
+                                    (ps:chain #'(lambda (site)
+                                                  (let ((marker (map-add-marker (ps:@ this google-map)
+                                                                                (ps:@ this site-info-window)
+                                                                                site)))
+                                                    (ps:chain this markers (push marker))))
+                                              (bind this))))
+                  (bind this)))
+  this)
+
+(defun map-widget-bounds (map-widget)
+  (ps:chain map-widget google-map (get-bounds)))
+
+;; https://developers.google.com/maps/documentation/javascript/events
+;;
+;; Note:
+;; 
+;;     Tip: If you're trying to detect a change in
+;;     the viewport, be sure to use the specific
+;;     bounds_changed event rather than
+;;     constituent zoom_changed and center_changed
+;;     events. ...
+;;
+;; However, because bounds_changed appears to fire
+;; repeatedly during a pan or resize, we listen
+;; for the idle event instead:
+;; 
+;;     This event is fired when the map becomes
+;;     idle after panning or zooming.
+(defun map-widget-listen-on-idle (map-widget fn)
+  (unless (null (ps:@ map-widget idle-listener))
+    (ps:chain google
+              maps
+              event
+              (remove-listener (ps:@ map-widget idle-listener))))
+  (setf (ps:@ map-widget idle-listener)
+        (ps:chain map-widget
+                  google-map
+                  (add-listener "idle" #'(lambda (event) (funcall fn map-widget))))))
+
+(defun geolocation-position-to-google-lat-lng (position)
+  (let ((lat (ps:@ position coords latitude))
+        (lng (ps:@ position coords longitude)))
+    (ps:new (ps:chain google maps (-lat-lng (ps:create :lat lat :lng lng))))))
+
+(defun geolocation-success (map-widget position)
+  (let ((google-lat-lng (geolocation-position-to-google-lat-lng position)))
+    (ps:chain map-widget google-map (set-center google-lat-lng))
+    (ps:chain (ps:@ map-widget geolocation-marker) (set-position google-lat-lng))
+    (ps:chain console (log (+ "GEOLOCATION SUCCESS: lat-lng=" google-lat-lng)))))
+
+(defun geolocation-error (position-error)
+  (ps:chain console (log (+ "GEOLOCATION ERROR: "
+                            (ps:@ position-error code)
+                            ": "
+                            (ps:@ position-error message))))
+  (alert (+ "Geolocation Error: "
+            (ps:@ position-error code)
+            ": "
+            (ps:@ position-error message))))
+
+(defun map-widget-start-geolocation (map-widget)
+  (if (ps:@ navigator geolocation)
+      (progn
+        (ps:chain map-widget
+                  geolocation-marker
+                  (set-map (ps:@ map-widget google-map)))
+        (setf (ps:@ map-widget geolocation-watch-id)
+              (ps:chain navigator
+                        geolocation
+                        (watch-position #'(lambda (position) (geolocation-success map-widget position))
+                                        #'geolocation-error
+                                        (ps:@ map-widget geolocation-options)))))
+      (alert "Geolocation is not available.")))
+
+(defun map-widget-stop-geolocation (map-widget)
+  (if (ps:@ navigator geolocation)
+      (progn
+        (ps:chain navigator
+                  geolocation
+                  (clear-watch (ps:@ map-widget geolocation-watch-id)))
+        (setf (ps:@ map geolocation-watch-id) nil)
+        (ps:chain map-widget geolocation-marker (set-map nil)))
+      (alert "Geolocation is not available.")))

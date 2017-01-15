@@ -1,0 +1,45 @@
+;;;; util.paren
+
+(in-package #:mhs-map)
+
+(defun xhr-get-json (url success-function)
+  (ps:chain j-query
+            (get-j-s-o-n url success-function)
+            (fail #'(lambda (jq-x-h-r text-status error-thrown)
+                      (alert (+ "Error: " text-status))))))
+
+;; https://developers.google.com/maps/documentation/javascript/3.exp/reference#LatLngBounds
+(defun decode-bounds (bounds)
+  (let ((south-west (ps:chain bounds (get-south-west)))
+        (north-east (ps:chain bounds (get-north-east))))
+    (let ((south (ps:chain south-west (lat)))
+          (west (ps:chain south-west (lng)))
+          (north (ps:chain north-east (lat)))
+          (east (ps:chain north-east (lng))))
+      (values south west north east))))
+
+(defun geometry-point-x (geometry)
+  (if (/= (ps:@ geometry type) "Point")
+      (throw "Geometry is not a Point")
+      (ps:@ geometry coordinates 0)))
+
+(defun geometry-point-y (geometry)
+  (if (/= (ps:@ geometry type) "Point")
+      (throw "Geometry is not a Point")
+      (ps:@ geometry coordinates 1)))
+
+(defun geometry-point-to-lat-lng (geometry)
+  (ps:new (ps:chain google
+                    maps
+                    (-lat-lng (ps:create 'lat (geometry-point-y geometry)
+                                         'lng (geometry-point-x geometry))))))
+
+(defun feature-to-site (feature)
+  (ps:new (-site
+           (ps:@ feature properties s-no)
+           (ps:@ feature properties s-name)
+           (ps:@ feature properties m-name)
+           (ps:@ feature properties s-address)
+           (ps:@ feature properties st-name)
+           (ps:@ feature properties s-url)
+           (geometry-point-to-lat-lng (ps:@ feature geometry)))))

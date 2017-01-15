@@ -2,9 +2,17 @@
 
 (in-package #:mhs-map)
 
-(defun compile-paren-file ()
-  (let ((paren-filespec (merge-pathnames #p"map.paren" app-config:*base-directory*))
-        (js-filespec (merge-pathnames #p"static/mhs-map/js/map.js" app-config:*base-directory*)))
+(defun compile-paren-files ()
+  (compile-paren-file "util")
+  (compile-paren-file "model")
+  (compile-paren-file "widget")
+  (compile-paren-file "map"))
+
+(defun compile-paren-file (filename)
+  (let ((paren-filespec (merge-pathnames (make-pathname :name filename :type "paren") app-config:*base-directory*))
+        (js-filespec (merge-pathnames (make-pathname :name filename :type "js")
+                                      (merge-pathnames "static/mhs-map/js/"
+                                                        app-config:*base-directory*))))
     (with-open-file (stream js-filespec :direction :output :if-exists :supersede)
       (let ((ps:*parenscript-stream* stream))
         (ps:ps-compile-file paren-filespec)))))
@@ -35,6 +43,9 @@
                     (defvar *features-within-bounds-uri* ,(princ-to-string *features-within-bounds-uri*))
                     (defvar *features-within-distance-uri* ,(princ-to-string *features-within-distance-uri*))
                     (defvar *features-by-municipality-uri* ,(princ-to-string *features-by-municipality-uri*))))))
+      (:script :type "text/javascript" :src (static-uri "mhs-map/js/util.js"))
+      (:script :type "text/javascript" :src (static-uri "mhs-map/js/model.js"))
+      (:script :type "text/javascript" :src (static-uri "mhs-map/js/widget.js"))
       (:script :type "text/javascript" :src (static-uri "mhs-map/js/map.js"))
       (:script :type "text/javascript"
                (cl-who:str
