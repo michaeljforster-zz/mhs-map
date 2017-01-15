@@ -74,8 +74,8 @@ function siteListAnnouncePopulated(siteList) {
 };
 function siteListPopulate(siteList, features) {
     siteList.sites = [];
-    for (var feature = null, _js_idx191 = 0; _js_idx191 < features.length; _js_idx191 += 1) {
-        feature = features[_js_idx191];
+    for (var feature = null, _js_idx205 = 0; _js_idx205 < features.length; _js_idx205 += 1) {
+        feature = features[_js_idx205];
         siteList.sites.push(featureToSite(feature));
     };
     siteListAnnouncePopulated(siteList);
@@ -96,20 +96,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName192 = site.stName;
-    if (stName192 === 'Featured site') {
+    var stName206 = site.stName;
+    if (stName206 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName192 === 'Museum/Archives') {
+    } else if (stName206 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName192 === 'Building') {
+    } else if (stName206 === 'Building') {
         return 'icon_building.png';
-    } else if (stName192 === 'Monument') {
+    } else if (stName206 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName192 === 'Cemetery') {
+    } else if (stName206 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName192 === 'Location') {
+    } else if (stName206 === 'Location') {
         return 'icon_location.png';
-    } else if (stName192 === 'Other') {
+    } else if (stName206 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -121,8 +121,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress193 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress193 === '' ? '' : ', ' + sAddress193);
+    var sAddress207 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress207 === '' ? '' : ', ' + sAddress207);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -149,8 +149,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = (function () {
-        for (var marker = null, _js_arrvar195 = this.markers, _js_idx194 = 0; _js_idx194 < _js_arrvar195.length; _js_idx194 += 1) {
-            marker = _js_arrvar195[_js_idx194];
+        for (var marker = null, _js_arrvar209 = this.markers, _js_idx208 = 0; _js_idx208 < _js_arrvar209.length; _js_idx208 += 1) {
+            marker = _js_arrvar209[_js_idx208];
             marker.setMap(null);
         };
         this.markers.length = 0;
@@ -161,24 +161,12 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     }).bind(this);
     return this;
 };
-function siteListPopulateWithinBounds(siteList, south, west, north, east) {
-    return xhrGetJson(siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
-        return siteListPopulate(siteList, results.features);
-    });
+function mapWidgetBounds(mapWidget) {
+    return mapWidget.googleMap.getBounds();
 };
-function mapWidgetStartUpdatingMarkers(mapWidget) {
-    return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv196 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
-        try {
-            var south = decodeBounds(mapWidget.googleMap.getBounds());
-            var _db197 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db197[0];
-            var north = _db197[1];
-            var east = _db197[2];
-            return siteListPopulateWithinBounds(mapWidget.model, south, west, north, east);
-        } finally {
-            __PS_MV_REG = prevMv196;
-        };
+function mapWidgetListenOnIdle(mapWidget, fn) {
+    return mapWidget.googleMap.addListener('idle', function (event) {
+        return fn(mapWidget);
     });
 };
 function geolocationPositionToGoogleLatLng(position) {
@@ -240,5 +228,19 @@ function initialize() {
         console.log('MAP notified ' + siteListSize(SITELIST));
         return updateWidget(MAP);
     });
-    return mapWidgetStartUpdatingMarkers(MAP);
+    return mapWidgetListenOnIdle(MAP, function (mapWidget) {
+        var prevMv210 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        try {
+            var south = decodeBounds(mapWidgetBounds(mapWidget));
+            var _db211 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db211[0];
+            var north = _db211[1];
+            var east = _db211[2];
+            return xhrGetJson(mapWidget.model.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
+                return siteListPopulate(mapWidget.model, results.features);
+            });
+        } finally {
+            __PS_MV_REG = prevMv210;
+        };
+    });
 };

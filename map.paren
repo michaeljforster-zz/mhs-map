@@ -196,14 +196,8 @@
                   (bind this)))
   this)
 
-(defun site-list-populate-within-bounds (site-list south west north east)
-  (xhr-get-json (+ (ps:@ site-list url)
-                   "?south=" south
-                   "&west=" west
-                   "&north=" north
-                   "&east=" east)
-                #'(lambda (results)
-                    (site-list-populate site-list (ps:@ results features)))))
+(defun map-widget-bounds (map-widget)
+  (ps:chain map-widget google-map (get-bounds)))
 
 ;; https://developers.google.com/maps/documentation/javascript/events
 ;;
@@ -221,15 +215,10 @@
 ;; 
 ;;     This event is fired when the map becomes
 ;;     idle after panning or zooming.
-(defun map-widget-start-updating-markers (map-widget)
+(defun map-widget-listen-on-idle (map-widget fn)
   (ps:chain map-widget
             google-map
-            (add-listener "idle"
-                          #'(lambda ()
-                              (multiple-value-bind (south west north east)
-                                  (decode-bounds (ps:chain map-widget google-map (get-bounds)))
-                                (site-list-populate-within-bounds (ps:@ map-widget model)
-                                                                  south west north east))))))
+            (add-listener "idle" #'(lambda (event) (funcall fn map-widget)))))
 
 (defun geolocation-position-to-google-lat-lng (position)
   (let ((lat (ps:@ position coords latitude))
@@ -324,6 +313,17 @@
                                                           (site-list-size *site-list*))))
                                         (update-widget *map*)))
   
-  (map-widget-start-updating-markers *map*)
+  (map-widget-listen-on-idle *map*
+                             #'(lambda (map-widget)
+                                 (multiple-value-bind (south west north east)
+                                     (decode-bounds (map-widget-bounds map-widget))
+                                   (xhr-get-json (+ (ps:@ map-widget model url)
+                                                    "?south=" south
+                                                    "&west=" west
+                                                    "&north=" north
+                                                    "&east=" east)
+                                                 #'(lambda (results)
+                                                     (site-list-populate (ps:@ map-widget model)
+                                                                         (ps:@ results features)))))))
 
   )
