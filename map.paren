@@ -66,41 +66,41 @@
            (ps:@ feature properties s-url)
            (geometry-point-to-lat-lng (ps:@ feature geometry)))))
 
-(defun -sites (url)
+(defun -site-list (url)
   (setf (ps:@ this url) url)
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
   this)
 
-(defun sites-unsubscribe-all (sites)
-  (setf (ps:@ this subscribers) (array))
-  sites)
+(defun site-list-unsubscribe-all (site-list)
+  (setf (ps:@ site-list subscribers) (array))
+  site-list)
 
-(defun sites-subscribe-to-populated (sites fn)
-  (ps:chain sites subscribers (push fn))
-  sites)
+(defun site-list-subscribe-to-populated (site-list fn)
+  (ps:chain site-list subscribers (push fn))
+  site-list)
 
-(defun sites-announce-populated (sites)
-  (ps:chain sites subscribers (for-each #'(lambda (element) (funcall element))))
-  sites)
+(defun site-list-announce-populated (site-list)
+  (ps:chain site-list subscribers (for-each #'(lambda (element) (funcall element))))
+  site-list)
 
-(defun sites-populate (sites features)
-  (setf (ps:@ sites sites) (array))
+(defun site-list-populate (site-list features)
+  (setf (ps:@ site-list sites) (array))
   (dolist (feature features)
-    (ps:chain sites
+    (ps:chain site-list
               sites
               (push (feature-to-site feature))))
-  (sites-announce-populated sites)
-  sites)
+  (site-list-announce-populated site-list)
+  site-list)
 
-(defun sites-populate-within-bounds (sites south west north east)
-  (xhr-get-json (+ (ps:@ sites url)
+(defun site-list-populate-within-bounds (site-list south west north east)
+  (xhr-get-json (+ (ps:@ site-list url)
                    "?south=" south
                    "&west=" west
                    "&north=" north
                    "&east=" east)
                 #'(lambda (results)
-                    (sites-populate sites (ps:@ results features)))))
+                    (site-list-populate site-list (ps:@ results features)))))
 
 (defun update-widget (widget)
   (ps:chain widget (update-widget)))
@@ -224,7 +224,7 @@
                           #'(lambda ()
                               (multiple-value-bind (south west north east)
                                   (decode-bounds (ps:chain *map* google-map (get-bounds)))
-                                (sites-populate-within-bounds *sites* south west north east))))))
+                                (site-list-populate-within-bounds *site-list* south west north east))))))
 
 (defun geolocation-position-to-google-lat-lng (position)
   (let ((lat (ps:@ position coords latitude))
@@ -271,7 +271,7 @@
         (ps:chain map-widget geolocation-marker (set-map nil)))
       (alert "Geolocation is not available.")))
 
-(defvar *sites* nil)
+(defvar *site-list* nil)
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
@@ -291,30 +291,30 @@
                        (ps:chain (j-query "#map-canvas") (show)))))
 
 
-  (setf *sites*
-        (ps:new (-sites *features-within-bounds-uri*)))
+  (setf *site-list*
+        (ps:new (-site-list *features-within-bounds-uri*)))
 
   (setf *list-widget*
-        (ps:new (-list-widget *sites*
+        (ps:new (-list-widget *site-list*
                               (j-query "#list-view"))))
 
-  (sites-subscribe-to-populated *sites*
-                                #'(lambda ()
-                                    (ps:chain console (log (+ "LIST-WIDGET notified " (ps:@ *sites* sites length))))
-                                    (update-widget *list-widget*)))
+  (site-list-subscribe-to-populated *site-list*
+                                    #'(lambda ()
+                                        (ps:chain console (log (+ "LIST-WIDGET notified " (ps:@ *site-list* sites length))))
+                                        (update-widget *list-widget*)))
 
   (setf *map*
-        (ps:new (-map-widget *sites*
+        (ps:new (-map-widget *site-list*
                              (j-query "#map-canvas")
                              *default-center*
                              *default-zoom*
                              *geolocation-options*)))
 
-  (sites-subscribe-to-populated *sites*
-                                #'(lambda ()
-                                    (ps:chain console (log (+ "MAP notified " (ps:@ *sites* sites length))))
-                                    (update-widget *map*)))
-                                     
+  (site-list-subscribe-to-populated *site-list*
+                                    #'(lambda ()
+                                        (ps:chain console (log (+ "MAP notified " (ps:@ *site-list* sites length))))
+                                        (update-widget *map*)))
+  
   (map-widget-start-updating-markers *map*)
 
   (map-widget-start-geolocation *map*))
