@@ -226,8 +226,9 @@
             (add-listener "idle"
                           #'(lambda ()
                               (multiple-value-bind (south west north east)
-                                  (decode-bounds (ps:chain *map* google-map (get-bounds)))
-                                (site-list-populate-within-bounds *site-list* south west north east))))))
+                                  (decode-bounds (ps:chain map-widget google-map (get-bounds)))
+                                (site-list-populate-within-bounds (ps:@ map-widget model)
+                                                                  south west north east))))))
 
 (defun geolocation-position-to-google-lat-lng (position)
   (let ((lat (ps:@ position coords latitude))

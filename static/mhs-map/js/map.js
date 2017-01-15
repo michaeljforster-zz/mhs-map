@@ -69,8 +69,8 @@ function siteListAnnouncePopulated(siteList) {
 };
 function siteListPopulate(siteList, features) {
     siteList.sites = [];
-    for (var feature = null, _js_idx82 = 0; _js_idx82 < features.length; _js_idx82 += 1) {
-        feature = features[_js_idx82];
+    for (var feature = null, _js_idx91 = 0; _js_idx91 < features.length; _js_idx91 += 1) {
+        feature = features[_js_idx91];
         siteList.sites.push(featureToSite(feature));
     };
     siteListAnnouncePopulated(siteList);
@@ -96,20 +96,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName83 = site.stName;
-    if (stName83 === 'Featured site') {
+    var stName92 = site.stName;
+    if (stName92 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName83 === 'Museum/Archives') {
+    } else if (stName92 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName83 === 'Building') {
+    } else if (stName92 === 'Building') {
         return 'icon_building.png';
-    } else if (stName83 === 'Monument') {
+    } else if (stName92 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName83 === 'Cemetery') {
+    } else if (stName92 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName83 === 'Location') {
+    } else if (stName92 === 'Location') {
         return 'icon_location.png';
-    } else if (stName83 === 'Other') {
+    } else if (stName92 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -121,8 +121,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress84 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress84 === '' ? '' : ', ' + sAddress84);
+    var sAddress93 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress93 === '' ? '' : ', ' + sAddress93);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -149,13 +149,13 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = function () {
-        for (var marker = null, _js_arrvar88 = this.markers, _js_idx87 = 0; _js_idx87 < _js_arrvar88.length; _js_idx87 += 1) {
-            marker = _js_arrvar88[_js_idx87];
+        for (var marker = null, _js_arrvar97 = this.markers, _js_idx96 = 0; _js_idx96 < _js_arrvar97.length; _js_idx96 += 1) {
+            marker = _js_arrvar97[_js_idx96];
             marker.setMap(null);
         };
         this.markers.length = 0;
-        for (var site = null, _js_arrvar86 = this.model.sites, _js_idx85 = 0; _js_idx85 < _js_arrvar86.length; _js_idx85 += 1) {
-            site = _js_arrvar86[_js_idx85];
+        for (var site = null, _js_arrvar95 = this.model.sites, _js_idx94 = 0; _js_idx94 < _js_arrvar95.length; _js_idx94 += 1) {
+            site = _js_arrvar95[_js_idx94];
             var marker = mapAddMarker(this.googleMap, this.siteInfoWindow, site);
             this.markers.push(marker);
         };
@@ -164,16 +164,16 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
 };
 function mapWidgetStartUpdatingMarkers(mapWidget) {
     return mapWidget.googleMap.addListener('idle', function () {
-        var prevMv89 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv98 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
-            var south = decodeBounds(MAP.googleMap.getBounds());
-            var _db90 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db90[0];
-            var north = _db90[1];
-            var east = _db90[2];
-            return siteListPopulateWithinBounds(SITELIST, south, west, north, east);
+            var south = decodeBounds(mapWidget.googleMap.getBounds());
+            var _db99 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db99[0];
+            var north = _db99[1];
+            var east = _db99[2];
+            return siteListPopulateWithinBounds(mapWidget.model, south, west, north, east);
         } finally {
-            __PS_MV_REG = prevMv89;
+            __PS_MV_REG = prevMv98;
         };
     });
 };
