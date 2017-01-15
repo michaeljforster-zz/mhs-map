@@ -167,6 +167,7 @@
 
 (defun -map-widget (model jqelement center zoom geolocation-options)
   (setf (ps:@ this model) model)
+  (setf (ps:@ this idle-listener) nil)
   (setf (ps:@ this geolocation-options) geolocation-options)
   (setf (ps:@ this geolocation-marker)
         (ps:new (ps:chain google
@@ -215,9 +216,14 @@
 ;;     This event is fired when the map becomes
 ;;     idle after panning or zooming.
 (defun map-widget-listen-on-idle (map-widget fn)
-  (ps:chain map-widget
-            google-map
-            (add-listener "idle" #'(lambda (event) (funcall fn map-widget)))))
+  (unless (null (ps:@ map-widget idle-listener))
+    (ps:chain map-widget
+              google-map
+              (remove-listener (ps:@ map-widget idle-listener))))
+  (setf (ps:@ map-widget idle-listener)
+        (ps:chain map-widget
+                  google-map
+                  (add-listener "idle" #'(lambda (event) (funcall fn map-widget))))))
 
 (defun geolocation-position-to-google-lat-lng (position)
   (let ((lat (ps:@ position coords latitude))
