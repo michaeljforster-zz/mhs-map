@@ -271,10 +271,13 @@
         (ps:chain map-widget geolocation-marker (set-map nil)))
       (alert "Geolocation is not available.")))
 
+
 (defvar *site-list* nil)
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
+
+;; TODO ...
 (defun set-map-area-mode ()
   (map-widget-listen-on-idle *map*
                              #'(lambda (map-widget)
@@ -288,7 +291,48 @@
                                                  #'(lambda (results)
                                                      (site-list-populate (ps:@ map-widget model)
                                                                          (ps:@ results features)))))))
+  (ps:chain *map* google-map (set-zoom *default-zoom*))
   (ps:chain *map* google-map (pan-to *default-center*)))
+
+;; TODO ...
+(defun set-municipality-mode ()
+  (map-widget-listen-on-idle *map*
+                             #'(lambda (map-widget)
+                                 ;; TODO search-form municipality
+                                 ;; TODO repository get-municipality
+                                 ;; TODO municipality center
+                                 ;; TODO map-widget google-map bounds
+                                 ;; TODO when center out of bounds, map-widget google-map pan-to (smoother than set-center) center
+                                 (let ((municipality-name "Winnipeg"))
+                                   (let ((municipality (ps:create 'm-name municipality-name
+                                                                  'm-lat 49.89024330998252d0
+                                                                  'm-lng -97.1446768914188d0)))
+                                     (xhr-get-json (+ *features-by-municipality-uri*
+                                                      "?municipality=" (ps:@ municipality m-name))
+                                                   #'(lambda (results)
+                                                       (site-list-populate (ps:@ map-widget model)
+                                                                           (ps:@ results features))))
+                                     (ps:chain map-widget google-map (pan-to (ps:new (ps:chain google
+                                                                                               maps
+                                                                                               (-lat-lng (ps:create 'lat (ps:@ municipality m-lat)
+                                                                                                                    'lng (ps:@ municipality m-lng)))))))))))
+  ;; TODO search-form municipality
+  ;; TODO search-form criteria
+  ;; TODO repository site-list-populate-by-municipality + criteria
+  ;; TODO repository get-municipality
+  ;; TODO municipality center
+  ;; TODO map-widget google-map pan-to (set-center might not trigger idle) center
+  (let ((municipality-name "Winnipeg"))
+    (let ((municipality (ps:create 'm-name municipality-name
+                                   'm-lat 49.89024330998252d0
+                                   'm-lng -97.1446768914188d0)))
+      (ps:chain *map* google-map (set-zoom 11)) ;; TODO define constant
+      (ps:chain *map* google-map (pan-to (ps:new (ps:chain google
+                                                           maps
+                                                           (-lat-lng (ps:create 'lat (ps:@ municipality m-lat)
+                                                                                'lng (ps:@ municipality m-lng)))))))))
+  )
+
 
 (defun initialize ()
 
@@ -333,5 +377,6 @@
                                         (update-widget *map*)))
 
   (set-map-area-mode)
+  ;; TODO try setMunicipalityMode(), then setMapAreaMode() in Firefox console
   
   )

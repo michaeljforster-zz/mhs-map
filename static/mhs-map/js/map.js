@@ -73,8 +73,8 @@ function siteListAnnouncePopulated(siteList) {
 };
 function siteListPopulate(siteList, features) {
     siteList.sites = [];
-    for (var feature = null, _js_idx261 = 0; _js_idx261 < features.length; _js_idx261 += 1) {
-        feature = features[_js_idx261];
+    for (var feature = null, _js_idx387 = 0; _js_idx387 < features.length; _js_idx387 += 1) {
+        feature = features[_js_idx387];
         siteList.sites.push(featureToSite(feature));
     };
     siteListAnnouncePopulated(siteList);
@@ -95,20 +95,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName262 = site.stName;
-    if (stName262 === 'Featured site') {
+    var stName388 = site.stName;
+    if (stName388 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName262 === 'Museum/Archives') {
+    } else if (stName388 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName262 === 'Building') {
+    } else if (stName388 === 'Building') {
         return 'icon_building.png';
-    } else if (stName262 === 'Monument') {
+    } else if (stName388 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName262 === 'Cemetery') {
+    } else if (stName388 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName262 === 'Location') {
+    } else if (stName388 === 'Location') {
         return 'icon_location.png';
-    } else if (stName262 === 'Other') {
+    } else if (stName388 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -120,8 +120,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress263 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress263 === '' ? '' : ', ' + sAddress263);
+    var sAddress389 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress389 === '' ? '' : ', ' + sAddress389);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -149,8 +149,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = (function () {
-        for (var marker = null, _js_arrvar265 = this.markers, _js_idx264 = 0; _js_idx264 < _js_arrvar265.length; _js_idx264 += 1) {
-            marker = _js_arrvar265[_js_idx264];
+        for (var marker = null, _js_arrvar391 = this.markers, _js_idx390 = 0; _js_idx390 < _js_arrvar391.length; _js_idx390 += 1) {
+            marker = _js_arrvar391[_js_idx390];
             marker.setMap(null);
         };
         this.markers.length = 0;
@@ -166,7 +166,7 @@ function mapWidgetBounds(mapWidget) {
 };
 function mapWidgetListenOnIdle(mapWidget, fn) {
     if (mapWidget.idleListener != null) {
-        mapWidget.googleMap.removeListener(mapWidget.idleListener);
+        google.maps.event.removeListener(mapWidget.idleListener);
     };
     return mapWidget.idleListener = mapWidget.googleMap.addListener('idle', function (event) {
         return fn(mapWidget);
@@ -211,21 +211,42 @@ var LISTWIDGET = null;
 var MAP = null;
 function setMapAreaMode() {
     mapWidgetListenOnIdle(MAP, function (mapWidget) {
-        var prevMv266 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv392 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(mapWidgetBounds(mapWidget));
-            var _db267 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db267[0];
-            var north = _db267[1];
-            var east = _db267[2];
+            var _db393 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db393[0];
+            var north = _db393[1];
+            var east = _db393[2];
             return xhrGetJson(FEATURESWITHINBOUNDSURI + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east, function (results) {
                 return siteListPopulate(mapWidget.model, results.features);
             });
         } finally {
-            __PS_MV_REG = prevMv266;
+            __PS_MV_REG = prevMv392;
         };
     });
+    MAP.googleMap.setZoom(DEFAULTZOOM);
     return MAP.googleMap.panTo(DEFAULTCENTER);
+};
+function setMunicipalityMode() {
+    mapWidgetListenOnIdle(MAP, function (mapWidget) {
+        var municipalityName = 'Winnipeg';
+        var municipality = { 'mName' : municipalityName,
+                             'mLat' : 49.89024330998252,
+                             'mLng' : -97.1446768914188
+                           };
+        xhrGetJson(FEATURESBYMUNICIPALITYURI + '?municipality=' + municipality.mName, function (results) {
+            return siteListPopulate(mapWidget.model, results.features);
+        });
+        return mapWidget.googleMap.panTo(new google.maps.LatLng({ 'lat' : municipality.mLat, 'lng' : municipality.mLng }));
+    });
+    var municipalityName = 'Winnipeg';
+    var municipality = { 'mName' : municipalityName,
+                         'mLat' : 49.89024330998252,
+                         'mLng' : -97.1446768914188
+                       };
+    MAP.googleMap.setZoom(11);
+    return MAP.googleMap.panTo(new google.maps.LatLng({ 'lat' : municipality.mLat, 'lng' : municipality.mLng }));
 };
 function initialize() {
     jQuery('#list-view').hide();
