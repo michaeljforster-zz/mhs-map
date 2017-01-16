@@ -32,6 +32,12 @@ function __setf_siteListBounds(newBounds, siteList) {
     siteList.bounds = newBounds;
     return percentpopulate(siteList);
 };
+function siteListCentroid(siteList) {
+    return siteList.centroid;
+};
+function __setf_siteListCentroid(newCentroid, siteList) {
+    return siteList.centroid = newCentroid;
+};
 function siteListCenterDistance(siteList) {
     return siteList.centerDistance;
 };
@@ -66,21 +72,21 @@ function siteListUnsubscribeAll(siteList) {
 function percenturl(siteList) {
     switch (siteList.mode) {
     case 'map-area':
-        var prevMv112 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv202 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(siteList.bounds);
-            var _db113 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db113[0];
-            var north = _db113[1];
-            var east = _db113[2];
+            var _db203 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db203[0];
+            var north = _db203[1];
+            var east = _db203[2];
             return siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east;
         } finally {
-            __PS_MV_REG = prevMv112;
+            __PS_MV_REG = prevMv202;
         };
     case 'geolocation':
-        var lat114 = siteList.centerDistance.center.lat();
-        var lng115 = siteList.centerDistance.center.lng();
-        var distance116 = siteList.centerDistance.distance;
+        var lat204 = siteList.centerDistance.center.lat();
+        var lng205 = siteList.centerDistance.center.lng();
+        var distance206 = siteList.centerDistance.distance;
         var plus = siteList.url;
         return null;
     case 'municipality':

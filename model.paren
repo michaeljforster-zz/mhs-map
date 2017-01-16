@@ -43,6 +43,12 @@
   (setf (ps:@ site-list bounds) new-bounds)
   (%populate site-list))
 
+(defun site-list-centroid (site-list)
+  (ps:@ site-list centroid))
+
+(defun (setf site-list-centroid) (new-centroid site-list)
+  (setf (ps:@ site-list centroid) new-centroid))
+
 (defun site-list-center-distance (site-list)
   (ps:@ site-list center-distance))
 
