@@ -7,9 +7,17 @@
 (defvar *map* nil)
 
 
-;; TODO this below works; now what do we need to do to switch to :municipality mode?
-;; (setf (site-list-mode *site-list*) :municipality)
-;; (setf (site-list-municipality-name *site-list*) "Winnipeg")
+(defun set-map-area-mode ()
+  ;; NOTE: leave the user where they're at; don't to anything to cause
+  ;; a recenter/rezoom, directly or indirectly.
+  (setf (site-list-mode *site-list*) :map-area)
+  (setf (site-list-municipality-name *site-list*) ""))
+
+(defun set-municipality-mode (municipality-name)
+  (setf (map-widget-recenter-p *map*) true)
+  (setf (site-list-mode *site-list*) :municipality)
+  (setf (site-list-municipality-name *site-list*) municipality-name))
+
 
 (defun initialize ()
   (ps:chain (j-query "#list-view") (hide))
@@ -44,10 +52,11 @@
                                                   (log (+ "MAP notified "
                                                           (site-list-size *site-list*))))
                                         (update-widget *map*)))
+
+  ;; TODO should this be hidden within map-widget? Is there any change to listener to be made over life of app?
   (map-widget-listen-on-idle *map*
                              #'(lambda (map-widget)
                                  (setf (site-list-bounds *site-list*)
                                        (map-widget-bounds map-widget))))
-  (ps:chain *map* google-map (set-zoom *default-zoom*))
-  (ps:chain *map* google-map (pan-to *default-center*))
+  
   )

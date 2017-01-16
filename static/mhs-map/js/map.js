@@ -2,11 +2,13 @@ var SITELIST = null;
 var LISTWIDGET = null;
 var MAP = null;
 function setMapAreaMode() {
-    mapWidgetListenOnIdle(MAP, function (mapWidget) {
-        return __setf_siteListBounds(mapWidgetBounds(mapWidget), SITELIST);
-    });
-    MAP.googleMap.setZoom(DEFAULTZOOM);
-    return MAP.googleMap.panTo(DEFAULTCENTER);
+    __setf_siteListMode('map-area', SITELIST);
+    return __setf_siteListMunicipalityName('', SITELIST);
+};
+function setMunicipalityMode(municipalityName) {
+    __setf_mapWidgetRecenterP(true, MAP);
+    __setf_siteListMode('municipality', SITELIST);
+    return __setf_siteListMunicipalityName(municipalityName, SITELIST);
 };
 function initialize() {
     jQuery('#list-view').hide();
@@ -30,5 +32,7 @@ function initialize() {
         console.log('MAP notified ' + siteListSize(SITELIST));
         return updateWidget(MAP);
     });
-    return setMapAreaMode();
+    return mapWidgetListenOnIdle(MAP, function (mapWidget) {
+        return __setf_siteListBounds(mapWidgetBounds(mapWidget), SITELIST);
+    });
 };
