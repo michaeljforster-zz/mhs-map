@@ -13,20 +13,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName117 = site.stName;
-    if (stName117 === 'Featured site') {
+    var stName207 = site.stName;
+    if (stName207 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName117 === 'Museum/Archives') {
+    } else if (stName207 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName117 === 'Building') {
+    } else if (stName207 === 'Building') {
         return 'icon_building.png';
-    } else if (stName117 === 'Monument') {
+    } else if (stName207 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName117 === 'Cemetery') {
+    } else if (stName207 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName117 === 'Location') {
+    } else if (stName207 === 'Location') {
         return 'icon_location.png';
-    } else if (stName117 === 'Other') {
+    } else if (stName207 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -38,8 +38,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress118 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress118 === '' ? '' : ', ' + sAddress118);
+    var sAddress208 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress208 === '' ? '' : ', ' + sAddress208);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -59,6 +59,7 @@ function mapAddMarker(googleMap, siteInfoWindow, site) {
 };
 function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.model = model;
+    this.recenterP = false;
     this.idleListener = null;
     this.geolocationOptions = geolocationOptions;
     this.geolocationMarker = new google.maps.Marker({ 'map' : null });
@@ -67,8 +68,12 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = (function () {
-        for (var marker = null, _js_arrvar120 = this.markers, _js_idx119 = 0; _js_idx119 < _js_arrvar120.length; _js_idx119 += 1) {
-            marker = _js_arrvar120[_js_idx119];
+        if (this.recenterP && siteListCentroid(this.model) != null) {
+            this.recenterP = false;
+            this.googleMap.panTo(siteListCentroid(this.model));
+        };
+        for (var marker = null, _js_arrvar210 = this.markers, _js_idx209 = 0; _js_idx209 < _js_arrvar210.length; _js_idx209 += 1) {
+            marker = _js_arrvar210[_js_idx209];
             marker.setMap(null);
         };
         this.markers.length = 0;
@@ -78,6 +83,12 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
         }).bind(this));
     }).bind(this);
     return this;
+};
+function mapWidgetRecenterP(mapWidget) {
+    return mapWidget.recenterP;
+};
+function __setf_mapWidgetRecenterP(newFlag, mapWidget) {
+    return mapWidget.recenterP = newFlag;
 };
 function mapWidgetBounds(mapWidget) {
     return mapWidget.googleMap.getBounds();

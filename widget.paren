@@ -76,6 +76,7 @@
 
 (defun -map-widget (model jqelement center zoom geolocation-options)
   (setf (ps:@ this model) model)
+  (setf (ps:@ this recenter-p) false)
   (setf (ps:@ this idle-listener) nil)
   (setf (ps:@ this geolocation-options) geolocation-options)
   (setf (ps:@ this geolocation-marker)
@@ -92,6 +93,12 @@
                                 (ps:create :center center :zoom zoom)))))
   (setf (ps:@ this update-widget)
         (ps:chain #'(lambda ()
+                      (when (and (ps:@ this recenter-p)
+                                 (not (null (site-list-centroid (ps:@ this model)))))
+                        (setf (ps:@ this recenter-p) false)
+                        (ps:chain this
+                                  google-map
+                                  (pan-to (site-list-centroid (ps:@ this model)))))
                       (dolist (marker (ps:@ this markers))
                         (ps:chain marker (set-map nil)))
                       (setf (ps:@ this markers length) 0)
@@ -105,6 +112,11 @@
                   (bind this)))
   this)
 
+(defun map-widget-recenter-p (map-widget)
+  (ps:@ map-widget recenter-p))
+
+(defun (setf map-widget-recenter-p) (new-flag map-widget)
+  (setf (ps:@ map-widget recenter-p) new-flag))
 (defun map-widget-bounds (map-widget)
   (ps:chain map-widget google-map (get-bounds)))
 
