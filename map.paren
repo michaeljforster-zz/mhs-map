@@ -54,6 +54,7 @@
                                         (update-widget *map*)))
 
   ;; TODO should this be hidden within map-widget? Is there any change to listener to be made over life of app?
+  ;; NOTE: wait to look at geolocation
   (map-widget-listen-on-idle *map*
                              #'(lambda (map-widget)
                                  (setf (site-list-bounds *site-list*)

@@ -21,11 +21,14 @@
   (cl-who:with-html-output (stream nil :prologue t)
     (:html
      (:head
-      (:meta :name "viewport" :content "initial-scale=1.0, user-scalable=no")
+      (:meta :charset "utf-8")
+      (:meta :http-equiv "X-UA-Compatible" :content "IE=edge")
+      (:meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
       (:title (cl-who:esc (concatenate 'string *app-title* ": Map")))
-      (:link :rel "stylesheet" :type "text/css" :href (static-uri "mhs-map/css/reset.css"))
+      (:link :rel "stylesheet" :type "text/css" :href (static-uri "vendor/bootstrap-3.3.7-dist/css/bootstrap.min.css"))
       (:link :rel "stylesheet" :type "text/css" :href (static-uri "mhs-map/css/map.css"))
-      (:script :type "text/javascript" :src "static/vendor/jquery-3.1.1.js")
+      (:script :type "text/javascript" :src (static-uri "vendor/jquery-3.1.1.js"))
+      (:script :type "text/javascript" :src (static-uri "vendor/bootstrap-3.3.7-dist/js/bootstrap.min.js"))
       (:script :type "text/javascript" :src "https://maps.googleapis.com/maps/api/js?v=3&sensor=false")
       (:script :type "text/javascript"
                (cl-who:str
@@ -50,10 +53,13 @@
                 (ps:ps
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
-      (:button :id "list-button" "Display List")
-      (:button :id "map-button" "Display Map")
-      (:div :id "list-view")
-      (:div :id "map-canvas")))))
+      (:div :class "fluid-container"
+            (:div :class "row"
+                  (:div :class "col-md-12"
+                        (:button :id "list-button" "Display List")
+                        (:button :id "map-button" "Display Map")))
+            (:div :id "list-view")
+            (:div :id "map-canvas"))))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))
     ()
