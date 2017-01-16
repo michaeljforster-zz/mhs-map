@@ -20,16 +20,9 @@
 
 
 (defun initialize ()
-  (ps:chain (j-query "#list-view") (hide))
-  (ps:chain (j-query "#map-canvas") (show))
-  (ps:chain (j-query "#list-button")
-            (click #'(lambda ()
-                       (ps:chain (j-query "#list-view") (show))
-                       (ps:chain (j-query "#map-canvas") (hide)))))
-  (ps:chain (j-query "#map-button")
-            (click #'(lambda ()
-                       (ps:chain (j-query "#list-view") (hide))
-                       (ps:chain (j-query "#map-canvas") (show)))))
+  (ps:chain (j-query "#my-tabs a")
+            (click #'(lambda (e)
+                       (ps:chain (j-query this (tab "show"))))))
   (setf *site-list* (ps:new (-site-list *features-uri*)))
   (setf *list-widget*
         (ps:new (-list-widget *site-list*

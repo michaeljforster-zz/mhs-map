@@ -14,7 +14,7 @@ html, body {
     padding: 0;
 }
 
-.fluid-container {
+.fluid-container, .tab-content {
     height: 100%;
 }
 

@@ -11,15 +11,8 @@ function setMunicipalityMode(municipalityName) {
     return __setf_siteListMunicipalityName(municipalityName, SITELIST);
 };
 function initialize() {
-    jQuery('#list-view').hide();
-    jQuery('#map-canvas').show();
-    jQuery('#list-button').click(function () {
-        jQuery('#list-view').show();
-        return jQuery('#map-canvas').hide();
-    });
-    jQuery('#map-button').click(function () {
-        jQuery('#list-view').hide();
-        return jQuery('#map-canvas').show();
+    jQuery('#my-tabs a').click(function (e) {
+        return jQuery(this, tab('show'));
     });
     SITELIST = new SiteList(FEATURESURI);
     LISTWIDGET = new ListWidget(SITELIST, jQuery('#list-view'));

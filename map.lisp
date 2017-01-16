@@ -54,12 +54,14 @@
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
       (:div :class "fluid-container"
-            (:div :class "row"
-                  (:div :class "col-md-12"
-                        (:button :id "list-button" "Display List")
-                        (:button :id "map-button" "Display Map")))
-            (:div :id "list-view")
-            (:div :id "map-canvas"))))))
+            (:ul :id "my-tabs" :class "nav nav-pills" :role "tablist"
+                 (:li :role "presentation" :class "active"
+                      (:a :href "#map-canvas" :aria-controls "map" :role "tab" :data-toggle "pill" "Map"))
+                 (:li :role "presentation"
+                      (:a :href "#list-view" :aria-controls "list" :role "tab" :data-toggle "pill" "Map" "List")))
+            (:div :class "tab-content"
+                  (:div :role "tabpanel" :class "tab-pane active" :id "map-canvas")
+                  (:div :role "tabpanel" :class "tab-pane" :id "list-view")))))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))
     ()
