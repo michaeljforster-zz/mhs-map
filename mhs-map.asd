@@ -31,7 +31,7 @@
                (:file "geojson")
                (:file "features")
                (:file "admin-ui")
-               (:file "search")
+               ;; (:file "search")
                (:file "map")
                (:file "mhs-map")))
 

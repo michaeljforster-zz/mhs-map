@@ -12,10 +12,50 @@
   (setf (ps:@ this lat-lng) lat-lng)
   this)
 
-(defun -site-list ()
+(defun -site-list (url)
+  (setf (ps:@ this url) url)
+  (setf (ps:@ this mode) :map-area)
+  (setf (ps:@ this bounds)
+        (ps:new (ps:chain google
+                          maps
+                          (-lat-lng-bounds 0 0 0 0))))
+  (setf (ps:@ this center-distance)
+        (ps:create 'center (ps:new (ps:chain google
+                                             maps
+                                             (-lat-lng 0 0)))
+                   'distance 0))
+  (setf (ps:@ this municipality-name) "")
+  (setf (ps:@ this centroid) nil)
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
   this)
+
+(defun site-list-mode (site-list)
+  (ps:@ site-list mode))
+
+(defun (setf site-list-mode) (new-mode site-list)
+  (setf (ps:@ site-list mode) new-mode))
+
+(defun site-list-bounds (site-list)
+  (ps:@ site-list bounds))
+
+(defun (setf site-list-bounds) (new-bounds site-list)
+  (setf (ps:@ site-list bounds) new-bounds)
+  (%populate site-list))
+
+(defun site-list-center-distance (site-list)
+  (ps:@ site-list center-distance))
+
+(defun (setf site-list-center-distance) (new-center-distance site-list)
+  (setf (ps:@ site-list center-distance) new-center-distance)
+  (%populate site-list))
+
+(defun site-list-municipality-name (site-list)
+  (ps:@ site-list municipality-name))
+
+(defun (setf site-list-municipality-name) (new-municipality-name site-list)
+  (setf (ps:@ site-list municipality-name) new-municipality-name)
+  (%populate site-list))
 
 (defun site-list-size (site-list)
   (ps:@ site-list sites length))
@@ -26,23 +66,49 @@
 (defun site-list-do (site-list fn)
   (ps:chain site-list sites (for-each fn)))
 
-(defun site-list-unsubscribe-all (site-list)
-  (setf (ps:@ site-list subscribers) (array))
-  site-list)
-
 (defun site-list-subscribe-to-populated (site-list fn)
   (ps:chain site-list subscribers (push fn))
   site-list)
 
-(defun site-list-announce-populated (site-list)
-  (ps:chain site-list subscribers (for-each #'(lambda (element) (funcall element))))
+(defun site-list-unsubscribe-all (site-list)
+  (setf (ps:@ site-list subscribers) (array))
   site-list)
 
-(defun site-list-populate (site-list features)
-  (setf (ps:@ site-list sites) (array))
-  (dolist (feature features)
-    (ps:chain site-list
-              sites
-              (push (feature-to-site feature))))
-  (site-list-announce-populated site-list)
-  site-list)
+(defun %url (site-list)
+  (case (ps:@ site-list mode)
+    (:map-area
+     (multiple-value-bind (south west north east)
+         (decode-bounds (ps:@ site-list bounds))
+       (+ (ps:@ site-list url)
+          "?south=" south
+          "&west=" west
+          "&north=" north
+          "&east=" east)))
+    (:geolocation
+     (let ((lat (ps:chain site-list center-distance center (lat)))
+           (lng (ps:chain site-list center-distance center (lng)))
+           (distance (ps:@ site-list center-distance distance))
+           (+ (ps:@ site-list url)
+             "?lat=" 
+             "&lng="
+             "&distance="))))
+    (:municipality
+     (+ (ps:@ site-list url)
+        "?municipality-name="
+        (ps:@ site-list municipality-name)))
+    (otherwise
+     (throw (+ (ps:@ site-list mode) " fell through CASE expression.")))))
+
+(defun %announce-populated (site-list)
+  (ps:chain site-list subscribers (for-each #'(lambda (element) (funcall element)))))
+
+(defun %populate (site-list)
+  (xhr-get-json (%url site-list)
+                #'(lambda (results)
+                    (setf (ps:@ site-list centroid)
+                          (if (null (ps:@ results centroid))
+                              nil
+                              (geometry-point-to-lat-lng (ps:@ results centroid geometry))))
+                    (setf (ps:@ site-list sites)
+                          (ps:chain results sites features (map #'(lambda (feature) (feature-to-site feature)))))
+                    (%announce-populated site-list))))

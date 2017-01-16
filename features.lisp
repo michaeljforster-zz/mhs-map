@@ -31,49 +31,38 @@
 ;;       (with-output-to-string (stream)
 ;;         (geojson-encode-sites rows stream)))))
 
-(hunchentoot:define-easy-handler (handle-features-within-bounds
-                                  :uri (princ-to-string *features-within-bounds-uri*))
-    ((south :parameter-type 'wu-decimal:parse-decimal :request-type :get)
-     (west :parameter-type 'wu-decimal:parse-decimal :request-type :get)
-     (north :parameter-type 'wu-decimal:parse-decimal :request-type :get)
-     (east :parameter-type 'wu-decimal:parse-decimal :request-type :get))
-  (hunchentoot:no-cache)
-  (setf (hunchentoot:content-type*) "application/json; charset=utf-8")
+(hunchentoot:define-easy-handler (handle-features :uri (princ-to-string *features-uri*))
+    ((south :parameter-type 'parse-coordinate :request-type :get)
+     (west :parameter-type 'parse-coordinate :request-type :get)
+     (north :parameter-type 'parse-coordinate :request-type :get)
+     (east :parameter-type 'parse-coordinate :request-type :get)
+     (lat :parameter-type 'parse-coordinate :request-type :get)
+     (lng :parameter-type 'parse-coordinate :request-type :get)
+     (distance :parameter-type 'parse-distance :request-type :get)
+     (municipality-name :parameter-type 'parse-non-empty-string :request-type :get))
   (with-database-connection
     (multiple-value-bind (rows count)
-        (select-sites-within-bounds south west north east)
-      (hunchentoot:log-message* :info
-                                "HANDLE-FEATURES-WITHIN-BOUNDS: south ~F west ~F north ~F east ~F count ~D"
-                                south west north east count)
-      (with-output-to-string (stream)
-        (geojson-encode-sites rows stream)))))
-
-(hunchentoot:define-easy-handler (handle-features-within-distance
-                                  :uri (princ-to-string *features-within-distance-uri*))
-    ((lat :parameter-type 'wu-decimal:parse-decimal :request-type :get)
-     (lng :parameter-type 'wu-decimal:parse-decimal :request-type :get)
-     (distance :parameter-type 'wu-decimal:parse-decimal :request-type :get))
-  (hunchentoot:no-cache)
-  (setf (hunchentoot:content-type*) "application/json; charset=utf-8")
-  (with-database-connection
-    (multiple-value-bind (rows count)
-        (select-sites-within-distance lat lng distance)
-      (hunchentoot:log-message* :info
-                                "HANDLE-FEATURES-WITHIN-DISTANCE: lat ~F lng ~F distance ~F count ~D"
-                                lat lng distance count)
-      (with-output-to-string (stream)
-        (geojson-encode-sites rows stream)))))
-
-(hunchentoot:define-easy-handler (handle-features-by-municipality
-                                  :uri (princ-to-string *features-by-municipality-uri*))
-    ((municipality :parameter-type 'parse-non-empty-string :request-type :get))
-  (hunchentoot:no-cache)
-  (setf (hunchentoot:content-type*) "application/json; charset=utf-8")
-  (with-database-connection
-    (multiple-value-bind (rows count)
-        (select-sites-by-municipality municipality)
-      (hunchentoot:log-message* :info
-                                "HANDLE-FEATURES-BY-MUNICIPALITY: municipality ~A count ~D"
-                                municipality count)
-      (with-output-to-string (stream)
-        (geojson-encode-sites rows stream)))))
+        (cond ((and (not (null south))
+                    (not (null west))
+                    (not (null north))
+                    (not (null east)))
+               (select-sites-within-bounds south west north east))
+              ((and (not (null lat))
+                    (not (null lng))
+                    (not (null distance)))
+               (select-sites-within-distance lat lng distance))
+              ((not (null municipality-name))
+               (select-sites-by-municipality municipality-name))
+              (t
+               (hunchentools:abort-with-bad-request)))
+      (let ((municipality (if (null municipality-name)
+                              nil
+                              (select-municipality municipality-name))))
+        (let ((centroid (if (null municipality)
+                            nil
+                            (make-point :x (municipality-m-lng municipality)
+                                        :y (municipality-m-lat municipality)))))
+          (hunchentoot:no-cache)
+          (setf (hunchentoot:content-type*) "application/json; charset=utf-8")
+          (with-output-to-string (stream)
+            (geojson-encode-sites rows centroid stream)))))))

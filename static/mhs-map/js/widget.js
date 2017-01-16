@@ -13,20 +13,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName2 = site.stName;
-    if (stName2 === 'Featured site') {
+    var stName117 = site.stName;
+    if (stName117 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName2 === 'Museum/Archives') {
+    } else if (stName117 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName2 === 'Building') {
+    } else if (stName117 === 'Building') {
         return 'icon_building.png';
-    } else if (stName2 === 'Monument') {
+    } else if (stName117 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName2 === 'Cemetery') {
+    } else if (stName117 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName2 === 'Location') {
+    } else if (stName117 === 'Location') {
         return 'icon_location.png';
-    } else if (stName2 === 'Other') {
+    } else if (stName117 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -38,8 +38,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress3 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress3 === '' ? '' : ', ' + sAddress3);
+    var sAddress118 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress118 === '' ? '' : ', ' + sAddress118);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -67,8 +67,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
     this.siteInfoWindow = new google.maps.InfoWindow({  });
     this.googleMap = new google.maps.Map(jqelement[0], { 'center' : center, 'zoom' : zoom });
     this.updateWidget = (function () {
-        for (var marker = null, _js_arrvar5 = this.markers, _js_idx4 = 0; _js_idx4 < _js_arrvar5.length; _js_idx4 += 1) {
-            marker = _js_arrvar5[_js_idx4];
+        for (var marker = null, _js_arrvar120 = this.markers, _js_idx119 = 0; _js_idx119 < _js_arrvar120.length; _js_idx119 += 1) {
+            marker = _js_arrvar120[_js_idx119];
             marker.setMap(null);
         };
         this.markers.length = 0;
