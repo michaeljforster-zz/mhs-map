@@ -35,6 +35,12 @@
         (and (string/= "" x) x))
       nil))
 
+(defun parse-coordinate (x)
+  (ignore-errors (wu-decimal:parse-decimal x)))
+
+(defun parse-distance (x)
+  (ignore-errors (wu-decimal:parse-decimal x)))
+
 (defun format-uri-query (string1
                          op2
                          string2
