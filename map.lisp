@@ -17,7 +17,7 @@
       (let ((ps:*parenscript-stream* stream))
         (ps:ps-compile-file paren-filespec)))))
 
-(defun render-map (&optional (stream *standard-output*))
+(defun render-map (municipality-names &optional (stream *standard-output*))
   (cl-who:with-html-output (stream nil :prologue t)
     (:html
      (:head
@@ -26,9 +26,11 @@
       (:meta :name "viewport" :content "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
       (:title (cl-who:esc (concatenate 'string *app-title* ": Map")))
       (:link :rel "stylesheet" :type "text/css" :href (static-uri "vendor/bootstrap-3.3.7-dist/css/bootstrap.min.css"))
+      (:link :rel "stylesheet" :type "text/css" :href (static-uri "vendor/bootstrap-select-1.12.1-dist/css/bootstrap-select.min.css"))
       (:link :rel "stylesheet" :type "text/css" :href (static-uri "mhs-map/css/map.css"))
       (:script :type "text/javascript" :src (static-uri "vendor/jquery-3.1.1.js"))
       (:script :type "text/javascript" :src (static-uri "vendor/bootstrap-3.3.7-dist/js/bootstrap.min.js"))
+      (:script :type "text/javascript" :src (static-uri "vendor/bootstrap-select-1.12.1-dist/js/bootstrap-select.min.js"))
       (:script :type "text/javascript" :src "https://maps.googleapis.com/maps/api/js?v=3&sensor=false")
       (:script :type "text/javascript"
                (cl-who:str
@@ -54,18 +56,75 @@
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
       (:div :class "fluid-container"
-            (:ul :id "my-tabs" :class "nav nav-pills" :role "tablist"
-                 (:li :role "presentation" :class "active"
-                      (:a :href "#map-canvas" :aria-controls "map" :role "tab" :data-toggle "pill" "Map"))
-                 (:li :role "presentation"
-                      (:a :href "#list-view" :aria-controls "list" :role "tab" :data-toggle "pill" "Map" "List")))
-            (:div :class "tab-content"
-                  (:div :role "tabpanel" :class "tab-pane active" :id "map-canvas")
-                  (:div :role "tabpanel" :class "tab-pane" :id "list-view")))))))
+            (:nav :class "navbar navbar-default"
+                  (:div :class "navbar-header"
+                        (:button :type "button"
+                                 :class "navbar-toggle collapsed"
+                                 :data-toggle "collapse"
+                                 :data-target "#mhs-navbar"
+                                 :aria-expanded "false"
+                                 (:span :class "sr-only" "Toggle Navigation")
+                                 (:span :class "icon-bar")
+                                 (:span :class "icon-bar")
+                                 (:span :class "icon-bar"))
+                        (:button :type "button"
+                                 :class "btn btn-default navbar-btn"
+                                 :id "mhs-show-map-btn"
+                                 "Show Map")
+                        (:button :type "button"
+                                 :class "btn btn-default navbar-btn"
+                                 :id "mhs-show-list-btn"
+                                 "Show List"))
+                  (:div :class "collapse navbar-collapse"
+                        :id "mhs-navbar"
+                        (:form :class "navbar-form navbar-right"
+                               (:div :class "form-group"
+                                     (:select :class "selectpicker"
+                                              (:option "Within map area")
+                                              (:optgroup :label "As I move"
+                                                         (:option "Within 100 m of me")
+                                                         (:option "Within 1 km of me")
+                                                         (:option "Within 10 km of me")
+                                                         (:option "Within 100 km of me")
+                                                         (:option "Within 1000 km of me"))
+                                              (:optgroup :label "Within municipality"
+                                                         (dolist (m-name municipality-names)
+                                                           (cl-who:htm
+                                                            (:option :title (cl-who:escape-string (concatenate 'string
+                                                                                                               "Within "
+                                                                                                               m-name))
+                                                                     (cl-who:esc m-name)))))))
+
+                               (:div :class "form-group"
+                                     (:select :class "selectpicker"
+                                              :title "Filter by site type"
+                                              (dolist (st-name (sort (copy-list *site-type-names*) #'string<=))
+                                                (cl-who:htm
+                                                 (:option (cl-who:esc st-name))))))
+
+                               (:div :class "form-group"
+                                     (:select :class "selectpicker"
+                                              :multiple t
+                                              :title "Filter by designations"
+                                              (:option "National")
+                                              (:option "Provincial")
+                                              (:option "Municipal")))
+
+                               (:div :class "form-group"
+                                     (:input :type "text"
+                                             :class "form-control"
+                                             :placeholder "keywords"))
+                               (:button :type "submit" :class "btn btn-default" "Filter"))))
+            (:div :id "mhs-content"
+                  ;; Manipulate visibility with Bootstrap CSS classes rather than DO .show() and .hide().
+                  (:div :id "mhs-map-widget")
+                  (:div :class "hidden" :id "mhs-list-widget")))))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))
     ()
   (hunchentoot:no-cache)
   (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
-  (with-output-to-string (stream)
-    (render-map stream)))
+  (with-database-connection
+    (with-output-to-string (stream)
+      (render-map (select-municipality-names)
+                  stream))))

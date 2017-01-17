@@ -20,13 +20,23 @@
 
 
 (defun initialize ()
-  (ps:chain (j-query "#my-tabs a")
+  ;; Manipulate visibility with Bootstrap CSS classes rather than DO .show() and .hide().
+  (ps:chain (j-query "#mhs-show-map-btn")
             (click #'(lambda (e)
-                       (ps:chain (j-query this (tab "show"))))))
-  (setf *site-list* (ps:new (-site-list *features-uri*)))
+                       (ps:chain (j-query "#mhs-map-widget")
+                                 (remove-class "hidden"))
+                       (ps:chain (j-query "#mhs-list-widget")
+                                 (add-class "hidden")))))
+  (ps:chain (j-query "#mhs-show-list-btn")
+            (click #'(lambda (e)
+                       (ps:chain (j-query "#mhs-map-widget")
+                                 (add-class "hidden"))
+                       (ps:chain (j-query "#mhs-list-widget")
+                                 (remove-class "hidden")))))
+    (setf *site-list* (ps:new (-site-list *features-uri*)))
   (setf *list-widget*
         (ps:new (-list-widget *site-list*
-                              (j-query "#list-view"))))
+                              (j-query "#mhs-list-widget"))))
   (site-list-subscribe-to-populated *site-list*
                                     #'(lambda ()
                                         (ps:chain console
@@ -35,7 +45,7 @@
                                         (update-widget *list-widget*)))
   (setf *map*
         (ps:new (-map-widget *site-list*
-                             (j-query "#map-canvas")
+                             (j-query "#mhs-map-widget")
                              *default-center*
                              *default-zoom*
                              *geolocation-options*)))

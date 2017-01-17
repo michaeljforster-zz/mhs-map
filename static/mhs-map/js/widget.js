@@ -13,20 +13,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName288 = site.stName;
-    if (stName288 === 'Featured site') {
+    var stName315 = site.stName;
+    if (stName315 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName288 === 'Museum/Archives') {
+    } else if (stName315 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName288 === 'Building') {
+    } else if (stName315 === 'Building') {
         return 'icon_building.png';
-    } else if (stName288 === 'Monument') {
+    } else if (stName315 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName288 === 'Cemetery') {
+    } else if (stName315 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName288 === 'Location') {
+    } else if (stName315 === 'Location') {
         return 'icon_location.png';
-    } else if (stName288 === 'Other') {
+    } else if (stName315 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -38,8 +38,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress289 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress289 === '' ? '' : ', ' + sAddress289);
+    var sAddress316 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress316 === '' ? '' : ', ' + sAddress316);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -72,8 +72,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
             this.recenterP = false;
             this.googleMap.panTo(siteListCentroid(this.model));
         };
-        for (var marker = null, _js_arrvar291 = this.markers, _js_idx290 = 0; _js_idx290 < _js_arrvar291.length; _js_idx290 += 1) {
-            marker = _js_arrvar291[_js_idx290];
+        for (var marker = null, _js_arrvar318 = this.markers, _js_idx317 = 0; _js_idx317 < _js_arrvar318.length; _js_idx317 += 1) {
+            marker = _js_arrvar318[_js_idx317];
             marker.setMap(null);
         };
         this.markers.length = 0;

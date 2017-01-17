@@ -6,28 +6,41 @@
  * NOTE: see https://developers.google.com/speed/docs/best-practices/rendering
  */
 
-/* NOTE that height is required. */
+
 html, body {
-    /* width: 100%; */
     height: 100%;
     margin: 0;
     padding: 0;
 }
 
-.fluid-container, .tab-content {
+.fluid-container {
     height: 100%;
 }
 
-/* NOTE that height is required. */
-#map-canvas {
-    /* width: 100%; */
+#mhs-content {
     height: 90%;
+}
+
+#mhs-map-widget {
+    height: 100%;
     border: 1px solid black;
 }
 
-#list-view {
-    border: 1px solid black;
+#mhs-list-widget {
 }
+
+/*
+ * Within #mhs-navbar
+ */
+
+.navbar-btn {
+    margin-right: 10px;
+}
+
+.form-group {
+    margin-right: 10px;
+}
+
 
 /* .site-info-window-content-box {} */
 

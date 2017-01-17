@@ -72,21 +72,21 @@ function siteListUnsubscribeAll(siteList) {
 function percenturl(siteList) {
     switch (siteList.mode) {
     case 'map-area':
-        var prevMv283 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv310 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(siteList.bounds);
-            var _db284 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db284[0];
-            var north = _db284[1];
-            var east = _db284[2];
+            var _db311 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db311[0];
+            var north = _db311[1];
+            var east = _db311[2];
             return siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east;
         } finally {
-            __PS_MV_REG = prevMv283;
+            __PS_MV_REG = prevMv310;
         };
     case 'geolocation':
-        var lat285 = siteList.centerDistance.center.lat();
-        var lng286 = siteList.centerDistance.center.lng();
-        var distance287 = siteList.centerDistance.distance;
+        var lat312 = siteList.centerDistance.center.lat();
+        var lng313 = siteList.centerDistance.center.lng();
+        var distance314 = siteList.centerDistance.distance;
         var plus = siteList.url;
         return null;
     case 'municipality':

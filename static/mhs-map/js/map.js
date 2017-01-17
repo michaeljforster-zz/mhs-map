@@ -11,16 +11,21 @@ function setMunicipalityMode(municipalityName) {
     return __setf_siteListMunicipalityName(municipalityName, SITELIST);
 };
 function initialize() {
-    jQuery('#my-tabs a').click(function (e) {
-        return jQuery(this, tab('show'));
+    jQuery('#mhs-show-map-btn').click(function (e) {
+        jQuery('#mhs-map-widget').removeClass('hidden');
+        return jQuery('#mhs-list-widget').addClass('hidden');
+    });
+    jQuery('#mhs-show-list-btn').click(function (e) {
+        jQuery('#mhs-map-widget').addClass('hidden');
+        return jQuery('#mhs-list-widget').removeClass('hidden');
     });
     SITELIST = new SiteList(FEATURESURI);
-    LISTWIDGET = new ListWidget(SITELIST, jQuery('#list-view'));
+    LISTWIDGET = new ListWidget(SITELIST, jQuery('#mhs-list-widget'));
     siteListSubscribeToPopulated(SITELIST, function () {
         console.log('LIST-WIDGET notified ' + siteListSize(SITELIST));
         return updateWidget(LISTWIDGET);
     });
-    MAP = new MapWidget(SITELIST, jQuery('#map-canvas'), DEFAULTCENTER, DEFAULTZOOM, GEOLOCATIONOPTIONS);
+    MAP = new MapWidget(SITELIST, jQuery('#mhs-map-widget'), DEFAULTCENTER, DEFAULTZOOM, GEOLOCATIONOPTIONS);
     siteListSubscribeToPopulated(SITELIST, function () {
         console.log('MAP notified ' + siteListSize(SITELIST));
         return updateWidget(MAP);
