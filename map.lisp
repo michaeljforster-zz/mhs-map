@@ -113,8 +113,7 @@
                                (:div :class "form-group"
                                      (:input :type "text"
                                              :class "form-control"
-                                             :placeholder "keywords"))
-                               (:button :type "submit" :class "btn btn-default" "Filter"))))
+                                             :placeholder "keywords")))))
             (:div :id "mhs-content"
                   ;; Manipulate visibility with Bootstrap CSS classes rather than DO .show() and .hide().
                   (:div :id "mhs-map-widget")

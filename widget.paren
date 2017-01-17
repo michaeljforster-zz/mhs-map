@@ -14,15 +14,24 @@
                       (ps:chain this jqelement
                                 (html
                                  (ps:who-ps-html
-                                  (:ul
-                                   (ps:chain (site-list-map (ps:@ this model)
-                                                            (ps:chain #'(lambda (site)
-                                                                          (ps:who-ps-html
-                                                                           (:li (+ (ps:@ site s-no)
-                                                                                   " - "
-                                                                                   (ps:@ site s-name)))))
-                                                                      (bind this)))
-                                             (join "")))))))
+                                  (:div :class "list-group"
+                                        (ps:chain (site-list-map (ps:@ this model)
+                                                                 (ps:chain #'(lambda (site)
+                                                                               (ps:who-ps-html
+                                                                                (:a :href (if (= (ps:@ site url) "")
+                                                                                              "#"
+                                                                                              (+ *mhs-base-uri*
+                                                                                                 (ps:@ site s-url)))
+                                                                                    :target "_blank"
+                                                                                    :class "list-group-item"
+                                                                                    (:h4 :class "list-group-item-heading"
+                                                                                         (ps:@ site s-name))
+                                                                                    (:p :class "list-group-item-text"
+                                                                                        (ps:@ site s-address))
+                                                                                    (:p :class "list-group-item-text"
+                                                                                        (ps:@ site m-name)))))
+                                                                           (bind this)))
+                                                  (join "")))))))
                   (bind this)))
   this)
 
