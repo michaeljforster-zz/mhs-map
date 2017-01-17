@@ -80,35 +80,40 @@
                         (:form :class "navbar-form navbar-right"
                                (:div :class "form-group"
                                      (:select :class "selectpicker"
-                                              (:option "Within map area")
+                                              :id "mhs-filter-within-input"
+                                              (:option :value "map-area" "Within map area")
                                               (:optgroup :label "As I move"
-                                                         (:option "Within 100 m of me")
-                                                         (:option "Within 1 km of me")
-                                                         (:option "Within 10 km of me")
-                                                         (:option "Within 100 km of me")
-                                                         (:option "Within 1000 km of me"))
+                                                         (:option :value "100" "Within 100 m of me")
+                                                         (:option :value "1000" "Within 1 km of me")
+                                                         (:option :value "10000" "Within 10 km of me")
+                                                         (:option :value "100000" "Within 100 km of me")
+                                                         (:option :value "1000000" "Within 1000 km of me"))
                                               (:optgroup :label "Within municipality"
                                                          (dolist (m-name municipality-names)
                                                            (cl-who:htm
-                                                            (:option :title (cl-who:escape-string (concatenate 'string
+                                                            (:option :value (cl-who:escape-string m-name)
+                                                                     :title (cl-who:escape-string (concatenate 'string
                                                                                                                "Within "
                                                                                                                m-name))
                                                                      (cl-who:esc m-name)))))))
 
                                (:div :class "form-group"
                                      (:select :class "selectpicker"
-                                              :title "Filter by site type"
-                                              (dolist (st-name (sort (copy-list *site-type-names*) #'string<=))
+                                              :id "mhs-filter-by-site-type-input"
+                                              (dolist (st-name (cons "All site types"
+                                                                     (sort (copy-list *site-type-names*) #'string<=)))
                                                 (cl-who:htm
-                                                 (:option (cl-who:esc st-name))))))
+                                                 (:option :value (cl-who:escape-string st-name)
+                                                          (cl-who:esc st-name))))))
 
                                (:div :class "form-group"
                                      (:select :class "selectpicker"
+                                              :id "mhs-filter-by-designation-input"
                                               :multiple t
-                                              :title "Filter by designations"
-                                              (:option "National")
-                                              (:option "Provincial")
-                                              (:option "Municipal")))
+                                              :title "Has designations"
+                                              (:option :value "National" "National")
+                                              (:option :value "Provincial" "Provincial")
+                                              (:option :value "Municipal" "Municipal")))
 
                                (:div :class "form-group"
                                      (:input :type "text"

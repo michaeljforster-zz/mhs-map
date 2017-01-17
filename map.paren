@@ -8,15 +8,27 @@
 
 
 (defun set-map-area-mode ()
-  ;; NOTE: leave the user where they're at; don't to anything to cause
-  ;; a recenter/rezoom, directly or indirectly.
   (setf (site-list-mode *site-list*) :map-area)
-  (setf (site-list-municipality-name *site-list*) ""))
+  (setf (map-widget-center *map*) *default-center*)
+  (setf (map-widget-zoom *map*) *default-zoom*)
+  )
+
+(defun set-geolocation-mode (distance)
+  (setf (map-widget-recenter-p *map*) true)
+  (setf (site-list-mode *site-list*) :geolocation)
+  ;; TODO set distance, let geolocation update the center
+  (setf (site-list-center-distance *site-list*)
+        (ps:create 'center (ps:new (ps:chain google
+                                             maps
+                                             (-lat-lng 0 0)))
+                   'distance distance))
+  (setf (map-widget-zoom *map*) 8))
 
 (defun set-municipality-mode (municipality-name)
   (setf (map-widget-recenter-p *map*) true)
   (setf (site-list-mode *site-list*) :municipality)
-  (setf (site-list-municipality-name *site-list*) municipality-name))
+  (setf (site-list-municipality-name *site-list*) municipality-name)
+  (setf (map-widget-zoom *map*) 8))
 
 
 (defun initialize ()
@@ -33,7 +45,20 @@
                                  (add-class "hidden"))
                        (ps:chain (j-query "#mhs-list-widget")
                                  (remove-class "hidden")))))
-    (setf *site-list* (ps:new (-site-list *features-uri*)))
+
+  (ps:chain (j-query "#mhs-filter-within-input")
+            (on "changed.bs.select"
+                #'(lambda (e)
+                    (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
+                      (case within
+                        ("map-area"
+                         (set-map-area-mode))
+                        (("100" "1000" "10000" "100000" "1000000")
+                         (set-geolocation-mode (parse-int within)))
+                        (otherwise ; municipality-name
+                         (set-municipality-mode within)))))))
+
+  (setf *site-list* (ps:new (-site-list *features-uri*)))
   (setf *list-widget*
         (ps:new (-list-widget *site-list*
                               (j-query "#mhs-list-widget"))))

@@ -46,9 +46,6 @@
 (defun site-list-centroid (site-list)
   (ps:@ site-list centroid))
 
-(defun (setf site-list-centroid) (new-centroid site-list)
-  (setf (ps:@ site-list centroid) new-centroid))
-
 (defun site-list-center-distance (site-list)
   (ps:@ site-list center-distance))
 
@@ -93,11 +90,11 @@
     (:geolocation
      (let ((lat (ps:chain site-list center-distance center (lat)))
            (lng (ps:chain site-list center-distance center (lng)))
-           (distance (ps:@ site-list center-distance distance))
-           (+ (ps:@ site-list url)
-             "?lat=" 
-             "&lng="
-             "&distance="))))
+           (distance (ps:@ site-list center-distance distance)))
+       (+ (ps:@ site-list url)
+          "?lat=" 
+          "&lng="
+          "&distance=")))
     (:municipality
      (+ (ps:@ site-list url)
         "?municipality-name="

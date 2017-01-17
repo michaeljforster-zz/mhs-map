@@ -126,8 +126,21 @@
 
 (defun (setf map-widget-recenter-p) (new-flag map-widget)
   (setf (ps:@ map-widget recenter-p) new-flag))
+
 (defun map-widget-bounds (map-widget)
   (ps:chain map-widget google-map (get-bounds)))
+
+(defun map-widget-center (map-widget)
+  (ps:chain map-widget google-map (get-center)))
+
+(defun (setf map-widget-center) (new-center map-widget)
+  (ps:chain map-widget google-map (pan-to new-center)))
+
+(defun map-widget-zoom (map-widget)
+  (ps:chain map-widget google-map (get-zoom)))
+
+(defun (setf map-widget-zoom) (new-zoom map-widget)
+  (ps:chain map-widget google-map (set-zoom new-zoom)))
 
 ;; https://developers.google.com/maps/documentation/javascript/events
 ;;

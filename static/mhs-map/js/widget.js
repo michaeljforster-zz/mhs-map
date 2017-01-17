@@ -13,20 +13,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName369 = site.stName;
-    if (stName369 === 'Featured site') {
+    var stName720 = site.stName;
+    if (stName720 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName369 === 'Museum/Archives') {
+    } else if (stName720 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName369 === 'Building') {
+    } else if (stName720 === 'Building') {
         return 'icon_building.png';
-    } else if (stName369 === 'Monument') {
+    } else if (stName720 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName369 === 'Cemetery') {
+    } else if (stName720 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName369 === 'Location') {
+    } else if (stName720 === 'Location') {
         return 'icon_location.png';
-    } else if (stName369 === 'Other') {
+    } else if (stName720 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -38,8 +38,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress370 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress370 === '' ? '' : ', ' + sAddress370);
+    var sAddress721 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress721 === '' ? '' : ', ' + sAddress721);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -72,8 +72,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
             this.recenterP = false;
             this.googleMap.panTo(siteListCentroid(this.model));
         };
-        for (var marker = null, _js_arrvar372 = this.markers, _js_idx371 = 0; _js_idx371 < _js_arrvar372.length; _js_idx371 += 1) {
-            marker = _js_arrvar372[_js_idx371];
+        for (var marker = null, _js_arrvar723 = this.markers, _js_idx722 = 0; _js_idx722 < _js_arrvar723.length; _js_idx722 += 1) {
+            marker = _js_arrvar723[_js_idx722];
             marker.setMap(null);
         };
         this.markers.length = 0;
@@ -92,6 +92,18 @@ function __setf_mapWidgetRecenterP(newFlag, mapWidget) {
 };
 function mapWidgetBounds(mapWidget) {
     return mapWidget.googleMap.getBounds();
+};
+function mapWidgetCenter(mapWidget) {
+    return mapWidget.googleMap.getCenter();
+};
+function __setf_mapWidgetCenter(newCenter, mapWidget) {
+    return mapWidget.googleMap.panTo(newCenter);
+};
+function mapWidgetZoom(mapWidget) {
+    return mapWidget.googleMap.getZoom();
+};
+function __setf_mapWidgetZoom(newZoom, mapWidget) {
+    return mapWidget.googleMap.setZoom(newZoom);
 };
 function mapWidgetListenOnIdle(mapWidget, fn) {
     if (mapWidget.idleListener != null) {
