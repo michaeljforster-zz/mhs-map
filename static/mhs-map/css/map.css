@@ -7,39 +7,145 @@
  */
 
 
+/*
+ * NOTE: We must use 'visibility' and not 'display' as the latter
+ * cause problems with redisplay of the Google map (event with the use
+ * of google maps event trigger 'resize'.
+ */
+
 html, body {
-    height: 100%;
+    height: 100%; /* map requires height all the way down */
     margin: 0;
     padding: 0;
 }
 
-.fluid-container {
-    height: 100%;
+.page-header {
+    height: 44px;
+    margin: 0;
+    padding: 0;
 }
 
-#mhs-content {
-    height: 90%;
+.page-header h1 {
+    line-height: 20px;
+    font-size: 14px;
+    margin: 0;
+    padding: 10px 15px 15px 10px;
 }
 
-#mhs-map-widget {
-    height: 100%;
-    border: 1px solid black;
+#mhs-container {
+    position: relative;
+    height: 100%; /* map requires height all the way down */
+}
+#mhs-page-header-row {
+    height: 44px;
+    width: 100%;
+}
+#mhs-nav-row {
+    height: 44px;
+    width: 100%;
 }
 
-#mhs-list-widget {
+#mhs-search-col {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+#mhs-list-col {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+#mhs-map-col {
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
-/*
- * Within #mhs-navbar
- */
+/* Landscape phones and portrait tablets */
+@media (max-width: 767px) {
+    #mhs-page-header-row { display: none !important; }
+    #mhs-nav-row { display: block !important; }
 
-.navbar-btn {
-    margin-right: 10px;
+    #mhs-content-row {
+        position: absolute;
+        top: 44px;
+        left: 0px;
+        bottom: 20px; /* map requires height all the way down; we use bottom here */
+        width: 100%; /* map requires width all the way down */
+    }
+
+    #mhs-search-col {
+        position: absolute;
+        top: 0px; left: 0px;
+        height: 100%;
+        width: 100%;
+    }
+    #mhs-list-col {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        height: 100%;
+        width: 100%;
+    }
+    #mhs-map-col {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        height: 100%; /* map requires height all the way down */
+        width: 100%; /* map requires width all the way down */
+    }
+
+    #mhs-list-widget {
+        height: 100%; /* so that height: 100% works for .list-group child */
+    }
+    #mhs-list-widget .list-group {
+        height: 100%; /* height for scrolling overlow-y */
+        overflow-y: scroll;
+    }
+    #mhs-map-widget {
+        height: 100%; /* map requires height all the way down */
+        width: 100%; /* map requires width all the way down */
+    }
 }
 
-.form-group {
-    margin-right: 10px;
+/* Large desktops and laptops */
+@media (min-width: 1200px) {
+    #mhs-page-header-row { display: block !important; }
+    #mhs-nav-row { display: none !important; }
+    
+    #mhs-content-row {
+        position: absolute;
+        top: 44px;
+        left: 0px;
+        bottom: 10px; /* map requires height all the way down; we use bottom here */
+        width: 100%;
+    }
+
+    #mhs-search-col {
+        height: 100%;
+    }
+    #mhs-list-col {
+        height: 100%;
+    }
+    #mhs-map-col {
+        height: 100%; /* map requires height all the way down */
+    }
+
+    #mhs-list-widget {
+        height: 100%; /* so that height: 100% works for .list-group child */
+    }
+    #mhs-list-widget .list-group {
+        height: 100%; /* height for scrolling overlow-y */
+        overflow-y: scroll;
+    }
+    #mhs-map-widget {
+        height: 100%; /* map requires height all the way down */
+        width: 100%;
+    }
 }
+
+
+
+
+
+
 
 
 /* .site-info-window-content-box {} */

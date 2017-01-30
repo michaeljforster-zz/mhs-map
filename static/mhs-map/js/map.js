@@ -19,29 +19,6 @@ function setMunicipalityMode(municipalityName) {
     return __setf_mapWidgetZoom(8, MAP);
 };
 function initialize() {
-    jQuery('#mhs-show-map-btn').click(function (e) {
-        jQuery('#mhs-map-widget').removeClass('hidden');
-        return jQuery('#mhs-list-widget').addClass('hidden');
-    });
-    jQuery('#mhs-show-list-btn').click(function (e) {
-        jQuery('#mhs-map-widget').addClass('hidden');
-        return jQuery('#mhs-list-widget').removeClass('hidden');
-    });
-    jQuery('#mhs-filter-within-input').on('changed.bs.select', function (e) {
-        var within = jQuery('#mhs-filter-within-input').val();
-        switch (within) {
-        case 'map-area':
-            return setMapAreaMode();
-        case '100':
-        case '1000':
-        case '10000':
-        case '100000':
-        case '1000000':
-            return setGeolocationMode(parseInt(within));
-        default:
-            return setMunicipalityMode(within);
-        };
-    });
     SITELIST = new SiteList(FEATURESURI);
     LISTWIDGET = new ListWidget(SITELIST, jQuery('#mhs-list-widget'));
     siteListSubscribeToPopulated(SITELIST, function () {
@@ -53,7 +30,39 @@ function initialize() {
         console.log('MAP notified ' + siteListSize(SITELIST));
         return updateWidget(MAP);
     });
-    return mapWidgetListenOnIdle(MAP, function (mapWidget) {
+    mapWidgetListenOnIdle(MAP, function (mapWidget) {
         return __setf_siteListBounds(mapWidgetBounds(mapWidget), SITELIST);
+    });
+    jQuery(window).resize(function () {
+        jQuery('#mhs-search-tab').toggleClass('active', false);
+        jQuery('#mhs-list-tab').toggleClass('active', false);
+        jQuery('#mhs-map-tab').toggleClass('active', true);
+        jQuery('#mhs-search-col').toggleClass('invisible', false);
+        jQuery('#mhs-list-col').toggleClass('invisible', false);
+        return jQuery('#mhs-map-col').toggleClass('invisible', false);
+    });
+    jQuery('#mhs-search-btn').click(function () {
+        jQuery('#mhs-search-tab').toggleClass('active', true);
+        jQuery('#mhs-list-tab').toggleClass('active', false);
+        jQuery('#mhs-map-tab').toggleClass('active', false);
+        jQuery('#mhs-search-col').toggleClass('invisible', false);
+        jQuery('#mhs-list-col').toggleClass('invisible', true);
+        return jQuery('#mhs-map-col').toggleClass('invisible', true);
+    });
+    jQuery('#mhs-list-btn').click(function () {
+        jQuery('#mhs-search-tab').toggleClass('active', false);
+        jQuery('#mhs-list-tab').toggleClass('active', true);
+        jQuery('#mhs-map-tab').toggleClass('active', false);
+        jQuery('#mhs-search-col').toggleClass('invisible', true);
+        jQuery('#mhs-list-col').toggleClass('invisible', false);
+        return jQuery('#mhs-map-col').toggleClass('invisible', true);
+    });
+    return jQuery('#mhs-map-btn').click(function () {
+        jQuery('#mhs-search-tab').toggleClass('active', false);
+        jQuery('#mhs-list-tab').toggleClass('active', false);
+        jQuery('#mhs-map-tab').toggleClass('active', true);
+        jQuery('#mhs-search-col').toggleClass('invisible', true);
+        jQuery('#mhs-list-col').toggleClass('invisible', true);
+        return jQuery('#mhs-map-col').toggleClass('invisible', false);
     });
 };

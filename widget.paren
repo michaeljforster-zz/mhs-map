@@ -11,6 +11,7 @@
   (setf (ps:@ this update-widget)
         (ps:chain #'(lambda ()
                       (ps:chain this jqelement (empty))
+                      ;; (ps:chain this jqelement (add-class "list-group"))
                       (ps:chain this jqelement
                                 (html
                                  (ps:who-ps-html

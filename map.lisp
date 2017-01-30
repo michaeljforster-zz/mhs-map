@@ -55,74 +55,35 @@
                 (ps:ps
                   (ps:chain google maps event (add-dom-listener window "load" #'initialize))))))
      (:body
-      (:div :class "fluid-container"
-            (:nav :class "navbar navbar-default"
-                  (:div :class "navbar-header"
-                        (:button :type "button"
-                                 :class "navbar-toggle collapsed"
-                                 :data-toggle "collapse"
-                                 :data-target "#mhs-navbar"
-                                 :aria-expanded "false"
-                                 (:span :class "sr-only" "Toggle Navigation")
-                                 (:span :class "icon-bar")
-                                 (:span :class "icon-bar")
-                                 (:span :class "icon-bar"))
-                        (:button :type "button"
-                                 :class "btn btn-default navbar-btn"
-                                 :id "mhs-show-map-btn"
-                                 "Show Map")
-                        (:button :type "button"
-                                 :class "btn btn-default navbar-btn"
-                                 :id "mhs-show-list-btn"
-                                 "Show List"))
-                  (:div :class "collapse navbar-collapse"
-                        :id "mhs-navbar"
-                        (:form :class "navbar-form navbar-right"
-                               (:div :class "form-group"
-                                     (:select :class "selectpicker"
-                                              :id "mhs-filter-within-input"
-                                              (:option :value "map-area" "Within map area")
-                                              (:optgroup :label "As I move"
-                                                         (:option :value "100" "Within 100 m of me")
-                                                         (:option :value "1000" "Within 1 km of me")
-                                                         (:option :value "10000" "Within 10 km of me")
-                                                         (:option :value "100000" "Within 100 km of me")
-                                                         (:option :value "1000000" "Within 1000 km of me"))
-                                              (:optgroup :label "Within municipality"
-                                                         (dolist (m-name municipality-names)
-                                                           (cl-who:htm
-                                                            (:option :value (cl-who:escape-string m-name)
-                                                                     :title (cl-who:escape-string (concatenate 'string
-                                                                                                               "Within "
-                                                                                                               m-name))
-                                                                     (cl-who:esc m-name)))))))
-
-                               (:div :class "form-group"
-                                     (:select :class "selectpicker"
-                                              :id "mhs-filter-by-site-type-input"
-                                              (dolist (st-name (cons "All site types"
-                                                                     (sort (copy-list *site-type-names*) #'string<=)))
-                                                (cl-who:htm
-                                                 (:option :value (cl-who:escape-string st-name)
-                                                          (cl-who:esc st-name))))))
-
-                               (:div :class "form-group"
-                                     (:select :class "selectpicker"
-                                              :id "mhs-filter-by-designation-input"
-                                              :multiple t
-                                              :title "Has designations"
-                                              (:option :value "National" "National")
-                                              (:option :value "Provincial" "Provincial")
-                                              (:option :value "Municipal" "Municipal")))
-
-                               (:div :class "form-group"
-                                     (:input :type "text"
-                                             :class "form-control"
-                                             :placeholder "keywords")))))
-            (:div :id "mhs-content"
-                  ;; Manipulate visibility with Bootstrap CSS classes rather than DO .show() and .hide().
-                  (:div :id "mhs-map-widget")
-                  (:div :class "hidden" :id "mhs-list-widget")))))))
+      (:div :class "fluid-container" :id "mhs-container"
+            (:div :class "row" :id "mhs-page-header-row"
+                  (:div :class "col-md-12"
+                        (:div :class "page-header"
+                              (:h1 (cl-who:esc *app-title*)))))
+            (:div :class "row" :id "mhs-nav-row"
+                  (:div :class "col-md-12"
+                        (:ul :class "nav nav-tabs"
+                             (:li :role "presentation" :id "mhs-search-tab"
+                                  (:a :href "#" :id "mhs-search-btn" "Search"))
+                             (:li :role "presentation" :id "mhs-list-tab"
+                                  (:a :href "#" :id "mhs-list-btn" "List"))
+                             (:li :role "presentation" :id "mhs-map-tab" :class "active"
+                                  (:a :href "#" :id "mhs-map-btn" "Map")))))
+            ;; NOTE: We specify the widgets in this order so that the
+            ;; map widget will be the default when stacked.
+            (:div :class "row" :id "mhs-content-row"
+                  (:div :class "col-md-2 mhs-col" :id "mhs-search-col"
+                        (:div  :id "mhs-search-widget"
+                               ;; TODO search-widget...
+                               (:div :class "panel panel-default"
+                                     (:div :class "panel-body"
+                                           (:div :class "form-group"
+                                                 (:label :for "" "Field")
+                                                 (:input :type "text" :class "form-control"))))))
+                  (:div :class "col-md-2 mhs-col" :id "mhs-list-col"
+                        (:div :id "mhs-list-widget"))
+                  (:div :class "col-md-8 mhs-col" :id "mhs-map-col"
+                        (:div :id "mhs-map-widget"))))))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))
     ()

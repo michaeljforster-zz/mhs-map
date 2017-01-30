@@ -32,31 +32,6 @@
 
 
 (defun initialize ()
-  ;; Manipulate visibility with Bootstrap CSS classes rather than DO .show() and .hide().
-  (ps:chain (j-query "#mhs-show-map-btn")
-            (click #'(lambda (e)
-                       (ps:chain (j-query "#mhs-map-widget")
-                                 (remove-class "hidden"))
-                       (ps:chain (j-query "#mhs-list-widget")
-                                 (add-class "hidden")))))
-  (ps:chain (j-query "#mhs-show-list-btn")
-            (click #'(lambda (e)
-                       (ps:chain (j-query "#mhs-map-widget")
-                                 (add-class "hidden"))
-                       (ps:chain (j-query "#mhs-list-widget")
-                                 (remove-class "hidden")))))
-
-  (ps:chain (j-query "#mhs-filter-within-input")
-            (on "changed.bs.select"
-                #'(lambda (e)
-                    (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
-                      (case within
-                        ("map-area"
-                         (set-map-area-mode))
-                        (("100" "1000" "10000" "100000" "1000000")
-                         (set-geolocation-mode (parse-int within)))
-                        (otherwise ; municipality-name
-                         (set-municipality-mode within)))))))
 
   (setf *site-list* (ps:new (-site-list *features-uri*)))
   (setf *list-widget*
@@ -81,11 +56,47 @@
                                                           (site-list-size *site-list*))))
                                         (update-widget *map*)))
 
-  ;; TODO should this be hidden within map-widget? Is there any change to listener to be made over life of app?
+  ;; TODO should this be hidden within map-widget? Is there any change
+  ;; to listener to be made over life of app?
   ;; NOTE: wait to look at geolocation
   (map-widget-listen-on-idle *map*
                              #'(lambda (map-widget)
                                  (setf (site-list-bounds *site-list*)
                                        (map-widget-bounds map-widget))))
-  
-  )
+
+  ;; NOTE: This is the only portable way to ensure that all three
+  ;; widgets will be visible at and above the desktop breakpoint. The
+  ;; consequence is that the map widget will be displayed by default.
+  (ps:chain (j-query window)
+            (resize #'(lambda ()
+                        (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
+                        (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
+                        (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" true))
+                        (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
+                        (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
+                        (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false)))))
+
+  (ps:chain (j-query "#mhs-search-btn")
+            (click #'(lambda ()
+                       (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" true))
+                       (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
+                       (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
+                       (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
+                       (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" true))
+                       (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" true)))))
+  (ps:chain (j-query "#mhs-list-btn")
+            (click #'(lambda ()
+                       (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
+                       (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" true))
+                       (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
+                       (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" true))
+                       (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
+                       (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" true)))))
+  (ps:chain (j-query "#mhs-map-btn")
+            (click #'(lambda ()
+                       (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
+                       (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
+                       (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" true))
+                       (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" true))
+                       (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" true))
+                       (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false))))))
