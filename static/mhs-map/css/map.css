@@ -45,7 +45,7 @@ html, body {
     margin: 0;
 }
 
-#mhs-search-col {
+#mhs-map-col {
     padding-left: 5px;
     padding-right: 5px;
 }
@@ -55,13 +55,14 @@ html, body {
     padding-right: 5px;
 }
 
-#mhs-map-col {
+#mhs-search-col {
     padding-left: 5px;
     padding-right: 5px;
 }
 
-#mhs-search-widget {
-    height: 100%;
+#mhs-map-widget {
+    height: 100%; /* map requires height all the way down */
+    width: 100%; /* map requires width all the way down */
 }
 
 #mhs-list-widget {
@@ -73,9 +74,8 @@ html, body {
     overflow-y: scroll;
 }
 
-#mhs-map-widget {
-    height: 100%; /* map requires height all the way down */
-    width: 100%; /* map requires width all the way down */
+#mhs-search-widget {
+    height: 100%;
 }
 
 /* Landscape phones and portrait tablets */
@@ -85,16 +85,23 @@ html, body {
     #mhs-page-header-row {
         display: none !important;
     }
+    #mhs-list-widget .panel-heading {
+        display: none !important;
+    }
+    #mhs-search-widget .panel-heading {
+        display: none !important;
+    }
 
     #mhs-nav-row {
         display: block !important;
     }
 
-    #mhs-search-col {
+    #mhs-map-col {
         position: absolute;
-        top: 0px; left: 0px;
-        height: 100%;
-        width: 100%;
+        top: 0px;
+        left: 0px;
+        height: 100%; /* map requires height all the way down */
+        width: 100%; /* map requires width all the way down */
         margin: 0;
         padding: 0;
     }
@@ -109,12 +116,11 @@ html, body {
         padding: 0;
     }
 
-    #mhs-map-col {
+    #mhs-search-col {
         position: absolute;
-        top: 0px;
-        left: 0px;
-        height: 100%; /* map requires height all the way down */
-        width: 100%; /* map requires width all the way down */
+        top: 0px; left: 0px;
+        height: 100%;
+        width: 100%;
         margin: 0;
         padding: 0;
     }
@@ -127,21 +133,27 @@ html, body {
     #mhs-page-header-row {
         display: block !important;
     }
+    #mhs-list-widget .panel-heading {
+        display: block !important;
+    }
+    #mhs-search-widget .panel-heading {
+        display: block !important;
+    }
 
     #mhs-nav-row {
         display: none !important;
     }
 
-    #mhs-search-col {
-        height: 100%;
+    #mhs-map-col {
+        height: 100%; /* map requires height all the way down */
     }
 
     #mhs-list-col {
         height: 100%;
     }
 
-    #mhs-map-col {
-        height: 100%; /* map requires height all the way down */
+    #mhs-search-col {
+        height: 100%;
     }
 }
 
