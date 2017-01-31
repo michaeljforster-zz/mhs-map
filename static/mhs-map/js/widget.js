@@ -6,27 +6,28 @@ function ListWidget(model, jqelement) {
     this.jqelement = jqelement;
     this.updateWidget = (function () {
         this.jqelement.empty();
-        return this.jqelement.html(['<DIV CLASS="list-group">', siteListMap(this.model, (function (site) {
+        this.jqelement.addClass('panel panel-default');
+        return this.jqelement.html(['<DIV CLASS="panel-heading"><H3 CLASS="panel-title">List</H3></DIV><DIV CLASS="list-group">', siteListMap(this.model, (function (site) {
             return ['<A HREF="', site.url === '' ? '#' : MHSBASEURI + site.sUrl, '" TARGET="_blank" CLASS="list-group-item"><H4 CLASS="list-group-item-heading">', site.sName, '</H4><P CLASS="list-group-item-text">', site.sAddress, '</P><P CLASS="list-group-item-text">', site.mName, '</P></A>'].join('');
         }).bind(this)).join(''), '</DIV>'].join(''));
     }).bind(this);
     return this;
 };
 function siteIconUri(site) {
-    var stName609 = site.stName;
-    if (stName609 === 'Featured site') {
+    var stName699 = site.stName;
+    if (stName699 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName609 === 'Museum/Archives') {
+    } else if (stName699 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName609 === 'Building') {
+    } else if (stName699 === 'Building') {
         return 'icon_building.png';
-    } else if (stName609 === 'Monument') {
+    } else if (stName699 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName609 === 'Cemetery') {
+    } else if (stName699 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName609 === 'Location') {
+    } else if (stName699 === 'Location') {
         return 'icon_location.png';
-    } else if (stName609 === 'Other') {
+    } else if (stName699 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -38,8 +39,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress610 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress610 === '' ? '' : ', ' + sAddress610);
+    var sAddress700 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress700 === '' ? '' : ', ' + sAddress700);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -72,8 +73,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
             this.recenterP = false;
             this.googleMap.panTo(siteListCentroid(this.model));
         };
-        for (var marker = null, _js_arrvar612 = this.markers, _js_idx611 = 0; _js_idx611 < _js_arrvar612.length; _js_idx611 += 1) {
-            marker = _js_arrvar612[_js_idx611];
+        for (var marker = null, _js_arrvar702 = this.markers, _js_idx701 = 0; _js_idx701 < _js_arrvar702.length; _js_idx701 += 1) {
+            marker = _js_arrvar702[_js_idx701];
             marker.setMap(null);
         };
         this.markers.length = 0;

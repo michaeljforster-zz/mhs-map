@@ -14,19 +14,6 @@ html, body {
     padding: 0;
 }
 
-.page-header {
-    height: 44px;
-    margin: 0;
-    padding: 0;
-}
-
-.page-header h1 {
-    line-height: 20px;
-    font-size: 14px;
-    margin: 0;
-    padding: 10px 15px 15px 10px;
-}
-
 #mhs-container {
     position: relative;
     height: 100%; /* map requires height all the way down */
@@ -35,6 +22,13 @@ html, body {
 #mhs-page-header-row {
     height: 44px;
     width: 100%;
+}
+
+#mhs-page-header-row h1 {
+    line-height: 20px;
+    font-size: 14px;
+    margin: 0;
+    padding: 10px 15px 15px 10px;
 }
 
 #mhs-nav-row {
@@ -64,6 +58,10 @@ html, body {
 #mhs-map-col {
     padding-left: 5px;
     padding-right: 5px;
+}
+
+#mhs-search-widget {
+    height: 100%;
 }
 
 #mhs-list-widget {

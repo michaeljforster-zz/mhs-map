@@ -11,10 +11,12 @@
   (setf (ps:@ this update-widget)
         (ps:chain #'(lambda ()
                       (ps:chain this jqelement (empty))
-                      ;; (ps:chain this jqelement (add-class "list-group"))
+                      (ps:chain this jqelement (add-class "panel panel-default"))
                       (ps:chain this jqelement
                                 (html
                                  (ps:who-ps-html
+                                  (:div :class "panel-heading"
+                                        (:h3 :class "panel-title" "List"))
                                   (:div :class "list-group"
                                         (ps:chain (site-list-map (ps:@ this model)
                                                                  (ps:chain #'(lambda (site)

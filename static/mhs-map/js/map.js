@@ -34,9 +34,9 @@ function initialize() {
         return __setf_siteListBounds(mapWidgetBounds(mapWidget), SITELIST);
     });
     jQuery(window).resize(function () {
-        jQuery('#mhs-search-tab').toggleClass('active', false);
+        jQuery('#mhs-search-tab').toggleClass('active', true);
         jQuery('#mhs-list-tab').toggleClass('active', false);
-        jQuery('#mhs-map-tab').toggleClass('active', true);
+        jQuery('#mhs-map-tab').toggleClass('active', false);
         jQuery('#mhs-search-col').toggleClass('invisible', false);
         jQuery('#mhs-list-col').toggleClass('invisible', false);
         return jQuery('#mhs-map-col').toggleClass('invisible', false);

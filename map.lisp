@@ -58,32 +58,31 @@
       (:div :class "fluid-container" :id "mhs-container"
             (:div :class "row" :id "mhs-page-header-row"
                   (:div :class "col-md-12"
-                        (:div :class "page-header"
-                              (:h1 (cl-who:esc *app-title*)))))
+                        (:h1 (cl-who:esc *app-title*))))
             (:div :class "row" :id "mhs-nav-row"
                   (:div :class "col-md-12"
                         (:ul :class "nav nav-tabs"
-                             (:li :role "presentation" :id "mhs-search-tab"
-                                  (:a :href "#" :id "mhs-search-btn" "Search"))
+                             (:li :role "presentation" :id "mhs-map-tab"
+                                  (:a :href "#" :id "mhs-map-btn" "Map"))
                              (:li :role "presentation" :id "mhs-list-tab"
                                   (:a :href "#" :id "mhs-list-btn" "List"))
-                             (:li :role "presentation" :id "mhs-map-tab" :class "active"
-                                  (:a :href "#" :id "mhs-map-btn" "Map")))))
+                             (:li :role "presentation" :id "mhs-search-tab" :class "active"
+                                  (:a :href "#" :id "mhs-search-btn" "Search")))))
             ;; NOTE: We specify the widgets in this order so that the
             ;; map widget will be the default when stacked.
             (:div :class "row" :id "mhs-content-row"
-                  (:div :class "col-md-2 mhs-col" :id "mhs-search-col"
-                        (:div  :id "mhs-search-widget"
-                               ;; TODO search-widget...
-                               (:div :class "panel panel-default"
-                                     (:div :class "panel-body"
-                                           (:div :class "form-group"
-                                                 (:label :for "" "Field")
-                                                 (:input :type "text" :class "form-control"))))))
+                  (:div :class "col-md-8 mhs-col" :id "mhs-map-col"
+                        (:div :id "mhs-map-widget"))
                   (:div :class "col-md-2 mhs-col" :id "mhs-list-col"
                         (:div :id "mhs-list-widget"))
-                  (:div :class "col-md-8 mhs-col" :id "mhs-map-col"
-                        (:div :id "mhs-map-widget"))))))))
+                  (:div :class "col-md-2 mhs-col" :id "mhs-search-col"
+                        (:div :id "mhs-search-widget" :class "panel panel-default"
+                              (:div :class "panel-heading"
+                                    (:h3 :class "panel-title" "Search"));; TODO search-widget...
+                              (:div :class "panel-body"
+                                    (:div :class "form-group"
+                                          (:label :for "" "Field")
+                                          (:input :type "text" :class "form-control")))))))))))
 
 (hunchentoot:define-easy-handler (handle-map :uri (princ-to-string *map-uri*))
     ()

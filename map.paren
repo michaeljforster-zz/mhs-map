@@ -69,9 +69,9 @@
   ;; consequence is that the map widget will be displayed by default.
   (ps:chain (j-query window)
             (resize #'(lambda ()
-                        (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
+                        (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" true))
                         (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
-                        (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" true))
+                        (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
                         (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
                         (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
                         (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false)))))
