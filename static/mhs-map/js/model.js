@@ -69,21 +69,21 @@ function siteListUnsubscribeAll(siteList) {
 function percenturl(siteList) {
     switch (siteList.mode) {
     case 'map-area':
-        var prevMv694 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv524 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(siteList.bounds);
-            var _db695 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db695[0];
-            var north = _db695[1];
-            var east = _db695[2];
+            var _db525 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db525[0];
+            var north = _db525[1];
+            var east = _db525[2];
             return siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east;
         } finally {
-            __PS_MV_REG = prevMv694;
+            __PS_MV_REG = prevMv524;
         };
     case 'geolocation':
-        var lat696 = siteList.centerDistance.center.lat();
-        var lng697 = siteList.centerDistance.center.lng();
-        var distance698 = siteList.centerDistance.distance;
+        var lat526 = siteList.centerDistance.center.lat();
+        var lng527 = siteList.centerDistance.center.lng();
+        var distance528 = siteList.centerDistance.distance;
         return siteList.url + '?lat=' + '&lng=' + '&distance=';
     case 'municipality':
         return siteList.url + '?municipality-name=' + siteList.municipalityName;

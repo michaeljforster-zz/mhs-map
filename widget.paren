@@ -5,6 +5,63 @@
 (defun update-widget (widget)
   (ps:chain widget (update-widget)))
 
+;; (defun -search-widget (model jqelement)
+;;   (setf (ps:@ this model) model)
+;;   (setf (ps:@ this jqelement) jqelement)
+;;   (setf (ps:@ this update-widget)
+;;         (ps:chain #'(lambda ()
+;;                       (ps:chain this jqelement (empty))
+;;                       (ps:chain this jqelement (add-class "panel panel-default"))
+;;                       (ps:chain this jqelement
+;;                                 (html
+;;                                  (ps:who-ps-html
+;;                                   (:div :class "panel-heading"
+;;                                         (:h3 :class "panel-title" "Search"))
+;;                                   (:div :class "panel-body"
+                                        
+;;                                         ;; TODO mode box first
+;;                                         (:div :class "form-group"
+;;                                               (:select :class "selectpicker"
+;;                                                        :id "mhs-filter-within-input"
+;;                                                        (:option :value "map-area" "Within map area")
+;;                                                        (:optgroup :label "As I move"
+;;                                                                   (:option :value "100" "Within 100 m of me")
+;;                                                                   (:option :value "1000" "Within 1 km of me")
+;;                                                                   (:option :value "10000" "Within 10 km of me")
+;;                                                                   (:option :value "100000" "Within 100 km of me")
+;;                                                                   (:option :value "1000000" "Within 1000 km of me"))
+;;                                                        ;; (:optgroup :label "Within municipality"
+;;                                                        ;;            (dolist (m-name *municipality-names*)
+;;                                                        ;;              (cl-who:htm
+;;                                                        ;;               (:option :value (cl-who:escape-string m-name)
+;;                                                        ;;                        :title (cl-who:escape-string (concatenate 'string
+;;                                                        ;;                                                                  "Within "
+;;                                                        ;;                                                                  m-name))
+;;                                                        ;;                        (cl-who:esc m-name)))))
+;;                                                        ))
+                                        
+                                        
+;;                                         ;; TODO new site types box
+;;                                         ;; (:div :class "form-group"
+;;                                         ;;       (:label :for "" "Field")
+;;                                         ;;       (:input :type "text" :class "form-control"))
+
+;;                                         ;; ;; TODO new designations box
+;;                                         ;; (:div :class "form-group"
+;;                                         ;;       (:label :for "" "Field")
+;;                                         ;;       (:input :type "text" :class "form-control"))
+
+;;                                         ;; ;; TODO then old search fields
+;;                                         ;; (:div :class "form-group"
+;;                                         ;;       (:label :for "" "Field")
+;;                                         ;;       (:input :type "text" :class "form-control"))
+
+
+
+;;                                         )))))
+;;                   (bind this)))
+;;   this)
+
 (defun -list-widget (model jqelement)
   (setf (ps:@ this model) model)
   (setf (ps:@ this jqelement) jqelement)

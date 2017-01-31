@@ -3,6 +3,7 @@
 (in-package #:mhs-map)
 
 (defvar *site-list* nil)
+;; (defvar *search-widget* nil)
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
@@ -34,6 +35,27 @@
 (defun initialize ()
 
   (setf *site-list* (ps:new (-site-list *features-uri*)))
+
+  
+  ;; (setf *search-widget*
+  ;;       (ps:new (-search-widget *site-list*
+  ;;                               (j-query "#mhs-search-widget"))))
+  ;; (update-widget *search-widget*)
+
+
+  ;; (ps:chain (j-query "#mhs-filter-within-input")
+  ;;           (on "changed.bs.select"
+  ;;               #'(lambda (e)
+  ;;                   (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
+  ;;                     (case within
+  ;;                       ("map-area"
+  ;;                        (set-map-area-mode))
+  ;;                       (("100" "1000" "10000" "100000" "1000000")
+  ;;                        (set-geolocation-mode (parse-int within)))
+  ;;                       (otherwise ; municipality-name
+  ;;                        (set-municipality-mode within)))))))
+
+  
   (setf *list-widget*
         (ps:new (-list-widget *site-list*
                               (j-query "#mhs-list-widget"))))

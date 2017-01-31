@@ -14,6 +14,10 @@ html, body {
     padding: 0;
 }
 
+label {
+    display: block;
+}
+
 #mhs-container {
     position: relative;
     height: 100%; /* map requires height all the way down */
