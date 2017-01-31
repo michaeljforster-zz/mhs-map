@@ -1,11 +1,6 @@
 /*
  * Copyright (c) 2012 Shared Logic Inc.  All rights reserved.
- *
- * mapp.css
- *
- * NOTE: see https://developers.google.com/speed/docs/best-practices/rendering
  */
-
 
 /*
  * NOTE: We must use 'visibility' and not 'display' as the latter
@@ -36,39 +31,65 @@ html, body {
     position: relative;
     height: 100%; /* map requires height all the way down */
 }
+
 #mhs-page-header-row {
     height: 44px;
     width: 100%;
 }
+
 #mhs-nav-row {
     height: 44px;
     width: 100%;
+}
+
+#mhs-content-row {
+    position: absolute;
+    top: 44px;
+    left: 0px;
+    bottom: 20px; /* map requires height all the way down; we use bottom here */
+    width: 100%; /* map requires width all the way down */
+    margin: 0;
 }
 
 #mhs-search-col {
     padding-left: 5px;
     padding-right: 5px;
 }
+
 #mhs-list-col {
     padding-left: 5px;
     padding-right: 5px;
 }
+
 #mhs-map-col {
     padding-left: 5px;
     padding-right: 5px;
 }
 
-/* Landscape phones and portrait tablets */
-@media (max-width: 767px) {
-    #mhs-page-header-row { display: none !important; }
-    #mhs-nav-row { display: block !important; }
+#mhs-list-widget {
+    height: 100%; /* so that height: 100% works for .list-group child */
+}
 
-    #mhs-content-row {
-        position: absolute;
-        top: 44px;
-        left: 0px;
-        bottom: 20px; /* map requires height all the way down; we use bottom here */
-        width: 100%; /* map requires width all the way down */
+#mhs-list-widget .list-group {
+    height: 100%; /* height for scrolling overlow-y */
+    overflow-y: scroll;
+}
+
+#mhs-map-widget {
+    height: 100%; /* map requires height all the way down */
+    width: 100%; /* map requires width all the way down */
+}
+
+/* Landscape phones and portrait tablets */
+/* @media (max-width: 767px) { */
+/* Portrait tablets and small desktops */
+@media /* (min-width: 768px) and */ (max-width: 991px) {
+    #mhs-page-header-row {
+        display: none !important;
+    }
+
+    #mhs-nav-row {
+        display: block !important;
     }
 
     #mhs-search-col {
@@ -76,68 +97,53 @@ html, body {
         top: 0px; left: 0px;
         height: 100%;
         width: 100%;
+        margin: 0;
+        padding: 0;
     }
+
     #mhs-list-col {
         position: absolute;
         top: 0px;
         left: 0px;
         height: 100%;
         width: 100%;
+        margin: 0;
+        padding: 0;
     }
+
     #mhs-map-col {
         position: absolute;
         top: 0px;
         left: 0px;
         height: 100%; /* map requires height all the way down */
         width: 100%; /* map requires width all the way down */
-    }
-
-    #mhs-list-widget {
-        height: 100%; /* so that height: 100% works for .list-group child */
-    }
-    #mhs-list-widget .list-group {
-        height: 100%; /* height for scrolling overlow-y */
-        overflow-y: scroll;
-    }
-    #mhs-map-widget {
-        height: 100%; /* map requires height all the way down */
-        width: 100%; /* map requires width all the way down */
+        margin: 0;
+        padding: 0;
     }
 }
 
+/* Landscape tablets and medium desktops */
+@media (min-width: 992px) { /* and (max-width: 1199px) { */
 /* Large desktops and laptops */
-@media (min-width: 1200px) {
-    #mhs-page-header-row { display: block !important; }
-    #mhs-nav-row { display: none !important; }
-    
-    #mhs-content-row {
-        position: absolute;
-        top: 44px;
-        left: 0px;
-        bottom: 10px; /* map requires height all the way down; we use bottom here */
-        width: 100%;
+/* @media (min-width: 1200px) { */
+    #mhs-page-header-row {
+        display: block !important;
+    }
+
+    #mhs-nav-row {
+        display: none !important;
     }
 
     #mhs-search-col {
         height: 100%;
     }
+
     #mhs-list-col {
         height: 100%;
     }
+
     #mhs-map-col {
         height: 100%; /* map requires height all the way down */
-    }
-
-    #mhs-list-widget {
-        height: 100%; /* so that height: 100% works for .list-group child */
-    }
-    #mhs-list-widget .list-group {
-        height: 100%; /* height for scrolling overlow-y */
-        overflow-y: scroll;
-    }
-    #mhs-map-widget {
-        height: 100%; /* map requires height all the way down */
-        width: 100%;
     }
 }
 
