@@ -25,72 +25,71 @@
           (:div :class "panel-heading"
                 (:h3 :class "panel-title" "Search"))
           (:div :class "panel-body"
-                (:form
-                 (:div :class "form-group"
-                       (:select :class "selectpicker"
-                                :id "mhs-filter-within-input"
-                                :data-width "auto"
-                                (:option :value "map-area" "Within map area")
-                                (:optgroup :label "As I move, within"
-                                           (:option :value "100" :title "Within 100 m of me" "100 m of me")
-                                           (:option :value "1000" :title "Within 1 km of me" "1 km of me")
-                                           (:option :value "10000" :title "Within 10 km of me" "10 km of me")
-                                           (:option :value "100000" :title "Within 100 km of me" "100 km of me")
-                                           (:option :value "1000000" :title "Within 1000 km of me" "1000 km of me"))
-                                (:optgroup :label "Within municipality"
-                                           (dolist (m-name municipality-names)
-                                             (cl-who:htm
-                                              (:option :value (cl-who:escape-string m-name)
-                                                       :title (cl-who:escape-string
-                                                               (concatenate 'string
-                                                                            "Within "
-                                                                            m-name))
-                                                       (cl-who:esc m-name)))))))
-                 (:div :class "form-group"
-                       (:select :class "selectpicker"
-                                :data-width "auto"
-                                :id "mhs-st-name-input"
-                                (dolist (x (cons (cons "" "All site types")
-                                                 (sort (mapcar #'(lambda (x) (cons x x)) site-type-names) #'string<= :key #'car)))
-                                  (cl-who:htm
-                                   (:option :value (cl-who:escape-string (car x))
-                                            (cl-who:esc (cdr x)))))))
-                 (:div :class "form-group"
-                       (:select :class "selectpicker"
-                                :id "mhs-designation-input"
-                                :multiple t
-                                :title "Has designations"
-                                (:option :value "National" "National")
-                                (:option :value "Provincial" "Provincial")
-                                (:option :value "Municipal" "Municipal")))
-                 (:div :class "form-group"
-                       (:div :class "row"
-                             (:div :class "col-xs-12"
-                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword1-input"))))
-                 (:div :class "form-group"
-                       (:div :class "row"
-                             (:div :class "col-xs-4"
-                                   (:select :class "selectpicker"
-                                            :data-width "auto"
-                                            :id "mhs-op2-input"
-                                            (:option :value "AND" "AND")
-                                            (:option :value "NOT" "NOT")
-                                            (:option :value "OR" "OR")))
-                             (:div :class "col-xs-8"
-                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword2-input"))))
-                 (:div :class "form-group"
-                       (:div :class "row"
-                             (:div :class "col-xs-4"
-                                   (:select :class "selectpicker"
-                                            :data-width "auto"
-                                            :id "mhs-op3-input"
-                                            (:option :value "AND" "AND")
-                                            (:option :value "NOT" "NOT")
-                                            (:option :value "OR" "OR")))
-                             (:div :class "col-xs-8"
-                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword3-input"))))
-                 (:div :class "form-group"
-                       (:button :type "submit" :class "btn btn-primary" :id "mhs-update-map-btn" "Update Map")))))))
+                (:div :class "form-group"
+                      (:select :class "selectpicker"
+                               :id "mhs-filter-within-input"
+                               :data-width "auto"
+                               (:option :value "map-area" "Within map area")
+                               (:optgroup :label "As I move, within"
+                                          (:option :value "100" :title "Within 100 m of me" "100 m of me")
+                                          (:option :value "1000" :title "Within 1 km of me" "1 km of me")
+                                          (:option :value "10000" :title "Within 10 km of me" "10 km of me")
+                                          (:option :value "100000" :title "Within 100 km of me" "100 km of me")
+                                          (:option :value "1000000" :title "Within 1000 km of me" "1000 km of me"))
+                               (:optgroup :label "Within municipality"
+                                          (dolist (m-name municipality-names)
+                                            (cl-who:htm
+                                             (:option :value (cl-who:escape-string m-name)
+                                                      :title (cl-who:escape-string
+                                                              (concatenate 'string
+                                                                           "Within "
+                                                                           m-name))
+                                                      (cl-who:esc m-name)))))))
+                (:div :class "form-group"
+                      (:select :class "selectpicker"
+                               :data-width "auto"
+                               :id "mhs-st-name-input"
+                               (dolist (x (cons (cons "" "All site types")
+                                                (sort (mapcar #'(lambda (x) (cons x x)) site-type-names) #'string<= :key #'car)))
+                                 (cl-who:htm
+                                  (:option :value (cl-who:escape-string (car x))
+                                           (cl-who:esc (cdr x)))))))
+                (:div :class "form-group"
+                      (:select :class "selectpicker"
+                               :id "mhs-designation-input"
+                               :multiple t
+                               :title "Has designations"
+                               (:option :value "National" "National")
+                               (:option :value "Provincial" "Provincial")
+                               (:option :value "Municipal" "Municipal")))
+                (:div :class "form-group"
+                      (:div :class "row"
+                            (:div :class "col-xs-12"
+                                  (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword1-input"))))
+                (:div :class "form-group"
+                      (:div :class "row"
+                            (:div :class "col-xs-4"
+                                  (:select :class "selectpicker"
+                                           :data-width "auto"
+                                           :id "mhs-op2-input"
+                                           (:option :value "AND" "AND")
+                                           (:option :value "NOT" "NOT")
+                                           (:option :value "OR" "OR")))
+                            (:div :class "col-xs-8"
+                                  (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword2-input"))))
+                (:div :class "form-group"
+                      (:div :class "row"
+                            (:div :class "col-xs-4"
+                                  (:select :class "selectpicker"
+                                           :data-width "auto"
+                                           :id "mhs-op3-input"
+                                           (:option :value "AND" "AND")
+                                           (:option :value "NOT" "NOT")
+                                           (:option :value "OR" "OR")))
+                            (:div :class "col-xs-8"
+                                  (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword3-input"))))
+                (:div :class "form-group"
+                      (:button :type "submit" :class "btn btn-primary" :id "mhs-update-map-btn" "Update Map"))))))
 
 (defun render-map (municipality-names
                    site-type-names

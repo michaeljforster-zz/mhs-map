@@ -7,21 +7,18 @@
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
-;; TODO separate form
-;; (set-site-list-parameters *site-list*
-;;                           (ps:chain (j-query "#mhs-st-name-input") (val))
-;;                           "" ;; TODO (ps:chain (j-query "#mhs-snd-no-p-input") (val))
-;;                           "" ;; TODO (ps:chain (j-query "#mhs-spd-no-p-input") (val))
-;;                           "" ;; TODO (ps:chain (j-query "#mhs-smd-no-p-input") (val))
-;;                           (ps:chain (j-query "#mhs-keyword1-input") (val))
-;;                           (ps:chain (j-query "#mhs-op2-input") (val))
-;;                           (ps:chain (j-query "#mhs-keyword2-input") (val))
-;;                           (ps:chain (j-query "#mhs-op3-input") (val))
-;;                           (ps:chain (j-query "#mhs-keyword3-input") (val)))
-
-
 (defun set-map-area-mode ()
   (set-site-list-map-area-mode *site-list*)
+  (update-site-list-parameters *site-list*
+                               (ps:chain (j-query "#mhs-st-name-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-snd-no-p-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-spd-no-p-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-smd-no-p-input") (val))
+                               (ps:chain (j-query "#mhs-keyword1-input") (val))
+                               (ps:chain (j-query "#mhs-op2-input") (val))
+                               (ps:chain (j-query "#mhs-keyword2-input") (val))
+                               (ps:chain (j-query "#mhs-op3-input") (val))
+                               (ps:chain (j-query "#mhs-keyword3-input") (val)))
   (setf (map-widget-center *map*) *default-center*)
   (setf (map-widget-zoom *map*) *default-zoom*)
   ;; Let update bounds post-center/zoom.
@@ -29,12 +26,32 @@
 
 (defun set-geolocation-mode (distance)
   (set-site-list-geolocation-mode *site-list*)
+  (update-site-list-parameters *site-list*
+                               (ps:chain (j-query "#mhs-st-name-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-snd-no-p-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-spd-no-p-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-smd-no-p-input") (val))
+                               (ps:chain (j-query "#mhs-keyword1-input") (val))
+                               (ps:chain (j-query "#mhs-op2-input") (val))
+                               (ps:chain (j-query "#mhs-keyword2-input") (val))
+                               (ps:chain (j-query "#mhs-op3-input") (val))
+                               (ps:chain (j-query "#mhs-keyword3-input") (val)))
   (setf (map-widget-zoom *map*) 8)
   ;; Set the distance and let periodic geolocation update center.
   (update-site-list-center-distance *site-list* (make-center-distance 0 0 distance)))
 
 (defun set-municipality-mode (m-name)
   (set-site-list-municipality-mode *site-list*)
+  (update-site-list-parameters *site-list*
+                               (ps:chain (j-query "#mhs-st-name-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-snd-no-p-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-spd-no-p-input") (val))
+                               "" ;; TODO (ps:chain (j-query "#mhs-smd-no-p-input") (val))
+                               (ps:chain (j-query "#mhs-keyword1-input") (val))
+                               (ps:chain (j-query "#mhs-op2-input") (val))
+                               (ps:chain (j-query "#mhs-keyword2-input") (val))
+                               (ps:chain (j-query "#mhs-op3-input") (val))
+                               (ps:chain (j-query "#mhs-keyword3-input") (val)))
   (setf (map-widget-recenter-p *map*) true)
   (setf (map-widget-zoom *map*) 8)
   (update-site-list-m-name *site-list* m-name))
@@ -43,16 +60,15 @@
 (defun initialize ()
   (setf *site-list* (ps:new (-site-list *features-uri*)))
 
-  (ps:chain (j-query "#mhs-filter-within-input")
-            (on "changed.bs.select"
-                #'(lambda (e)
+  (ps:chain (j-query "#mhs-update-map-btn")
+            (click #'(lambda (e)
                        (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
                          (case within
                            ("map-area"
                             (set-map-area-mode))
                            (("100" "1000" "10000" "100000" "1000000")
                             (set-geolocation-mode (parse-int within)))
-                           (otherwise ; m-name
+                           (otherwise   ; m-name
                             (set-municipality-mode within)))))))
   
   (setf *list-widget*

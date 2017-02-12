@@ -153,8 +153,7 @@
   (setf (ps:@ site-list op2) op2)
   (setf (ps:@ site-list keyword2) keyword2)
   (setf (ps:@ site-list op3) op3)
-  (setf (ps:@ site-list keyword3) keyword3)
-  (%populate site-list))
+  (setf (ps:@ site-list keyword3) keyword3))
 
 (defun site-list-centroid (site-list)
   (ps:@ site-list centroid))
