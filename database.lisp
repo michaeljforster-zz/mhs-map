@@ -55,7 +55,6 @@
       (push location list))
     (format nil "~{~A~^ ~}" (nreverse list))))
 
-
 (defparameter *site-type-names*
   (list "Featured site"
         "Museum/Archives"
@@ -156,6 +155,10 @@
    m-name)
   :municipality)
 
+(defun municipality-centroid (municipality)
+  (make-point :x (municipality-m-lng municipality)
+              :y (municipality-m-lat municipality)))
+
 (postmodernity:defpgstruct site
   s-no
   s-name
@@ -169,100 +172,6 @@
   snd-no
   spd-no
   smd-no)
-
-(postmodern:defprepared-with-names select-sites-within-bounds (south west north east)
-  ((:order-by
-    (:select 's-no
-             's-name
-             'm-name
-             's-address
-             'st-name
-             's-url
-             's-published-p
-             (:as (:st-y 'sg-geometry) 's-lat) ; yes, Y is latitude; don't coalesce, use NIL
-             (:as (:st-x 'sg-geometry) 's-lng) ; yes, X is longitude; don't coalesce, use NIL
-             'snd-no ; don't coalesce, use NIL
-             'spd-no ; don't coalesce, use NIL
-             'smd-no ; don't coalesce, use NIL
-             :from 'site
-             :inner-join 'site-geo :using ('s-no)
-             :left-join 'site-national-designation :using ('s-no)
-             :left-join 'site-provincial-designation :using ('s-no)
-             :left-join 'site-municipal-designation :using ('s-no)
-             :where (:st-within 'sg-geometry
-                                (:st-setsrid
-                                 ;; NOTE: st-makebox2d (lower-left-point upper-right-point)
-                                 ;; NOTE: st-makepoint (x/lng y/lat)
-                                 (:st-makebox2d
-                                  ;; NOTE: st-makepoint (west south)
-                                  (:st-makepoint '$2 '$1)
-                                  ;; NOTE: st-makepoint (east north)
-                                  (:st-makepoint '$4 '$3))
-                                 4326)))
-    's-name)
-   south
-   west
-   north
-   east)
-  :sites)
-
-(postmodern:defprepared-with-names select-sites-within-distance (lat lng distance)
-  ((:order-by
-    (:select 's-no
-             's-name
-             'm-name
-             's-address
-             'st-name
-             's-url
-             's-published-p
-             (:as (:st-y 'sg-geometry) 's-lat) ; yes, Y is latitude; don't coalesce, use NIL
-             (:as (:st-x 'sg-geometry) 's-lng) ; yes, X is longitude; don't coalesce, use NIL
-             'snd-no ; don't coalesce, use NIL
-             'spd-no ; don't coalesce, use NIL
-             'smd-no ; don't coalesce, use NIL
-             :from 'site
-             :inner-join 'site-geo :using ('s-no)
-             :left-join 'site-national-designation :using ('s-no)
-             :left-join 'site-provincial-designation :using ('s-no)
-             :left-join 'site-municipal-designation :using ('s-no)
-             :where (:st-dwithin 'sg-geography
-                                 (:geography
-                                  (:st-transform
-                                   (:st-setsrid
-                                    ;; NOTE: st-makepoint (x/lng y/lat)
-                                    (:st-makepoint '$2 '$1)
-                                    *default-srid*)
-                                   *default-srid*))
-                                 '$3))
-    's-name)
-   lat
-   lng
-   distance)
-  :sites)
-
-(postmodern:defprepared-with-names select-sites-by-municipality (m-name)
-  ((:order-by
-    (:select 's-no
-             's-name
-             'm-name
-             's-address
-             'st-name
-             's-url
-             's-published-p
-             (:as (:st-y 'sg-geometry) 's-lat) ; yes, Y is latitude; don't coalesce, use NIL
-             (:as (:st-x 'sg-geometry) 's-lng) ; yes, X is longitude; don't coalesce, use NIL
-             'snd-no ; don't coalesce, use NIL
-             'spd-no ; don't coalesce, use NIL
-             'smd-no ; don't coalesce, use NIL
-             :from 'site
-             :inner-join 'site-geo :using ('s-no)
-             :left-join 'site-national-designation :using ('s-no)
-             :left-join 'site-provincial-designation :using ('s-no)
-             :left-join 'site-municipal-designation :using ('s-no)
-             :where (:= 'm-name '$1))
-    's-name)
-   m-name)
-  :sites)
 
 (defun make-binary-logical-form (a op b)
   (if (not (and op b))
@@ -315,50 +224,174 @@
              ,@where-form)
     's-name))
 
-(defparameter *select-site-sql*
-  (s-sql:sql-compile (make-select-sites-form '(:where (:= 's-no '$1)))))
+(defun make-st-name-condition-form (parameter-index)
+  `(:or (:= 'st-name ',(intern (format nil "$~D" parameter-index) "MHS-MAP"))
+        (:in ',(intern (format nil "$~D" parameter-index) "MHS-MAP")
+             (:select 'st-name :from 'site-secondary-site-type :where (:= 's-no 'site.s-no)))))
 
-(defun make-select-sites-sql (keyword1
-                              op2
-                              keyword2
-                              op3
-                              keyword3
-                              m-name
-                              st-name
-                              snd-no-p
-                              spd-no-p
-                              smd-no-p)
-  (flet ((make-sql (form)
-           (s-sql:sql-compile (make-select-sites-form `(:where ,form)))))
-    (let ((keyword-form (combine-logical-forms (list :and (make-ilike-name-address-form keyword1))
-                                               (list op2 (make-ilike-name-address-form keyword2))
-                                               (list op3 (make-ilike-name-address-form keyword3))))
-          (designation-form '()))
-      (when snd-no-p (push '(:not-null 'snd-no) designation-form))
-      (when spd-no-p (push '(:not-null 'spd-no) designation-form))
-      (when smd-no-p (push '(:not-null 'smd-no) designation-form))
-      (cond
-        ((and m-name st-name)
-         (values (make-sql `(:and ,keyword-form
-				  ,@designation-form
-				  (:= 'm-name '$1)
-				  (:or (:= 'st-name '$2)
-				       (:in '$2
-					    (:select 'st-name :from 'site-secondary-site-type :where (:= 's-no 'site.s-no))))))
-                 (list m-name st-name)))
-        (m-name
-         (values (make-sql `(:and ,keyword-form ,@designation-form (:= 'm-name '$1)))
-                 (list m-name)))
-        (st-name
-         (values (make-sql `(:and ,keyword-form
-				  ,@designation-form
-                                  (:or (:= 'st-name '$1)
-				       (:in '$1
-					    (:select 'st-name :from 'site-secondary-site-type :where (:= 's-no 'site.s-no))))))
-                 (list st-name)))
-        (t
-         (values (make-sql `(:and ,keyword-form ,@designation-form))
-                 nil))))))
+(defun make-designation-condition-forms (snd-no-p spd-no-p smd-no-p)
+  (let ((forms '()))
+    (when snd-no-p (push '(:not-null 'snd-no) forms))
+    (when spd-no-p (push '(:not-null 'spd-no) forms))
+    (when smd-no-p (push '(:not-null 'smd-no) forms))
+    forms))
+
+(defun make-keyword-condition-form (keyword1 op2 keyword2 op3 keyword3)
+  (combine-logical-forms (list :and (make-ilike-name-address-form keyword1))
+                         (list op2 (make-ilike-name-address-form keyword2))
+                         (list op3 (make-ilike-name-address-form keyword3))))
+
+(defun make-where-within-bounds-form (south west north east
+                                      st-name
+                                      snd-no-p spd-no-p smd-no-p
+                                      keyword1 op2 keyword2 op3 keyword3)
+  (let ((where-form `(:where (:and (:st-within 'sg-geometry
+                                               (:st-setsrid
+                                                ;; NOTE: st-makebox2d (lower-left-point upper-right-point)
+                                                ;; NOTE: st-makepoint (x/lng y/lat)
+                                                (:st-makebox2d
+                                                 ;; NOTE: st-makepoint (west south)
+                                                 (:st-makepoint '$2 '$1)
+                                                 ;; NOTE: st-makepoint (east north)
+                                                 (:st-makepoint '$4 '$3))
+                                                4326))
+                                   ,@(unless (null st-name) (make-st-name-condition-form 5))
+                                   ,@(make-designation-condition-forms snd-no-p spd-no-p smd-no-p)
+                                   ,(make-keyword-condition-form keyword1
+                                                                 op2
+                                                                 keyword2
+                                                                 op3
+                                                                 keyword3)))))
+    (values where-form
+            (if (null st-name)
+                (list south west north east)
+                (list south west north east st-name)))))
+
+(defun select-sites-within-bounds (south west north east
+                                   st-name
+                                   snd-no-p spd-no-p smd-no-p
+                                   keyword1 op2 keyword2 op3 keyword3
+                                   &optional (database postmodern:*database*))
+  (multiple-value-bind (where-form args)
+      (make-where-within-bounds-form south west north east
+                                     st-name
+                                     snd-no-p spd-no-p smd-no-p
+                                     keyword1 op2 keyword2 op3 keyword3)
+    (let ((sql (s-sql:sql-compile (make-select-sites-form where-form))))
+      (prepare-and-execute database sql args 'site-row-reader))))
+
+(defun make-where-within-distance-form (lat lng distance
+                                        st-name
+                                        snd-no-p spd-no-p smd-no-p
+                                        keyword1 op2 keyword2 op3 keyword3)
+  (let ((where-form `(:where (:and (:st-dwithin 'sg-geography
+                                                (:geography
+                                                 (:st-transform
+                                                  (:st-setsrid
+                                                   ;; NOTE: st-makepoint (x/lng y/lat)
+                                                   (:st-makepoint '$2 '$1)
+                                                   *default-srid*)
+                                                  *default-srid*))
+                                                '$3)
+                                   ,@(unless (null st-name) (make-st-name-condition-form 4))
+                                   ,@(make-designation-condition-forms snd-no-p spd-no-p smd-no-p)
+                                   ,(make-keyword-condition-form keyword1
+                                                                 op2
+                                                                 keyword2
+                                                                 op3
+                                                                 keyword3)))))
+    (values where-form
+            (if (null st-name)
+                (list lat lng distance)
+                (list lat lng distance st-name)))))
+
+(defun select-sites-within-distance (lat lng distance
+                                     st-name
+                                     snd-no-p spd-no-p smd-no-p
+                                     keyword1 op2 keyword2 op3 keyword3
+                                     &optional (database postmodern:*database*))
+  (multiple-value-bind (where-form args)
+      (make-where-within-distance-form lat lng distance
+                                       st-name
+                                       snd-no-p spd-no-p smd-no-p
+                                       keyword1 op2 keyword2 op3 keyword3)
+    (let ((sql (s-sql:sql-compile (make-select-sites-form where-form))))
+      (prepare-and-execute database sql args 'site-row-reader))))
+
+(defun make-where-within-municipality-form (m-name
+                                            st-name
+                                            snd-no-p spd-no-p smd-no-p
+                                            keyword1 op2 keyword2 op3 keyword3)
+  (let ((where-form `(:where (:and (:= 'm-name '$1)
+                                   ,@(unless (null st-name) (make-st-name-condition-form 2))
+                                   ,@(make-designation-condition-forms snd-no-p spd-no-p smd-no-p)
+                                   ,(make-keyword-condition-form keyword1
+                                                                 op2
+                                                                 keyword2
+                                                                 op3
+                                                                 keyword3)))))
+    (values where-form
+            (if (null st-name)
+                (list m-name)
+                (list m-name st-name)))))
+
+(defun select-sites-within-municipality (m-name
+                                         st-name
+                                         snd-no-p spd-no-p smd-no-p
+                                         keyword1 op2 keyword2 op3 keyword3
+                                         &optional (database postmodern:*database*))
+  (multiple-value-bind (where-form args)
+      (make-where-within-municipality-form m-name
+                                           st-name
+                                           snd-no-p spd-no-p smd-no-p
+                                           keyword1 op2 keyword2 op3 keyword3)
+    (let ((sql (s-sql:sql-compile (make-select-sites-form where-form))))
+      (prepare-and-execute database sql args 'site-row-reader))))
+
+;; (defparameter *select-site-sql*
+;;   (s-sql:sql-compile (make-select-sites-form '(:where (:= 's-no '$1)))))
+
+;; (defun make-select-sites-sql (keyword1
+;;                               op2
+;;                               keyword2
+;;                               op3
+;;                               keyword3
+;;                               m-name
+;;                               st-name
+;;                               snd-no-p
+;;                               spd-no-p
+;;                               smd-no-p)
+;;   (flet ((make-sql (form)
+;;            (s-sql:sql-compile (make-select-sites-form `(:where ,form)))))
+;;     (let ((keyword-form (combine-logical-forms (list :and (make-ilike-name-address-form keyword1))
+;;                                                (list op2 (make-ilike-name-address-form keyword2))
+;;                                                (list op3 (make-ilike-name-address-form keyword3))))
+;;           (designation-form '()))
+;;       (when snd-no-p (push '(:not-null 'snd-no) designation-form))
+;;       (when spd-no-p (push '(:not-null 'spd-no) designation-form))
+;;       (when smd-no-p (push '(:not-null 'smd-no) designation-form))
+;;       (cond
+;;         ((and m-name st-name)
+;;          (values (make-sql `(:and ,keyword-form
+;; 				  ,@designation-form
+;; 				  (:= 'm-name '$1)
+;; 				  (:or (:= 'st-name '$2)
+;; 				       (:in '$2
+;; 					    (:select 'st-name :from 'site-secondary-site-type :where (:= 's-no 'site.s-no))))))
+;;                  (list m-name st-name)))
+;;         (m-name
+;;          (values (make-sql `(:and ,keyword-form ,@designation-form (:= 'm-name '$1)))
+;;                  (list m-name)))
+;;         (st-name
+;;          (values (make-sql `(:and ,keyword-form
+;; 				  ,@designation-form
+;;                                   (:or (:= 'st-name '$1)
+;; 				       (:in '$1
+;; 					    (:select 'st-name :from 'site-secondary-site-type :where (:= 's-no 'site.s-no))))))
+;;                  (list st-name)))
+;;         (t
+;;          (values (make-sql `(:and ,keyword-form ,@designation-form))
+;;                  nil))))))
 
 ;; (define-struct-row-reader site
 ;;   (s-no 0)

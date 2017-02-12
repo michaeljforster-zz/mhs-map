@@ -12,10 +12,10 @@ function setGeolocationMode(distance) {
     __setf_siteListCenterDistance({ 'center' : new google.maps.LatLng(0, 0), 'distance' : distance }, SITELIST);
     return __setf_mapWidgetZoom(8, MAP);
 };
-function setMunicipalityMode(municipalityName) {
+function setMunicipalityMode(mName) {
     __setf_mapWidgetRecenterP(true, MAP);
     __setf_siteListMode('municipality', SITELIST);
-    __setf_siteListMunicipalityName(municipalityName, SITELIST);
+    __setf_siteListMName(mName, SITELIST);
     return __setf_mapWidgetZoom(8, MAP);
 };
 function initialize() {

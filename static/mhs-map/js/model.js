@@ -13,7 +13,16 @@ function SiteList(url) {
     this.mode = 'map-area';
     this.bounds = new google.maps.LatLngBounds(0, 0, 0, 0);
     this.centerDistance = { 'center' : new google.maps.LatLng(0, 0), 'distance' : 0 };
-    this.municipalityName = '';
+    this.mName = '';
+    this.stName = '';
+    this.sndNoP = false;
+    this.spdNoP = false;
+    this.smdNoP = false;
+    this.keyword1 = '';
+    this.op2 = 'and';
+    this.keyword2 = '';
+    this.op3 = 'and';
+    this.keyword3 = '';
     this.centroid = null;
     this.sites = [];
     this.subscribers = [];
@@ -42,11 +51,11 @@ function __setf_siteListCenterDistance(newCenterDistance, siteList) {
     siteList.centerDistance = newCenterDistance;
     return percentpopulate(siteList);
 };
-function siteListMunicipalityName(siteList) {
-    return siteList.municipalityName;
+function siteListMName(siteList) {
+    return siteList.mName;
 };
-function __setf_siteListMunicipalityName(newMunicipalityName, siteList) {
-    siteList.municipalityName = newMunicipalityName;
+function __setf_siteListMName(newMName, siteList) {
+    siteList.mName = newMName;
     return percentpopulate(siteList);
 };
 function siteListSize(siteList) {
@@ -69,24 +78,24 @@ function siteListUnsubscribeAll(siteList) {
 function percenturl(siteList) {
     switch (siteList.mode) {
     case 'map-area':
-        var prevMv524 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv46 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(siteList.bounds);
-            var _db525 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db525[0];
-            var north = _db525[1];
-            var east = _db525[2];
-            return siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east;
+            var _db47 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db47[0];
+            var north = _db47[1];
+            var east = _db47[2];
+            return siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
         } finally {
-            __PS_MV_REG = prevMv524;
+            __PS_MV_REG = prevMv46;
         };
     case 'geolocation':
-        var lat526 = siteList.centerDistance.center.lat();
-        var lng527 = siteList.centerDistance.center.lng();
-        var distance528 = siteList.centerDistance.distance;
-        return siteList.url + '?lat=' + '&lng=' + '&distance=';
+        var lat48 = siteList.centerDistance.center.lat();
+        var lng49 = siteList.centerDistance.center.lng();
+        var distance50 = siteList.centerDistance.distance;
+        return siteList.url + '?lat=' + lat48 + '&lng=' + lng49 + '&distance=' + distance50 + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
     case 'municipality':
-        return siteList.url + '?municipality-name=' + siteList.municipalityName;
+        return siteList.url + '?m-name=' + siteList.mName + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
     default:
         throw siteList.mode + ' fell through CASE expression.';
     };

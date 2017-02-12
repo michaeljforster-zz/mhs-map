@@ -14,20 +14,20 @@ function ListWidget(model, jqelement) {
     return this;
 };
 function siteIconUri(site) {
-    var stName529 = site.stName;
-    if (stName529 === 'Featured site') {
+    var stName51 = site.stName;
+    if (stName51 === 'Featured site') {
         return 'icon_feature.png';
-    } else if (stName529 === 'Museum/Archives') {
+    } else if (stName51 === 'Museum/Archives') {
         return 'icon_museum.png';
-    } else if (stName529 === 'Building') {
+    } else if (stName51 === 'Building') {
         return 'icon_building.png';
-    } else if (stName529 === 'Monument') {
+    } else if (stName51 === 'Monument') {
         return 'icon_monument.png';
-    } else if (stName529 === 'Cemetery') {
+    } else if (stName51 === 'Cemetery') {
         return 'icon_cemetery.png';
-    } else if (stName529 === 'Location') {
+    } else if (stName51 === 'Location') {
         return 'icon_location.png';
-    } else if (stName529 === 'Other') {
+    } else if (stName51 === 'Other') {
         return 'icon_other.png';
     };
 };
@@ -39,8 +39,8 @@ function siteMarkerIcon(site) {
            };
 };
 function siteLinkTitle(site) {
-    var sAddress530 = site.sAddress;
-    return site.sName + ', ' + site.mName + (sAddress530 === '' ? '' : ', ' + sAddress530);
+    var sAddress52 = site.sAddress;
+    return site.sName + ', ' + site.mName + (sAddress52 === '' ? '' : ', ' + sAddress52);
 };
 function siteLinkUrl(site) {
     return MHSBASEURI + site.sUrl;
@@ -73,8 +73,8 @@ function MapWidget(model, jqelement, center, zoom, geolocationOptions) {
             this.recenterP = false;
             this.googleMap.panTo(siteListCentroid(this.model));
         };
-        for (var marker = null, _js_arrvar532 = this.markers, _js_idx531 = 0; _js_idx531 < _js_arrvar532.length; _js_idx531 += 1) {
-            marker = _js_arrvar532[_js_idx531];
+        for (var marker = null, _js_arrvar54 = this.markers, _js_idx53 = 0; _js_idx53 < _js_arrvar54.length; _js_idx53 += 1) {
+            marker = _js_arrvar54[_js_idx53];
             marker.setMap(null);
         };
         this.markers.length = 0;

@@ -25,10 +25,10 @@
                    'distance distance))
   (setf (map-widget-zoom *map*) 8))
 
-(defun set-municipality-mode (municipality-name)
+(defun set-municipality-mode (m-name)
   (setf (map-widget-recenter-p *map*) true)
   (setf (site-list-mode *site-list*) :municipality)
-  (setf (site-list-municipality-name *site-list*) municipality-name)
+  (setf (site-list-m-name *site-list*) m-name)
   (setf (map-widget-zoom *map*) 8))
 
 
@@ -43,6 +43,17 @@
   ;; (update-widget *search-widget*)
 
 
+  ;; #mhs-search-btn
+  
+  ;; #mhs-keyword1-input
+  ;; #mhs-op2-input
+  ;; #mhs-keyword2-input
+  ;; #mhs-op3-input
+  ;; #mhs-keyword3-input
+
+  ;; "#mhs-filter-by-site-type-input"
+  ;; "#mhs-filter-by-designation-input"
+  
   ;; (ps:chain (j-query "#mhs-filter-within-input")
   ;;           (on "changed.bs.select"
   ;;               #'(lambda (e)
@@ -52,7 +63,7 @@
   ;;                        (set-map-area-mode))
   ;;                       (("100" "1000" "10000" "100000" "1000000")
   ;;                        (set-geolocation-mode (parse-int within)))
-  ;;                       (otherwise ; municipality-name
+  ;;                       (otherwise ; m-name
   ;;                        (set-municipality-mode within)))))))
 
   

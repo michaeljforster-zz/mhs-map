@@ -24,7 +24,16 @@
                                              maps
                                              (-lat-lng 0 0)))
                    'distance 0))
-  (setf (ps:@ this municipality-name) "")
+  (setf (ps:@ this m-name) "")
+  (setf (ps:@ this st-name) "")
+  (setf (ps:@ this snd-no-p) false)
+  (setf (ps:@ this spd-no-p) false)
+  (setf (ps:@ this smd-no-p) false)
+  (setf (ps:@ this keyword1) "")
+  (setf (ps:@ this op2) :and)
+  (setf (ps:@ this keyword2) "")
+  (setf (ps:@ this op3) :and)
+  (setf (ps:@ this keyword3) "")
   (setf (ps:@ this centroid) nil)
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
@@ -53,12 +62,36 @@
   (setf (ps:@ site-list center-distance) new-center-distance)
   (%populate site-list))
 
-(defun site-list-municipality-name (site-list)
-  (ps:@ site-list municipality-name))
+(defun site-list-m-name (site-list)
+  (ps:@ site-list m-name))
 
-(defun (setf site-list-municipality-name) (new-municipality-name site-list)
-  (setf (ps:@ site-list municipality-name) new-municipality-name)
+(defun (setf site-list-m-name) (new-m-name site-list)
+  (setf (ps:@ site-list m-name) new-m-name)
   (%populate site-list))
+
+(defun site-list-st-name (site-list)
+  (ps:@ this st-name))
+
+(defun (setf site-list-st-name (new-st-name site-list))
+    (setf (ps:@ this st-name) new-st-name))
+
+
+
+
+;; TODO ... then form submission of these via JS...
+
+(ps:@ this snd-no-p)
+(ps:@ this spd-no-p)
+(ps:@ this smd-no-p)
+(ps:@ this keyword1)
+(ps:@ this op2)
+(ps:@ this keyword2)
+(ps:@ this op3)
+(ps:@ this keyword3)
+
+
+
+
 
 (defun site-list-size (site-list)
   (ps:@ site-list sites length))
@@ -86,19 +119,45 @@
           "?south=" south
           "&west=" west
           "&north=" north
-          "&east=" east)))
+          "&east=" east
+          "&st-name=" (ps:@ site-list st-name)
+          (if (ps:@ site-list snd-no-p) "&snd-no-p=t" "")
+          (if (ps:@ site-list spd-no-p) "&spd-no-p=t" "")
+          (if (ps:@ site-list smd-no-p) "&smd-no-p=t" "")
+          "&keyword1=" (ps:@ site-list keyword1)
+          "&op2=" (ps:@ site-list op2)
+          "&keyword2=" (ps:@ site-list keyword2)
+          "&op3=" (ps:@ site-list op3)
+          "&keyword3=" (ps:@ site-list keyword3))))
     (:geolocation
      (let ((lat (ps:chain site-list center-distance center (lat)))
            (lng (ps:chain site-list center-distance center (lng)))
            (distance (ps:@ site-list center-distance distance)))
        (+ (ps:@ site-list url)
-          "?lat=" 
-          "&lng="
-          "&distance=")))
+          "?lat=" lat
+          "&lng=" lng
+          "&distance=" distance
+          "&st-name=" (ps:@ site-list st-name)
+          (if (ps:@ site-list snd-no-p) "&snd-no-p=t" "")
+          (if (ps:@ site-list spd-no-p) "&spd-no-p=t" "")
+          (if (ps:@ site-list smd-no-p) "&smd-no-p=t" "")
+          "&keyword1=" (ps:@ site-list keyword1)
+          "&op2=" (ps:@ site-list op2)
+          "&keyword2=" (ps:@ site-list keyword2)
+          "&op3=" (ps:@ site-list op3)
+          "&keyword3=" (ps:@ site-list keyword3))))
     (:municipality
      (+ (ps:@ site-list url)
-        "?municipality-name="
-        (ps:@ site-list municipality-name)))
+        "?m-name=" (ps:@ site-list m-name)
+        "&st-name=" (ps:@ site-list st-name)
+        (if (ps:@ site-list snd-no-p) "&snd-no-p=t" "")
+        (if (ps:@ site-list spd-no-p) "&spd-no-p=t" "")
+        (if (ps:@ site-list smd-no-p) "&smd-no-p=t" "")
+        "&keyword1=" (ps:@ site-list keyword1)
+        "&op2=" (ps:@ site-list op2)
+        "&keyword2=" (ps:@ site-list keyword2)
+        "&op3=" (ps:@ site-list op3)
+        "&keyword3=" (ps:@ site-list keyword3)))
     (otherwise
      (throw (+ (ps:@ site-list mode) " fell through CASE expression.")))))
 

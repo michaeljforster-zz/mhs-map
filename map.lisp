@@ -66,31 +66,31 @@
                  (:div :class "form-group"
                        (:div :class "row"
                              (:div :class "col-xs-12"
-                                   (:input :type "text" :class "form-control" :placeholder "keyword" :name "string1"))))
+                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword1-input"))))
                  (:div :class "form-group"
                        (:div :class "row"
                              (:div :class "col-xs-4"
                                    (:select :class "selectpicker"
                                             :data-width "auto"
-                                            :name "op2"
+                                            :id "mhs-op2-input"
                                             (:option :value "AND" "AND")
                                             (:option :value "NOT" "NOT")
                                             (:option :value "OR" "OR")))
                              (:div :class "col-xs-8"
-                                   (:input :type "text" :class "form-control" :placeholder "keyword" :name "string2"))))
+                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword2-input"))))
                  (:div :class "form-group"
                        (:div :class "row"
                              (:div :class "col-xs-4"
                                    (:select :class "selectpicker"
                                             :data-width "auto"
-                                            :name "op3"
+                                            :id "mhs-op3-input"
                                             (:option :value "AND" "AND")
                                             (:option :value "NOT" "NOT")
                                             (:option :value "OR" "OR")))
                              (:div :class "col-xs-8"
-                                   (:input :type "text" :class "form-control" :placeholder "keyword" :name "string3"))))
+                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword3-input"))))
                  (:div :class "form-group"
-                       (:button :type "submit" :class "btn btn-primary" "Update Map")))))))
+                       (:button :type "submit" :class "btn btn-primary" :id "mhs-search-btn" "Update Map")))))))
 
 (defun render-map (municipality-names
                    site-type-names
