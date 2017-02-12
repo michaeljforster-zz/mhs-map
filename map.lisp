@@ -49,15 +49,15 @@
                  (:div :class "form-group"
                        (:select :class "selectpicker"
                                 :data-width "auto"
-                                :id "mhs-filter-by-site-type-input"
-                                (dolist (st-name (cons "All site types"
-                                                       (sort (copy-list site-type-names) #'string<=)))
+                                :id "mhs-st-name-input"
+                                (dolist (x (cons (cons "" "All site types")
+                                                 (sort (mapcar #'(lambda (x) (cons x x)) site-type-names) #'string<= :key #'car)))
                                   (cl-who:htm
-                                   (:option :value (cl-who:escape-string st-name)
-                                            (cl-who:esc st-name))))))
+                                   (:option :value (cl-who:escape-string (car x))
+                                            (cl-who:esc (cdr x)))))))
                  (:div :class "form-group"
                        (:select :class "selectpicker"
-                                :id "mhs-filter-by-designation-input"
+                                :id "mhs-designation-input"
                                 :multiple t
                                 :title "Has designations"
                                 (:option :value "National" "National")
@@ -90,7 +90,7 @@
                              (:div :class "col-xs-8"
                                    (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword3-input"))))
                  (:div :class "form-group"
-                       (:button :type "submit" :class "btn btn-primary" :id "mhs-search-btn" "Update Map")))))))
+                       (:button :type "submit" :class "btn btn-primary" :id "mhs-update-map-btn" "Update Map")))))))
 
 (defun render-map (municipality-names
                    site-type-names

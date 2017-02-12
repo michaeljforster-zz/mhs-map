@@ -14,6 +14,15 @@
 
 (defun -site-list (url)
   (setf (ps:@ this url) url)
+  (setf (ps:@ this st-name) "")
+  (setf (ps:@ this snd-no-p) false)
+  (setf (ps:@ this spd-no-p) false)
+  (setf (ps:@ this smd-no-p) false)
+  (setf (ps:@ this keyword1) "")
+  (setf (ps:@ this op2) :and)
+  (setf (ps:@ this keyword2) "")
+  (setf (ps:@ this op3) :and)
+  (setf (ps:@ this keyword3) "")
   (setf (ps:@ this mode) :map-area)
   (setf (ps:@ this bounds)
         (ps:new (ps:chain google
@@ -25,19 +34,65 @@
                                              (-lat-lng 0 0)))
                    'distance 0))
   (setf (ps:@ this m-name) "")
-  (setf (ps:@ this st-name) "")
-  (setf (ps:@ this snd-no-p) false)
-  (setf (ps:@ this spd-no-p) false)
-  (setf (ps:@ this smd-no-p) false)
-  (setf (ps:@ this keyword1) "")
-  (setf (ps:@ this op2) :and)
-  (setf (ps:@ this keyword2) "")
-  (setf (ps:@ this op3) :and)
-  (setf (ps:@ this keyword3) "")
   (setf (ps:@ this centroid) nil)
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
   this)
+
+
+(defun site-list-st-name (site-list)
+  (ps:@ site-list st-name))
+
+(defun (setf site-list-st-name) (new-st-name site-list)
+    (setf (ps:@ site-list st-name) new-st-name))
+
+(defun site-list-snd-no-p (site-list)
+  (ps:@ site-list snd-no-p))
+
+(defun (setf site-list-snd-no-p) (new-snd-no-p site-list)
+  (setf (ps:@ site-list snd-no-p) new-snd-no-p))
+
+(defun site-list-spd-no-p (site-list)
+  (ps:@ site-list spd-no-p))
+
+(defun (setf site-list-spd-no-p) (new-spd-no-p site-list)
+  (setf (ps:@ site-list spd-no-p) new-spd-no-p))
+
+(defun site-list-smd-no-p (site-list)
+  (ps:@ site-list smd-no-p))
+
+(defun (setf site-list-smd-no-p) (new-smd-no-p site-list)
+  (setf (ps:@ site-list smd-no-p) new-smd-no-p))
+
+(defun site-list-keyword1 (site-list)
+  (ps:@ site-list keyword1))
+
+(defun (setf site-list-keyword1) (new-keyword1 site-list)
+  (setf (ps:@ site-list keyword1) new-keyword1))
+
+(defun site-list-op2 (site-list)
+  (ps:@ site-list op2))
+
+(defun (setf site-list-op2) (new-op2 site-list)
+  (setf (ps:@ site-list op2) new-op2))
+
+(defun site-list-keyword2 (site-list)
+  (ps:@ site-list keyword2))
+
+(defun (setf site-list-keyword2) (new-keyword2 site-list)
+  (setf (ps:@ site-list keyword2) new-keyword2))
+
+(defun site-list-op3 (site-list)
+  (ps:@ site-list op3))
+
+(defun (setf site-list-op3) (new-op3 site-list)
+  (setf (ps:@ site-list op3) new-op3))
+
+(defun site-list-keyword3 (site-list)
+  (ps:@ site-list keyword3))
+
+(defun (setf site-list-keyword3) (new-keyword3 site-list)
+  (setf (ps:@ site-list keyword3) new-keyword3))
 
 (defun site-list-mode (site-list)
   (ps:@ site-list mode))
@@ -68,30 +123,6 @@
 (defun (setf site-list-m-name) (new-m-name site-list)
   (setf (ps:@ site-list m-name) new-m-name)
   (%populate site-list))
-
-(defun site-list-st-name (site-list)
-  (ps:@ this st-name))
-
-(defun (setf site-list-st-name (new-st-name site-list))
-    (setf (ps:@ this st-name) new-st-name))
-
-
-
-
-;; TODO ... then form submission of these via JS...
-
-(ps:@ this snd-no-p)
-(ps:@ this spd-no-p)
-(ps:@ this smd-no-p)
-(ps:@ this keyword1)
-(ps:@ this op2)
-(ps:@ this keyword2)
-(ps:@ this op3)
-(ps:@ this keyword3)
-
-
-
-
 
 (defun site-list-size (site-list)
   (ps:@ site-list sites length))

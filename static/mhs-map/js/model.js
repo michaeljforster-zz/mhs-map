@@ -10,10 +10,6 @@ function Site(sNo, sName, mName, sAddress, stName, sUrl, latLng) {
 };
 function SiteList(url) {
     this.url = url;
-    this.mode = 'map-area';
-    this.bounds = new google.maps.LatLngBounds(0, 0, 0, 0);
-    this.centerDistance = { 'center' : new google.maps.LatLng(0, 0), 'distance' : 0 };
-    this.mName = '';
     this.stName = '';
     this.sndNoP = false;
     this.spdNoP = false;
@@ -23,10 +19,68 @@ function SiteList(url) {
     this.keyword2 = '';
     this.op3 = 'and';
     this.keyword3 = '';
+    this.mode = 'map-area';
+    this.bounds = new google.maps.LatLngBounds(0, 0, 0, 0);
+    this.centerDistance = { 'center' : new google.maps.LatLng(0, 0), 'distance' : 0 };
+    this.mName = '';
     this.centroid = null;
     this.sites = [];
     this.subscribers = [];
     return this;
+};
+function siteListStName(siteList) {
+    return siteList.stName;
+};
+function __setf_siteListStName(newStName, siteList) {
+    return siteList.stName = newStName;
+};
+function siteListSndNoP(siteList) {
+    return siteList.sndNoP;
+};
+function __setf_siteListSndNoP(newSndNoP, siteList) {
+    return siteList.sndNoP = newSndNoP;
+};
+function siteListSpdNoP(siteList) {
+    return siteList.spdNoP;
+};
+function __setf_siteListSpdNoP(newSpdNoP, siteList) {
+    return siteList.spdNoP = newSpdNoP;
+};
+function siteListSmdNoP(siteList) {
+    return siteList.smdNoP;
+};
+function __setf_siteListSmdNoP(newSmdNoP, siteList) {
+    return siteList.smdNoP = newSmdNoP;
+};
+function siteListKeyword1(siteList) {
+    return siteList.keyword1;
+};
+function __setf_siteListKeyword1(newKeyword1, siteList) {
+    return siteList.keyword1 = newKeyword1;
+};
+function siteListOp2(siteList) {
+    return siteList.op2;
+};
+function __setf_siteListOp2(newOp2, siteList) {
+    return siteList.op2 = newOp2;
+};
+function siteListKeyword2(siteList) {
+    return siteList.keyword2;
+};
+function __setf_siteListKeyword2(newKeyword2, siteList) {
+    return siteList.keyword2 = newKeyword2;
+};
+function siteListOp3(siteList) {
+    return siteList.op3;
+};
+function __setf_siteListOp3(newOp3, siteList) {
+    return siteList.op3 = newOp3;
+};
+function siteListKeyword3(siteList) {
+    return siteList.keyword3;
+};
+function __setf_siteListKeyword3(newKeyword3, siteList) {
+    return siteList.keyword3 = newKeyword3;
 };
 function siteListMode(siteList) {
     return siteList.mode;

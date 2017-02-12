@@ -255,7 +255,7 @@
                                                  ;; NOTE: st-makepoint (east north)
                                                  (:st-makepoint '$4 '$3))
                                                 4326))
-                                   ,@(unless (null st-name) (make-st-name-condition-form 5))
+                                   ,@(unless (null st-name) `(,(make-st-name-condition-form 5)))
                                    ,@(make-designation-condition-forms snd-no-p spd-no-p smd-no-p)
                                    ,(make-keyword-condition-form keyword1
                                                                  op2
@@ -293,7 +293,7 @@
                                                    *default-srid*)
                                                   *default-srid*))
                                                 '$3)
-                                   ,@(unless (null st-name) (make-st-name-condition-form 4))
+                                   ,@(unless (null st-name) `(,(make-st-name-condition-form 4)))
                                    ,@(make-designation-condition-forms snd-no-p spd-no-p smd-no-p)
                                    ,(make-keyword-condition-form keyword1
                                                                  op2
@@ -323,7 +323,7 @@
                                             snd-no-p spd-no-p smd-no-p
                                             keyword1 op2 keyword2 op3 keyword3)
   (let ((where-form `(:where (:and (:= 'm-name '$1)
-                                   ,@(unless (null st-name) (make-st-name-condition-form 2))
+                                   ,@(unless (null st-name) `(,(make-st-name-condition-form 2)))
                                    ,@(make-designation-condition-forms snd-no-p spd-no-p smd-no-p)
                                    ,(make-keyword-condition-form keyword1
                                                                  op2

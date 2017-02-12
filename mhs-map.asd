@@ -22,6 +22,7 @@
                #:hunchentools
                #:parenscript)
   :components ((:file "package")
+               (:file "postgres")
                (:file "util")
                (:file "specials")
                (:file "structs")
