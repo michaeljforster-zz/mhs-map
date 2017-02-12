@@ -2,52 +2,24 @@ var SITELIST = null;
 var LISTWIDGET = null;
 var MAP = null;
 function setMapAreaMode() {
-    __setf_siteListStName(jQuery('#mhs-st-name-input').val(), SITELIST);
-    __setf_siteListSndNoP(jQuery('#mhs-snd-no-p-input').val(), SITELIST);
-    __setf_siteListSpdNoP(jQuery('#mhs-spd-no-p-input').val(), SITELIST);
-    __setf_siteListSmdNoP(jQuery('#mhs-smd-no-p-input').val(), SITELIST);
-    __setf_siteListKeyword1(jQuery('#mhs-keyword1-input').val(), SITELIST);
-    __setf_siteListOp2(jQuery('#mhs-op2-input').val(), SITELIST);
-    __setf_siteListKeyword2(jQuery('#mhs-keyword2-input').val(), SITELIST);
-    __setf_siteListOp3(jQuery('#mhs-op3-input').val(), SITELIST);
-    __setf_siteListKeyword3(jQuery('#mhs-keyword3-input').val(), SITELIST);
-    __setf_siteListMode('map-area', SITELIST);
+    setSiteListMapAreaMode(SITELIST);
     __setf_mapWidgetCenter(DEFAULTCENTER, MAP);
     return __setf_mapWidgetZoom(DEFAULTZOOM, MAP);
 };
 function setGeolocationMode(distance) {
-    __setf_siteListStName(jQuery('#mhs-st-name-input').val(), SITELIST);
-    __setf_siteListSndNoP(jQuery('#mhs-snd-no-p-input').val(), SITELIST);
-    __setf_siteListSpdNoP(jQuery('#mhs-spd-no-p-input').val(), SITELIST);
-    __setf_siteListSmdNoP(jQuery('#mhs-smd-no-p-input').val(), SITELIST);
-    __setf_siteListKeyword1(jQuery('#mhs-keyword1-input').val(), SITELIST);
-    __setf_siteListOp2(jQuery('#mhs-op2-input').val(), SITELIST);
-    __setf_siteListKeyword2(jQuery('#mhs-keyword2-input').val(), SITELIST);
-    __setf_siteListOp3(jQuery('#mhs-op3-input').val(), SITELIST);
-    __setf_siteListKeyword3(jQuery('#mhs-keyword3-input').val(), SITELIST);
-    __setf_mapWidgetRecenterP(true, MAP);
-    __setf_siteListMode('geolocation', SITELIST);
-    __setf_siteListCenterDistance({ 'center' : new google.maps.LatLng(0, 0), 'distance' : distance }, SITELIST);
-    return __setf_mapWidgetZoom(8, MAP);
+    setSiteListGeolocationMode(SITELIST);
+    __setf_mapWidgetZoom(8, MAP);
+    return updateSiteListCenterDistance(SITELIST, makeCenterDistance(0, 0, distance));
 };
 function setMunicipalityMode(mName) {
-    __setf_siteListStName(jQuery('#mhs-st-name-input').val(), SITELIST);
-    __setf_siteListSndNoP(jQuery('#mhs-snd-no-p-input').val(), SITELIST);
-    __setf_siteListSpdNoP(jQuery('#mhs-spd-no-p-input').val(), SITELIST);
-    __setf_siteListSmdNoP(jQuery('#mhs-smd-no-p-input').val(), SITELIST);
-    __setf_siteListKeyword1(jQuery('#mhs-keyword1-input').val(), SITELIST);
-    __setf_siteListOp2(jQuery('#mhs-op2-input').val(), SITELIST);
-    __setf_siteListKeyword2(jQuery('#mhs-keyword2-input').val(), SITELIST);
-    __setf_siteListOp3(jQuery('#mhs-op3-input').val(), SITELIST);
-    __setf_siteListKeyword3(jQuery('#mhs-keyword3-input').val(), SITELIST);
+    setSiteListMunicipalityMode(SITELIST);
     __setf_mapWidgetRecenterP(true, MAP);
-    __setf_siteListMode('municipality', SITELIST);
-    __setf_siteListMName(mName, SITELIST);
-    return __setf_mapWidgetZoom(8, MAP);
+    __setf_mapWidgetZoom(8, MAP);
+    return updateSiteListMName(SITELIST, mName);
 };
 function initialize() {
     SITELIST = new SiteList(FEATURESURI);
-    jQuery('#mhs-update-map-btn').click(function () {
+    jQuery('#mhs-filter-within-input').on('changed.bs.select', function (e) {
         var within = jQuery('#mhs-filter-within-input').val();
         switch (within) {
         case 'map-area':
@@ -73,7 +45,7 @@ function initialize() {
         return updateWidget(MAP);
     });
     mapWidgetListenOnIdle(MAP, function (mapWidget) {
-        return __setf_siteListBounds(mapWidgetBounds(mapWidget), SITELIST);
+        return updateSiteListBounds(SITELIST, mapWidgetBounds(mapWidget));
     });
     jQuery(window).resize(function () {
         jQuery('#mhs-search-tab').toggleClass('active', true);

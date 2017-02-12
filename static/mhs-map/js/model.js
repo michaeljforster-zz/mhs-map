@@ -8,8 +8,17 @@ function Site(sNo, sName, mName, sAddress, stName, sUrl, latLng) {
     this.latLng = latLng;
     return this;
 };
+var DEFAULTBOUNDS = new google.maps.LatLngBounds(0, 0, 0, 0);
+function makeCenterDistance(lat, lng, distance) {
+    return { 'center' : new google.maps.LatLng(lat, lng), 'distance' : distance };
+};
+var DEFAULTCENTERDISTANCE = makeCenterDistance(0, 0, 0);
 function SiteList(url) {
     this.url = url;
+    this.mode = 'map-area';
+    this.bounds = DEFAULTBOUNDS;
+    this.centerDistance = DEFAULTCENTERDISTANCE;
+    this.mName = '';
     this.stName = '';
     this.sndNoP = false;
     this.spdNoP = false;
@@ -19,135 +28,30 @@ function SiteList(url) {
     this.keyword2 = '';
     this.op3 = 'and';
     this.keyword3 = '';
-    this.mode = 'map-area';
-    this.bounds = new google.maps.LatLngBounds(0, 0, 0, 0);
-    this.centerDistance = { 'center' : new google.maps.LatLng(0, 0), 'distance' : 0 };
-    this.mName = '';
     this.centroid = null;
     this.sites = [];
     this.subscribers = [];
     return this;
 };
-function siteListStName(siteList) {
-    return siteList.stName;
-};
-function __setf_siteListStName(newStName, siteList) {
-    return siteList.stName = newStName;
-};
-function siteListSndNoP(siteList) {
-    return siteList.sndNoP;
-};
-function __setf_siteListSndNoP(newSndNoP, siteList) {
-    return siteList.sndNoP = newSndNoP;
-};
-function siteListSpdNoP(siteList) {
-    return siteList.spdNoP;
-};
-function __setf_siteListSpdNoP(newSpdNoP, siteList) {
-    return siteList.spdNoP = newSpdNoP;
-};
-function siteListSmdNoP(siteList) {
-    return siteList.smdNoP;
-};
-function __setf_siteListSmdNoP(newSmdNoP, siteList) {
-    return siteList.smdNoP = newSmdNoP;
-};
-function siteListKeyword1(siteList) {
-    return siteList.keyword1;
-};
-function __setf_siteListKeyword1(newKeyword1, siteList) {
-    return siteList.keyword1 = newKeyword1;
-};
-function siteListOp2(siteList) {
-    return siteList.op2;
-};
-function __setf_siteListOp2(newOp2, siteList) {
-    return siteList.op2 = newOp2;
-};
-function siteListKeyword2(siteList) {
-    return siteList.keyword2;
-};
-function __setf_siteListKeyword2(newKeyword2, siteList) {
-    return siteList.keyword2 = newKeyword2;
-};
-function siteListOp3(siteList) {
-    return siteList.op3;
-};
-function __setf_siteListOp3(newOp3, siteList) {
-    return siteList.op3 = newOp3;
-};
-function siteListKeyword3(siteList) {
-    return siteList.keyword3;
-};
-function __setf_siteListKeyword3(newKeyword3, siteList) {
-    return siteList.keyword3 = newKeyword3;
-};
-function siteListMode(siteList) {
-    return siteList.mode;
-};
-function __setf_siteListMode(newMode, siteList) {
-    return siteList.mode = newMode;
-};
-function siteListBounds(siteList) {
-    return siteList.bounds;
-};
-function __setf_siteListBounds(newBounds, siteList) {
-    siteList.bounds = newBounds;
-    return percentpopulate(siteList);
-};
-function siteListCentroid(siteList) {
-    return siteList.centroid;
-};
-function siteListCenterDistance(siteList) {
-    return siteList.centerDistance;
-};
-function __setf_siteListCenterDistance(newCenterDistance, siteList) {
-    siteList.centerDistance = newCenterDistance;
-    return percentpopulate(siteList);
-};
-function siteListMName(siteList) {
-    return siteList.mName;
-};
-function __setf_siteListMName(newMName, siteList) {
-    siteList.mName = newMName;
-    return percentpopulate(siteList);
-};
-function siteListSize(siteList) {
-    return siteList.sites.length;
-};
-function siteListMap(siteList, fn) {
-    return siteList.sites.map(fn);
-};
-function siteListDo(siteList, fn) {
-    return siteList.sites.forEach(fn);
-};
-function siteListSubscribeToPopulated(siteList, fn) {
-    siteList.subscribers.push(fn);
-    return siteList;
-};
-function siteListUnsubscribeAll(siteList) {
-    siteList.subscribers = [];
-    return siteList;
-};
 function percenturl(siteList) {
     switch (siteList.mode) {
     case 'map-area':
-        var prevMv46 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
+        var prevMv100 = 'undefined' === typeof __PS_MV_REG ? (__PS_MV_REG = undefined) : __PS_MV_REG;
         try {
             var south = decodeBounds(siteList.bounds);
-            var _db47 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
-            var west = _db47[0];
-            var north = _db47[1];
-            var east = _db47[2];
+            var _db101 = decodeBounds === __PS_MV_REG['tag'] ? __PS_MV_REG['values'] : [];
+            var west = _db101[0];
+            var north = _db101[1];
+            var east = _db101[2];
             return siteList.url + '?south=' + south + '&west=' + west + '&north=' + north + '&east=' + east + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
         } finally {
-            __PS_MV_REG = prevMv46;
+            __PS_MV_REG = prevMv100;
         };
     case 'geolocation':
-        var lat48 = siteList.centerDistance.center.lat();
-        var lng49 = siteList.centerDistance.center.lng();
-        var distance50 = siteList.centerDistance.distance;
-        return siteList.url + '?lat=' + lat48 + '&lng=' + lng49 + '&distance=' + distance50 + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
+        var lat102 = siteList.centerDistance.center.lat();
+        var lng103 = siteList.centerDistance.center.lng();
+        var distance104 = siteList.centerDistance.distance;
+        return siteList.url + '?lat=' + lat102 + '&lng=' + lng103 + '&distance=' + distance104 + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
     case 'municipality':
         return siteList.url + '?m-name=' + siteList.mName + '&st-name=' + siteList.stName + (siteList.sndNoP ? '&snd-no-p=t' : '') + (siteList.spdNoP ? '&spd-no-p=t' : '') + (siteList.smdNoP ? '&smd-no-p=t' : '') + '&keyword1=' + siteList.keyword1 + '&op2=' + siteList.op2 + '&keyword2=' + siteList.keyword2 + '&op3=' + siteList.op3 + '&keyword3=' + siteList.keyword3;
     default:
@@ -167,4 +71,66 @@ function percentpopulate(siteList) {
         });
         return percentannouncePopulated(siteList);
     });
+};
+function setSiteListMapAreaMode(siteList) {
+    siteList.mode = 'map-area';
+    this.bounds = DEFAULTBOUNDS;
+    this.centerDistance = DEFAULTCENTERDISTANCE;
+    return siteList.mName = '';
+};
+function setSiteListGeolocationMode(siteList) {
+    siteList.mode = 'geolocation';
+    this.bounds = DEFAULTBOUNDS;
+    this.centerDistance = DEFAULTCENTERDISTANCE;
+    return siteList.mName = '';
+};
+function setSiteListMunicipalityMode(siteList) {
+    siteList.mode = 'municipality';
+    this.bounds = DEFAULTBOUNDS;
+    this.centerDistance = DEFAULTCENTERDISTANCE;
+    return siteList.mName = '';
+};
+function updateSiteListBounds(siteList, bounds) {
+    siteList.bounds = bounds;
+    return percentpopulate(siteList);
+};
+function updateSiteListCenterDistance(siteList, centerDistance) {
+    siteList.centerDistance = centerDistance;
+    return percentpopulate(siteList);
+};
+function updateSiteListMName(siteList, mName) {
+    siteList.mName = mName;
+    return percentpopulate(siteList);
+};
+function updateSiteListParameters(siteList, stName, sndNoP, spdNoP, smdNoP, keyword1, op2, keyword2, op3, keyword3) {
+    siteList.stName = stName;
+    siteList.sndNoP = sndNoP;
+    siteList.spdNoP = spdNoP;
+    siteList.smdNoP = smdNoP;
+    siteList.keyword1 = keyword1;
+    siteList.op2 = op2;
+    siteList.keyword2 = keyword2;
+    siteList.op3 = op3;
+    siteList.keyword3 = keyword3;
+    return percentpopulate(siteList);
+};
+function siteListCentroid(siteList) {
+    return siteList.centroid;
+};
+function siteListSize(siteList) {
+    return siteList.sites.length;
+};
+function siteListMap(siteList, fn) {
+    return siteList.sites.map(fn);
+};
+function siteListDo(siteList, fn) {
+    return siteList.sites.forEach(fn);
+};
+function siteListSubscribeToPopulated(siteList, fn) {
+    siteList.subscribers.push(fn);
+    return siteList;
+};
+function siteListUnsubscribeAll(siteList) {
+    siteList.subscribers = [];
+    return siteList;
 };

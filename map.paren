@@ -7,101 +7,45 @@
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
+;; TODO separate form
+;; (set-site-list-parameters *site-list*
+;;                           (ps:chain (j-query "#mhs-st-name-input") (val))
+;;                           "" ;; TODO (ps:chain (j-query "#mhs-snd-no-p-input") (val))
+;;                           "" ;; TODO (ps:chain (j-query "#mhs-spd-no-p-input") (val))
+;;                           "" ;; TODO (ps:chain (j-query "#mhs-smd-no-p-input") (val))
+;;                           (ps:chain (j-query "#mhs-keyword1-input") (val))
+;;                           (ps:chain (j-query "#mhs-op2-input") (val))
+;;                           (ps:chain (j-query "#mhs-keyword2-input") (val))
+;;                           (ps:chain (j-query "#mhs-op3-input") (val))
+;;                           (ps:chain (j-query "#mhs-keyword3-input") (val)))
+
 
 (defun set-map-area-mode ()
-  (setf (site-list-st-name *site-list*)
-        (ps:chain (j-query "#mhs-st-name-input") (val)))
-
-
-  (setf (site-list-snd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-snd-no-p-input") (val)))
-  (setf (site-list-spd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-spd-no-p-input") (val)))
-  (setf (site-list-smd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-smd-no-p-input") (val)))
-
-
-  (setf (site-list-keyword1 *site-list*)
-        (ps:chain (j-query "#mhs-keyword1-input") (val)))
-  (setf (site-list-op2 *site-list*)
-        (ps:chain (j-query "#mhs-op2-input") (val)))
-  (setf (site-list-keyword2 *site-list*)
-        (ps:chain (j-query "#mhs-keyword2-input") (val)))
-  (setf (site-list-op3 *site-list*)
-        (ps:chain (j-query "#mhs-op3-input") (val)))
-  (setf (site-list-keyword3 *site-list*)
-        (ps:chain (j-query "#mhs-keyword3-input") (val)))
-  (setf (site-list-mode *site-list*) :map-area)
+  (set-site-list-map-area-mode *site-list*)
   (setf (map-widget-center *map*) *default-center*)
-  (setf (map-widget-zoom *map*) *default-zoom*))
+  (setf (map-widget-zoom *map*) *default-zoom*)
+  ;; Let update bounds post-center/zoom.
+  )
 
 (defun set-geolocation-mode (distance)
-  (setf (site-list-st-name *site-list*)
-        (ps:chain (j-query "#mhs-st-name-input") (val)))
-
-
-  (setf (site-list-snd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-snd-no-p-input") (val)))
-  (setf (site-list-spd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-spd-no-p-input") (val)))
-  (setf (site-list-smd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-smd-no-p-input") (val)))
-
-
-  (setf (site-list-keyword1 *site-list*)
-        (ps:chain (j-query "#mhs-keyword1-input") (val)))
-  (setf (site-list-op2 *site-list*)
-        (ps:chain (j-query "#mhs-op2-input") (val)))
-  (setf (site-list-keyword2 *site-list*)
-        (ps:chain (j-query "#mhs-keyword2-input") (val)))
-  (setf (site-list-op3 *site-list*)
-        (ps:chain (j-query "#mhs-op3-input") (val)))
-  (setf (site-list-keyword3 *site-list*)
-        (ps:chain (j-query "#mhs-keyword3-input") (val)))
-  (setf (map-widget-recenter-p *map*) true)
-  (setf (site-list-mode *site-list*) :geolocation)
-  ;; TODO set distance, let geolocation update the center
-  (setf (site-list-center-distance *site-list*)
-        (ps:create 'center (ps:new (ps:chain google
-                                             maps
-                                             (-lat-lng 0 0)))
-                   'distance distance))
-  (setf (map-widget-zoom *map*) 8))
+  (set-site-list-geolocation-mode *site-list*)
+  (setf (map-widget-zoom *map*) 8)
+  ;; Set the distance and let periodic geolocation update center.
+  (update-site-list-center-distance *site-list* (make-center-distance 0 0 distance)))
 
 (defun set-municipality-mode (m-name)
-  (setf (site-list-st-name *site-list*)
-        (ps:chain (j-query "#mhs-st-name-input") (val)))
-
-
-  (setf (site-list-snd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-snd-no-p-input") (val)))
-  (setf (site-list-spd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-spd-no-p-input") (val)))
-  (setf (site-list-smd-no-p *site-list*)
-        (ps:chain (j-query "#mhs-smd-no-p-input") (val)))
-
-
-  (setf (site-list-keyword1 *site-list*)
-        (ps:chain (j-query "#mhs-keyword1-input") (val)))
-  (setf (site-list-op2 *site-list*)
-        (ps:chain (j-query "#mhs-op2-input") (val)))
-  (setf (site-list-keyword2 *site-list*)
-        (ps:chain (j-query "#mhs-keyword2-input") (val)))
-  (setf (site-list-op3 *site-list*)
-        (ps:chain (j-query "#mhs-op3-input") (val)))
-  (setf (site-list-keyword3 *site-list*)
-        (ps:chain (j-query "#mhs-keyword3-input") (val)))
+  (set-site-list-municipality-mode *site-list*)
   (setf (map-widget-recenter-p *map*) true)
-  (setf (site-list-mode *site-list*) :municipality)
-  (setf (site-list-m-name *site-list*) m-name)
-  (setf (map-widget-zoom *map*) 8))
+  (setf (map-widget-zoom *map*) 8)
+  (update-site-list-m-name *site-list* m-name))
 
 
 (defun initialize ()
   (setf *site-list* (ps:new (-site-list *features-uri*)))
 
-  (ps:chain (j-query "#mhs-update-map-btn")
-            (click #'(lambda ()
+  (ps:chain (j-query "#mhs-filter-within-input")
+            (on "changed.bs.select"
+                #'(lambda (e)
                        (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
                          (case within
                            ("map-area"
@@ -110,7 +54,6 @@
                             (set-geolocation-mode (parse-int within)))
                            (otherwise ; m-name
                             (set-municipality-mode within)))))))
-  
   
   (setf *list-widget*
         (ps:new (-list-widget *site-list*
@@ -121,6 +64,7 @@
                                                   (log (+ "LIST-WIDGET notified "
                                                           (site-list-size *site-list*))))
                                         (update-widget *list-widget*)))
+
   (setf *map*
         (ps:new (-map-widget *site-list*
                              (j-query "#mhs-map-widget")
@@ -139,8 +83,7 @@
   ;; NOTE: wait to look at geolocation
   (map-widget-listen-on-idle *map*
                              #'(lambda (map-widget)
-                                 (setf (site-list-bounds *site-list*)
-                                       (map-widget-bounds map-widget))))
+                                 (update-site-list-bounds *site-list* (map-widget-bounds map-widget))))
 
   ;; NOTE: This is the only portable way to ensure that all three
   ;; widgets will be visible at and above the desktop breakpoint. The

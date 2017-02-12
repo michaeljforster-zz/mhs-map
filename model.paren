@@ -12,8 +12,26 @@
   (setf (ps:@ this lat-lng) lat-lng)
   this)
 
+(defvar *default-bounds*
+  (ps:new (ps:chain google
+                    maps
+                    (-lat-lng-bounds 0 0 0 0))))
+
+(defun make-center-distance (lat lng distance)
+  (ps:create 'center (ps:new (ps:chain google
+                                       maps
+                                       (-lat-lng lat lng)))
+             'distance distance))
+
+(defvar *default-center-distance*
+  (make-center-distance 0 0 0))
+
 (defun -site-list (url)
   (setf (ps:@ this url) url)
+  (setf (ps:@ this mode) :map-area)
+  (setf (ps:@ this bounds) *default-bounds*)
+  (setf (ps:@ this center-distance) *default-center-distance*)
+  (setf (ps:@ this m-name) "")
   (setf (ps:@ this st-name) "")
   (setf (ps:@ this snd-no-p) false)
   (setf (ps:@ this spd-no-p) false)
@@ -23,123 +41,10 @@
   (setf (ps:@ this keyword2) "")
   (setf (ps:@ this op3) :and)
   (setf (ps:@ this keyword3) "")
-  (setf (ps:@ this mode) :map-area)
-  (setf (ps:@ this bounds)
-        (ps:new (ps:chain google
-                          maps
-                          (-lat-lng-bounds 0 0 0 0))))
-  (setf (ps:@ this center-distance)
-        (ps:create 'center (ps:new (ps:chain google
-                                             maps
-                                             (-lat-lng 0 0)))
-                   'distance 0))
-  (setf (ps:@ this m-name) "")
   (setf (ps:@ this centroid) nil)
   (setf (ps:@ this sites) (array))
   (setf (ps:@ this subscribers) (array))
   this)
-
-
-(defun site-list-st-name (site-list)
-  (ps:@ site-list st-name))
-
-(defun (setf site-list-st-name) (new-st-name site-list)
-    (setf (ps:@ site-list st-name) new-st-name))
-
-(defun site-list-snd-no-p (site-list)
-  (ps:@ site-list snd-no-p))
-
-(defun (setf site-list-snd-no-p) (new-snd-no-p site-list)
-  (setf (ps:@ site-list snd-no-p) new-snd-no-p))
-
-(defun site-list-spd-no-p (site-list)
-  (ps:@ site-list spd-no-p))
-
-(defun (setf site-list-spd-no-p) (new-spd-no-p site-list)
-  (setf (ps:@ site-list spd-no-p) new-spd-no-p))
-
-(defun site-list-smd-no-p (site-list)
-  (ps:@ site-list smd-no-p))
-
-(defun (setf site-list-smd-no-p) (new-smd-no-p site-list)
-  (setf (ps:@ site-list smd-no-p) new-smd-no-p))
-
-(defun site-list-keyword1 (site-list)
-  (ps:@ site-list keyword1))
-
-(defun (setf site-list-keyword1) (new-keyword1 site-list)
-  (setf (ps:@ site-list keyword1) new-keyword1))
-
-(defun site-list-op2 (site-list)
-  (ps:@ site-list op2))
-
-(defun (setf site-list-op2) (new-op2 site-list)
-  (setf (ps:@ site-list op2) new-op2))
-
-(defun site-list-keyword2 (site-list)
-  (ps:@ site-list keyword2))
-
-(defun (setf site-list-keyword2) (new-keyword2 site-list)
-  (setf (ps:@ site-list keyword2) new-keyword2))
-
-(defun site-list-op3 (site-list)
-  (ps:@ site-list op3))
-
-(defun (setf site-list-op3) (new-op3 site-list)
-  (setf (ps:@ site-list op3) new-op3))
-
-(defun site-list-keyword3 (site-list)
-  (ps:@ site-list keyword3))
-
-(defun (setf site-list-keyword3) (new-keyword3 site-list)
-  (setf (ps:@ site-list keyword3) new-keyword3))
-
-(defun site-list-mode (site-list)
-  (ps:@ site-list mode))
-
-(defun (setf site-list-mode) (new-mode site-list)
-  (setf (ps:@ site-list mode) new-mode))
-
-(defun site-list-bounds (site-list)
-  (ps:@ site-list bounds))
-
-(defun (setf site-list-bounds) (new-bounds site-list)
-  (setf (ps:@ site-list bounds) new-bounds)
-  (%populate site-list))
-
-(defun site-list-centroid (site-list)
-  (ps:@ site-list centroid))
-
-(defun site-list-center-distance (site-list)
-  (ps:@ site-list center-distance))
-
-(defun (setf site-list-center-distance) (new-center-distance site-list)
-  (setf (ps:@ site-list center-distance) new-center-distance)
-  (%populate site-list))
-
-(defun site-list-m-name (site-list)
-  (ps:@ site-list m-name))
-
-(defun (setf site-list-m-name) (new-m-name site-list)
-  (setf (ps:@ site-list m-name) new-m-name)
-  (%populate site-list))
-
-(defun site-list-size (site-list)
-  (ps:@ site-list sites length))
-
-(defun site-list-map (site-list fn)
-  (ps:chain site-list sites (map fn)))
-
-(defun site-list-do (site-list fn)
-  (ps:chain site-list sites (for-each fn)))
-
-(defun site-list-subscribe-to-populated (site-list fn)
-  (ps:chain site-list subscribers (push fn))
-  site-list)
-
-(defun site-list-unsubscribe-all (site-list)
-  (setf (ps:@ site-list subscribers) (array))
-  site-list)
 
 (defun %url (site-list)
   (case (ps:@ site-list mode)
@@ -205,3 +110,68 @@
                     (setf (ps:@ site-list sites)
                           (ps:chain results sites features (map #'(lambda (feature) (feature-to-site feature)))))
                     (%announce-populated site-list))))
+
+(defun set-site-list-map-area-mode (site-list)
+  (setf (ps:@ site-list mode) :map-area)
+  (setf (ps:@ this bounds) *default-bounds*)
+  (setf (ps:@ this center-distance) *default-center-distance*)
+  (setf (ps:@ site-list m-name) ""))
+
+(defun set-site-list-geolocation-mode (site-list)
+  (setf (ps:@ site-list mode) :geolocation)
+  (setf (ps:@ this bounds) *default-bounds*)
+  (setf (ps:@ this center-distance) *default-center-distance*)
+  (setf (ps:@ site-list m-name) ""))
+
+(defun set-site-list-municipality-mode (site-list)
+  (setf (ps:@ site-list mode) :municipality)
+  (setf (ps:@ this bounds) *default-bounds*)
+  (setf (ps:@ this center-distance) *default-center-distance*)
+  (setf (ps:@ site-list m-name) ""))
+
+(defun update-site-list-bounds (site-list bounds)
+  (setf (ps:@ site-list bounds) bounds)
+  (%populate site-list))
+
+(defun update-site-list-center-distance (site-list center-distance)
+  (setf (ps:@ site-list center-distance) center-distance)
+  (%populate site-list))
+
+(defun update-site-list-m-name (site-list m-name)
+  (setf (ps:@ site-list m-name) m-name)
+  (%populate site-list))
+
+(defun update-site-list-parameters (site-list
+                                    st-name
+                                    snd-no-p spd-no-p smd-no-p
+                                    keyword1 op2 keyword2 op3 keyword3)
+  (setf (ps:@ site-list st-name) st-name)
+  (setf (ps:@ site-list snd-no-p) snd-no-p)
+  (setf (ps:@ site-list spd-no-p) spd-no-p)
+  (setf (ps:@ site-list smd-no-p) smd-no-p)
+  (setf (ps:@ site-list keyword1) keyword1)
+  (setf (ps:@ site-list op2) op2)
+  (setf (ps:@ site-list keyword2) keyword2)
+  (setf (ps:@ site-list op3) op3)
+  (setf (ps:@ site-list keyword3) keyword3)
+  (%populate site-list))
+
+(defun site-list-centroid (site-list)
+  (ps:@ site-list centroid))
+
+(defun site-list-size (site-list)
+  (ps:@ site-list sites length))
+
+(defun site-list-map (site-list fn)
+  (ps:chain site-list sites (map fn)))
+
+(defun site-list-do (site-list fn)
+  (ps:chain site-list sites (for-each fn)))
+
+(defun site-list-subscribe-to-populated (site-list fn)
+  (ps:chain site-list subscribers (push fn))
+  site-list)
+
+(defun site-list-unsubscribe-all (site-list)
+  (setf (ps:@ site-list subscribers) (array))
+  site-list)

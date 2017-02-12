@@ -144,36 +144,26 @@ TODO resolution of markers for mobile?
 - use smaller simpler ones (just dots?) when zoomed out
 
 TODO specify search default of "10 km of me" to avoid user hitting the "Jackson Pollack" view!  a performance boost too
-TODO need to provide and integrate the the 3 kws + ops
+
 TODO integrate the geolocation
+- see GEOLOCATION in scratch.lisp
 - issues include Firefox's 3rd "Not now" permission option; looking for a workaround
+- let geolocation set center-distance
+- fix bug in center-distance query (database.lisp)
 
 
 *TODO release for review*
 
-TODO revise search widget to update model w/ keywords + ops, site types, and designations
+TODO *disable* form submission so it's just XHR (have removed action, but there's "prevent" we need in the JS
 
-TODO revise model to incoroporate keywords + ops, site types, and designations
-
-TODO revise features handler to incoroporate keywords + ops, site types, and designations
-
-TODO revise select-sites-within-bounds/within-distance/by-municipality to incoroporate keywords + ops, site types, and designations
-
-;; TODO ...
-keyword1
-op2
-keyword2
-op3
-keyword3
-m-name
-st-name
-snd-no-p
-spd-no-p
-smd-no-p
-
+TODO how to parse designations from single select to XHR
+TODO split form: within/mode sets *site-list* mode & necessary params; other params set by Update button; visually distinct!
 
 ------------------------------------------------------------------------------------------------------
 
+DONE revise model to incoroporate keywords + ops, site types, and designations
+DONE revise features handler to incoroporate keywords + ops, site types, and designations
+DONE revise select-sites-within-bounds/within-distance/by-municipality to incoroporate keywords + ops, site types, and designations
 DONE Rough out search widget
 DONE Toggle panel headings with nav tabs
 DONE Reorder columns/tabs: map, list, search
