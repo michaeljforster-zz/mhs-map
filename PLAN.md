@@ -132,9 +132,6 @@ TODO x-mobile testing
 
 TODO performance improvements?
 
-TODO (Gord) search form background accent colour
-
-TODO (Gord) same accent colour for alternating rows in list
 
 TODO (Gord) eliminate space beteen AND/OR/NOT selects and keyword fields
 
@@ -161,6 +158,8 @@ TODO split form: within/mode sets *site-list* mode & necessary params; other par
 
 ------------------------------------------------------------------------------------------------------
 
+DONE (Gord) search form background accent colour
+DONE (Gord) same accent colour for alternating rows in list
 DONE revise model to incoroporate keywords + ops, site types, and designations
 DONE revise features handler to incoroporate keywords + ops, site types, and designations
 DONE revise select-sites-within-bounds/within-distance/by-municipality to incoroporate keywords + ops, site types, and designations

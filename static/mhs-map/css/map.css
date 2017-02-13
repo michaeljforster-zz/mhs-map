@@ -78,8 +78,13 @@ label {
     overflow-y: scroll;
 }
 
+.mhs-alternate-list-group-item {
+    background-color: rgb(252, 248, 236);
+}
+
 #mhs-search-widget {
     height: 100%;
+    background-color: rgb(252, 248, 236);
 }
 
 /* Landscape phones and portrait tablets */

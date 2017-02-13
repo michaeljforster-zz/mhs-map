@@ -101,15 +101,17 @@
   (ps:chain site-list subscribers (for-each #'(lambda (element) (funcall element)))))
 
 (defun %populate (site-list)
-  (xhr-get-json (%url site-list)
-                #'(lambda (results)
-                    (setf (ps:@ site-list centroid)
-                          (if (null (ps:@ results centroid))
-                              nil
-                              (geometry-point-to-lat-lng (ps:@ results centroid geometry))))
-                    (setf (ps:@ site-list sites)
-                          (ps:chain results sites features (map #'(lambda (feature) (feature-to-site feature)))))
-                    (%announce-populated site-list))))
+  (let ((url (%url *site-list*)))
+    ;; TODO DEBUG (ps:chain console (log (+ "CLICK: " url)))
+    (xhr-get-json (%url site-list)
+                  #'(lambda (results)
+                      (setf (ps:@ site-list centroid)
+                            (if (null (ps:@ results centroid))
+                                nil
+                                (geometry-point-to-lat-lng (ps:@ results centroid geometry))))
+                      (setf (ps:@ site-list sites)
+                            (ps:chain results sites features (map #'(lambda (feature) (feature-to-site feature)))))
+                      (%announce-populated site-list)))))
 
 (defun set-site-list-map-area-mode (site-list)
   (setf (ps:@ site-list mode) :map-area)
