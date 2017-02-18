@@ -89,7 +89,7 @@
                             (:div :class "col-xs-8"
                                   (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword3-input"))))
                 (:div :class "form-group"
-                      (:button :type "submit" :class "btn btn-primary" :id "mhs-update-map-btn" "Update Map"))))))
+                      (:button :class "btn btn-primary" :id "mhs-update-map-btn" "Update Map"))))))
 
 (defun render-map (municipality-names
                    site-type-names
