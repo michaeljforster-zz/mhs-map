@@ -87,6 +87,16 @@ label {
     background-color: rgb(252, 248, 236);
 }
 
+#mhs-search-widget .form-inline .bootstrap-select {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#mhs-search-widget .form-inline .form-control {
+    display: inline-block;
+    width: 160px;
+}
+
 /* Landscape phones and portrait tablets */
 /* @media (max-width: 767px) { */
 /* Portrait tablets and small desktops */

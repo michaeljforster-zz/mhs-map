@@ -62,32 +62,26 @@
                                (:option :value "National" "National")
                                (:option :value "Provincial" "Provincial")
                                (:option :value "Municipal" "Municipal")))
-                (:div :class "form-group"
-                      (:div :class "row"
-                            (:div :class "col-xs-12"
-                                  (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword1-input"))))
-                (:div :class "form-group"
-                      (:div :class "row"
-                            (:div :class "col-xs-4"
-                                  (:select :class "selectpicker"
-                                           :data-width "auto"
-                                           :id "mhs-op2-input"
-                                           (:option :value "AND" "AND")
-                                           (:option :value "NOT" "NOT")
-                                           (:option :value "OR" "OR")))
-                            (:div :class "col-xs-8"
-                                  (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword2-input"))))
-                (:div :class "form-group"
-                      (:div :class "row"
-                            (:div :class "col-xs-4"
-                                  (:select :class "selectpicker"
-                                           :data-width "auto"
-                                           :id "mhs-op3-input"
-                                           (:option :value "AND" "AND")
-                                           (:option :value "NOT" "NOT")
-                                           (:option :value "OR" "OR")))
-                            (:div :class "col-xs-8"
-                                  (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword3-input"))))
+                (:div :class "form-group form-inline"
+                      (:input :type "text" :class "form-control" :placeholder "keyword" :id "mhs-keyword1-input"))
+                (:div :class "form-group form-inline"
+                      (:select :class "selectpicker"
+                               :data-width "auto"
+                               :id "mhs-op2-input"
+                               (:option :value "AND" "AND")
+                               (:option :value "NOT" "NOT")
+                               (:option :value "OR" "OR"))
+                      (:input :type "text" :class "form-control"
+                              :placeholder "keyword" :id "mhs-keyword2-input"))
+                (:div :class "form-group form-inline"
+                      (:select :class "selectpicker"
+                               :data-width "auto"
+                               :id "mhs-op3-input"
+                               (:option :value "AND" "AND")
+                               (:option :value "NOT" "NOT")
+                               (:option :value "OR" "OR"))
+                      (:input :type "text" :class "form-control"
+                              :placeholder "keyword" :id "mhs-keyword3-input"))
                 (:div :class "form-group"
                       (:button :class "btn btn-primary" :id "mhs-update-map-btn" "Update Map"))))))
 
