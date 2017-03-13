@@ -3,7 +3,6 @@
 (in-package #:mhs-map)
 
 (defvar *site-list* nil)
-;; (defvar *search-widget* nil)
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
