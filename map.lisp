@@ -108,6 +108,7 @@
                  `(progn
                     (defvar *default-center* (ps:new (ps:chain google maps (-lat-lng ,@*default-center*))))
                     (defvar *default-zoom* ,*default-zoom*)
+                    (defvar *municipality-mode-zoom* ,*municipality-mode-zoom*)
                     (defvar *geolocation-options*
                       (ps:create
                        :enable-high-accuracy 'true

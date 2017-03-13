@@ -131,6 +131,15 @@
   (setf (ps:@ this center-distance) *default-center-distance*)
   (setf (ps:@ site-list m-name) ""))
 
+(defun site-list-map-area-mode-p (site-list)
+  (= (ps:@ site-list mode) :map-area))
+
+(defun site-list-geolocation-mode-p (site-list)
+  (= (ps:@ site-list mode) :geolocation))
+
+(defun site-list-municipality-mode-p (site-list)
+  (= (ps:@ site-list mode) :municipality))
+
 (defun update-site-list-bounds (site-list bounds)
   (setf (ps:@ site-list bounds) bounds)
   (%populate site-list))
@@ -156,6 +165,9 @@
   (setf (ps:@ site-list keyword2) keyword2)
   (setf (ps:@ site-list op3) op3)
   (setf (ps:@ site-list keyword3) keyword3))
+
+(defun site-list-m-name (site-list)
+  (ps:@ site-list m-name))
 
 (defun site-list-centroid (site-list)
   (ps:@ site-list centroid))

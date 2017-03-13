@@ -1,44 +1,39 @@
 var SITELIST = null;
 var LISTWIDGET = null;
 var MAP = null;
-function setMapAreaMode() {
-    setSiteListMapAreaMode(SITELIST);
-    var designations = jQuery('#mhs-designation-input').val();
-    updateSiteListParameters(SITELIST, jQuery('#mhs-st-name-input').val(), designations.includes('National'), designations.includes('Provincial'), designations.includes('Municipal'), jQuery('#mhs-keyword1-input').val(), jQuery('#mhs-op2-input').val(), jQuery('#mhs-keyword2-input').val(), jQuery('#mhs-op3-input').val(), jQuery('#mhs-keyword3-input').val());
-    __setf_mapWidgetCenter(DEFAULTCENTER, MAP);
-    __setf_mapWidgetZoom(DEFAULTZOOM, MAP);
-    return updateSiteListBounds(SITELIST, mapWidgetBounds(MAP));
-};
-function setGeolocationMode(distance) {
-    setSiteListGeolocationMode(SITELIST);
-    var designations = jQuery('#mhs-designation-input').val();
-    updateSiteListParameters(SITELIST, jQuery('#mhs-st-name-input').val(), designations.includes('National'), designations.includes('Provincial'), designations.includes('Municipal'), jQuery('#mhs-keyword1-input').val(), jQuery('#mhs-op2-input').val(), jQuery('#mhs-keyword2-input').val(), jQuery('#mhs-op3-input').val(), jQuery('#mhs-keyword3-input').val());
-    __setf_mapWidgetZoom(8, MAP);
-    return updateSiteListCenterDistance(SITELIST, makeCenterDistance(0, 0, distance));
-};
-function setMunicipalityMode(mName) {
-    setSiteListMunicipalityMode(SITELIST);
-    var designations = jQuery('#mhs-designation-input').val();
-    updateSiteListParameters(SITELIST, jQuery('#mhs-st-name-input').val(), designations.includes('National'), designations.includes('Provincial'), designations.includes('Municipal'), jQuery('#mhs-keyword1-input').val(), jQuery('#mhs-op2-input').val(), jQuery('#mhs-keyword2-input').val(), jQuery('#mhs-op3-input').val(), jQuery('#mhs-keyword3-input').val());
-    __setf_mapWidgetRecenterP(true, MAP);
-    __setf_mapWidgetZoom(8, MAP);
-    return updateSiteListMName(SITELIST, mName);
-};
 function initialize() {
     SITELIST = new SiteList(FEATURESURI);
     jQuery('#mhs-update-map-btn').click(function (e) {
+        var designations = jQuery('#mhs-designation-input').val();
+        updateSiteListParameters(SITELIST, jQuery('#mhs-st-name-input').val(), designations.includes('National'), designations.includes('Provincial'), designations.includes('Municipal'), jQuery('#mhs-keyword1-input').val(), jQuery('#mhs-op2-input').val(), jQuery('#mhs-keyword2-input').val(), jQuery('#mhs-op3-input').val(), jQuery('#mhs-keyword3-input').val());
         var within = jQuery('#mhs-filter-within-input').val();
         switch (within) {
         case 'map-area':
-            return setMapAreaMode();
+            if (!siteListMapAreaModeP(SITELIST)) {
+                setSiteListMapAreaMode(SITELIST);
+                __setf_mapWidgetCenter(DEFAULTCENTER, MAP);
+                __setf_mapWidgetZoom(DEFAULTZOOM, MAP);
+            };
+            return updateSiteListBounds(SITELIST, mapWidgetBounds(MAP));
         case '100':
         case '1000':
         case '10000':
         case '100000':
         case '1000000':
-            return setGeolocationMode(parseInt(within));
+            if (!siteListGeolocationModeP(SITELIST)) {
+                setSiteListGeolocationMode(SITELIST);
+                __setf_mapWidgetZoom(8, MAP);
+            };
+            return updateSiteListCenterDistance(SITELIST, makeCenterDistance(0, 0, parseInt(within)));
         default:
-            return setMunicipalityMode(within);
+            if (!siteListMunicipalityModeP(SITELIST)) {
+                setSiteListMunicipalityMode(SITELIST);
+            };
+            if (siteListMName(SITELIST) !== within) {
+                __setf_mapWidgetRecenterP(true, MAP);
+                __setf_mapWidgetZoom(MUNICIPALITYMODEZOOM, MAP);
+            };
+            return updateSiteListMName(SITELIST, within);
         };
     });
     LISTWIDGET = new ListWidget(SITELIST, jQuery('#mhs-list-widget'));

@@ -14,6 +14,7 @@
 (defparameter *default-center* (list 54.0 -98.4)) ; rough center of MB
 (defparameter *default-zoom* 6) ; 8 okay for desktop, 7 better for iPad, 6 better for Android/iPhone
 (defparameter *default-srid* 4326)
+(defparameter *municipality-mode-zoom* 8)
 
 ;;; URIs
 

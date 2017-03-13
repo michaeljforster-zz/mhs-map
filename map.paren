@@ -6,71 +6,44 @@
 (defvar *list-widget* nil)
 (defvar *map* nil)
 
-(defun set-map-area-mode ()
-  (set-site-list-map-area-mode *site-list*)
-  (let ((designations (ps:chain (j-query "#mhs-designation-input") (val))))
-    (update-site-list-parameters *site-list*
-                                 (ps:chain (j-query "#mhs-st-name-input") (val))
-                                 (ps:chain designations (includes "National"))
-                                 (ps:chain designations (includes "Provincial"))
-                                 (ps:chain designations (includes "Municipal"))
-                                 (ps:chain (j-query "#mhs-keyword1-input") (val))
-                                 (ps:chain (j-query "#mhs-op2-input") (val))
-                                 (ps:chain (j-query "#mhs-keyword2-input") (val))
-                                 (ps:chain (j-query "#mhs-op3-input") (val))
-                                 (ps:chain (j-query "#mhs-keyword3-input") (val))))
-  (setf (map-widget-center *map*) *default-center*)
-  (setf (map-widget-zoom *map*) *default-zoom*)
-  (update-site-list-bounds *site-list* (map-widget-bounds *map*)))
-
-(defun set-geolocation-mode (distance)
-  (set-site-list-geolocation-mode *site-list*)
-  (let ((designations (ps:chain (j-query "#mhs-designation-input") (val))))
-    (update-site-list-parameters *site-list*
-                                 (ps:chain (j-query "#mhs-st-name-input") (val))
-                                 (ps:chain designations (includes "National"))
-                                 (ps:chain designations (includes "Provincial"))
-                                 (ps:chain designations (includes "Municipal"))
-                                 (ps:chain (j-query "#mhs-keyword1-input") (val))
-                                 (ps:chain (j-query "#mhs-op2-input") (val))
-                                 (ps:chain (j-query "#mhs-keyword2-input") (val))
-                                 (ps:chain (j-query "#mhs-op3-input") (val))
-                                 (ps:chain (j-query "#mhs-keyword3-input") (val))))
-  (setf (map-widget-zoom *map*) 8)
-  ;; Set the distance and let periodic geolocation update center.
-  (update-site-list-center-distance *site-list* (make-center-distance 0 0 distance)))
-
-(defun set-municipality-mode (m-name)
-  (set-site-list-municipality-mode *site-list*)
-  (let ((designations (ps:chain (j-query "#mhs-designation-input") (val))))
-    (update-site-list-parameters *site-list*
-                                 (ps:chain (j-query "#mhs-st-name-input") (val))
-                                 (ps:chain designations (includes "National"))
-                                 (ps:chain designations (includes "Provincial"))
-                                 (ps:chain designations (includes "Municipal"))
-                                 (ps:chain (j-query "#mhs-keyword1-input") (val))
-                                 (ps:chain (j-query "#mhs-op2-input") (val))
-                                 (ps:chain (j-query "#mhs-keyword2-input") (val))
-                                 (ps:chain (j-query "#mhs-op3-input") (val))
-                                 (ps:chain (j-query "#mhs-keyword3-input") (val))))
-  (setf (map-widget-recenter-p *map*) true)
-  (setf (map-widget-zoom *map*) 8)
-  (update-site-list-m-name *site-list* m-name))
-
-
 (defun initialize ()
   (setf *site-list* (ps:new (-site-list *features-uri*)))
 
   (ps:chain (j-query "#mhs-update-map-btn")
-            (click #'(lambda (e)
-                       (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
-                         (case within
-                           ("map-area"
-                            (set-map-area-mode))
-                           (("100" "1000" "10000" "100000" "1000000")
-                            (set-geolocation-mode (parse-int within)))
-                           (otherwise   ; m-name
-                            (set-municipality-mode within)))))))
+    (click #'(lambda (e)
+               (let ((designations (ps:chain (j-query "#mhs-designation-input") (val))))
+                 (update-site-list-parameters *site-list*
+                                              (ps:chain (j-query "#mhs-st-name-input") (val))
+                                              (ps:chain designations (includes "National"))
+                                              (ps:chain designations (includes "Provincial"))
+                                              (ps:chain designations (includes "Municipal"))
+                                              (ps:chain (j-query "#mhs-keyword1-input") (val))
+                                              (ps:chain (j-query "#mhs-op2-input") (val))
+                                              (ps:chain (j-query "#mhs-keyword2-input") (val))
+                                              (ps:chain (j-query "#mhs-op3-input") (val))
+                                              (ps:chain (j-query "#mhs-keyword3-input") (val))))
+               (let ((within (ps:chain (j-query "#mhs-filter-within-input") (val))))
+                 (case within
+                   ("map-area"
+                    (unless (site-list-map-area-mode-p *site-list*)
+                      (set-site-list-map-area-mode *site-list*)
+                      (setf (map-widget-center *map*) *default-center*)
+                      (setf (map-widget-zoom *map*) *default-zoom*))
+                    (update-site-list-bounds *site-list* (map-widget-bounds *map*)))
+                   (("100" "1000" "10000" "100000" "1000000")
+                    (unless (site-list-geolocation-mode-p *site-list*)
+                      (set-site-list-geolocation-mode *site-list*)
+                      (setf (map-widget-zoom *map*) 8)
+                      ;; Set the distance and let periodic geolocation update center.
+                      )
+                    (update-site-list-center-distance *site-list* (make-center-distance 0 0 (parse-int within))))
+                   (otherwise           ; m-name
+                    (unless (site-list-municipality-mode-p *site-list*)
+                      (set-site-list-municipality-mode *site-list*))
+                    (unless (= (site-list-m-name *site-list*) within)
+                      (setf (map-widget-recenter-p *map*) true)
+                      (setf (map-widget-zoom *map*) *municipality-mode-zoom*))
+                    (update-site-list-m-name *site-list* within)))))))
   
   (setf *list-widget*
         (ps:new (-list-widget *site-list*
@@ -78,8 +51,8 @@
   (site-list-subscribe-to-populated *site-list*
                                     #'(lambda ()
                                         (ps:chain console
-                                                  (log (+ "LIST-WIDGET notified "
-                                                          (site-list-size *site-list*))))
+                                          (log (+ "LIST-WIDGET notified "
+                                                  (site-list-size *site-list*))))
                                         (update-widget *list-widget*)))
 
   (setf *map*
@@ -91,8 +64,8 @@
   (site-list-subscribe-to-populated *site-list*
                                     #'(lambda ()
                                         (ps:chain console
-                                                  (log (+ "MAP notified "
-                                                          (site-list-size *site-list*))))
+                                          (log (+ "MAP notified "
+                                                  (site-list-size *site-list*))))
                                         (update-widget *map*)))
 
   ;; TODO should this be hidden within map-widget? Is there any change
@@ -106,35 +79,35 @@
   ;; widgets will be visible at and above the desktop breakpoint. The
   ;; consequence is that the map widget will be displayed by default.
   (ps:chain (j-query window)
-            (resize #'(lambda ()
-                        (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" true))
-                        (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
-                        (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
-                        (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
-                        (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
-                        (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false)))))
+    (resize #'(lambda ()
+                (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" true))
+                (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
+                (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
+                (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
+                (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
+                (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false)))))
 
   (ps:chain (j-query "#mhs-search-btn")
-            (click #'(lambda ()
-                       (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" true))
-                       (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
-                       (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
-                       (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
-                       (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" true))
-                       (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" true)))))
+    (click #'(lambda ()
+               (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" true))
+               (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
+               (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
+               (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" false))
+               (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" true))
+               (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" true)))))
   (ps:chain (j-query "#mhs-list-btn")
-            (click #'(lambda ()
-                       (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
-                       (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" true))
-                       (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
-                       (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" true))
-                       (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
-                       (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" true)))))
+    (click #'(lambda ()
+               (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
+               (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" true))
+               (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" false))
+               (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" true))
+               (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" false))
+               (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" true)))))
   (ps:chain (j-query "#mhs-map-btn")
-            (click #'(lambda ()
-                       (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
-                       (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
-                       (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" true))
-                       (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" true))
-                       (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" true))
-                       (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false))))))
+    (click #'(lambda ()
+               (ps:chain (j-query "#mhs-search-tab") (toggle-class "active" false))
+               (ps:chain (j-query "#mhs-list-tab") (toggle-class "active" false))
+               (ps:chain (j-query "#mhs-map-tab") (toggle-class "active" true))
+               (ps:chain (j-query "#mhs-search-col") (toggle-class "invisible" true))
+               (ps:chain (j-query "#mhs-list-col") (toggle-class "invisible" true))
+               (ps:chain (j-query "#mhs-map-col") (toggle-class "invisible" false))))))
